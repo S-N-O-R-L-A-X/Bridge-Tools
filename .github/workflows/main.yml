@@ -2,7 +2,7 @@ name: bridge-tools
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   main:
