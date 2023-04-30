@@ -1,5 +1,25 @@
 .board-container {
   display: grid;
-  grid-template-columns: repeat(12, auto);
-  grid-template-rows: repeat(12, auto);
+  grid-template-rows: 8rem;
+  grid-template-columns: 8rem;
+  grid-template-areas:
+    'NW Nhand NE'
+    'Whand blank Ehand'
+    'SW Shand SE';
+}
+
+.Nhand {
+  grid-area: Nhand;
+}
+
+.Shand {
+  grid-area: Shand;
+}
+
+.Whand {
+  grid-area: Whand;
+}
+
+.Ehand {
+  grid-area: Ehand;
 }

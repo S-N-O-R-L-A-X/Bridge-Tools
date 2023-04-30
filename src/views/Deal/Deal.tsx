@@ -47,7 +47,6 @@ export default function Deal() {
       } */}
       {boards.length > 0 &&
         <ShowCards all_hands={boards[0]} />
-
       }
     </>
   )

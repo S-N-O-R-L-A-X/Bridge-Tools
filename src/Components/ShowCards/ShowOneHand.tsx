@@ -1,6 +1,7 @@
 import Hand from "../../views/Deal/Hand";
+import { HTMLAttributes } from "react"
 import { NUMBER2COLOR, POSITION2FULL } from "../../Utils/maps";
-interface ShowOneHandProps {
+interface ShowOneHandProps extends HTMLAttributes<HTMLElement> {
   hand: Hand;
   position: "N" | "E" | "S" | "W";
 }
@@ -11,8 +12,8 @@ export default function ShowOneHand(props: ShowOneHandProps) {
   let className = POSITION2FULL[position];
 
   return (
-    <div>
-      {hand.show().map((suit: string, index: number) => <div className={className + NUMBER2COLOR[index]}> {suit}</div>)}
-    </div >
+    <>
+      {hand.show().map((suit: string, index: number) => <div key={index} className={className + NUMBER2COLOR[index]}> {suit}</div>)}
+    </>
   )
 }
