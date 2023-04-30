@@ -11,6 +11,7 @@ function deal(boardSize: number) {
       B.shuffle();
       B.deal(players);
       boards.push(players);
+      break;
       // if (handFilter(players[0], [24, 37]) || handFilter(players[0], [22, 23]) || handFilter(players[0], [18, 23])) {
       //   boards.push(players);
       //   break;
@@ -22,9 +23,10 @@ function deal(boardSize: number) {
 
 export default function Deal() {
   const [board_size, setBoard_size] = useState<string>("");
-  let boards: any = [];
+  const [boards, setBoards] = useState<Hand[][]>([]);
   function handleClick() {
-    boards = deal(Number(board_size));
+    setBoards(deal(Number(board_size)))
+    console.log(boards);
   }
 
   function handleChange(e: ChangeEvent) {
@@ -35,9 +37,11 @@ export default function Deal() {
     <>
       <input value={board_size} onChange={handleChange}></input>
       <button onClick={handleClick}>Get new boards</button>
-      {boards.length > 0 &&
+      {
         <div>
-          {boards}
+          {boards.map((board: Hand[]) =>
+            <div>{...board.map((hand) => hand.show())}</div>
+          )}
         </div>
       }
 

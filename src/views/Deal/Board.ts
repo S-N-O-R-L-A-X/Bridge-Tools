@@ -1,5 +1,16 @@
 import Hand from "./Hand";
 import Card from "./Card";
+
+function shuffleAlgo(arr: any[]) {
+  let n = arr.length, random;
+  while (0 != n) {
+    random = (Math.random() * n--) >>> 0; // 无符号右移位运算符向下取整 
+    //或者改写成 random = Math.floor(Math.random() * n--)
+    [arr[n], arr[random]] = [arr[random], arr[n]] // ES6的解构赋值实现变量互换
+  }
+  return arr;
+}
+
 export default class Board extends Hand {
   private static readonly VUL = ["EW", "None", "NS", "EW", "Both", "NS", "EW", "Both", "None",
     "EW", "Both", "None", "NS", "Both", "None", "NS", "EW",];
@@ -32,13 +43,13 @@ export default class Board extends Hand {
   public shuffle(): void {
     // 生成一副新牌
     for (const suit of Card.SUIT) {
-      for (const rank of Card.RANK) {
+      for (const rank in Card.RANK) {
         this.add(new Card(suit, rank));
       }
     }
 
     // 洗牌
-    shuffle(this.cards);
+    shuffleAlgo(this.cards);
   }
 
   public deal(hands: Hand[]): void {
