@@ -15,13 +15,13 @@ export default function handFilter(hand: Hand, points: [number, number] = [0, 37
     }
   }
 
-  if (hand.shape[max(Object.values(hand.shape))] > maxsuit) {
-    return false;
-  }
+  // if (hand.shape[max((hand.shape))] > maxsuit) {
+  //   return false;
+  // }
 
-  if (hand.shape[min(hand.shape)] < minsuit) {
-    return false;
-  }
+  // if (hand.shape[min(hand.shape)] < minsuit) {
+  //   return false;
+  // }
 
   if (havesuit !== null) {
     let have = false;
@@ -42,9 +42,9 @@ export default function handFilter(hand: Hand, points: [number, number] = [0, 37
 
     for (const card of hand.cards) {
       for (let i = 0; i < 4; i++) {
-        if (new Card(max(hand.shape), highcard[i]).suit === card.suit && new Card(max(hand.shape), highcard[i]).rank === card.rank) {
-          highcardnum++;
-        }
+        // if (new Card(max(hand.shape), highcard[i]).suit === card.suit && new Card(max(hand.shape), highcard[i]).rank === card.rank) {
+        //   highcardnum++;
+        // }
       }
     }
 
