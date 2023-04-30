@@ -1,29 +1,9 @@
 import Hand from "./Hand";
+import Card from "./Card";
 export default class Board extends Hand {
-  private static readonly VUL = {
-    1: "None",
-    2: "NS",
-    3: "EW",
-    4: "Both",
-    5: "NS",
-    6: "EW",
-    7: "Both",
-    8: "None",
-    9: "EW",
-    10: "Both",
-    11: "None",
-    12: "NS",
-    13: "Both",
-    14: "None",
-    15: "NS",
-    0: "EW",
-  };
-  private static readonly DEALER = {
-    1: "N",
-    2: "E",
-    3: "S",
-    0: "W",
-  };
+  private static readonly VUL = ["EW", "None", "NS", "EW", "Both", "NS", "EW", "Both", "None",
+    "EW", "Both", "None", "NS", "Both", "None", "NS", "EW",];
+  private static readonly DEALER = ["W", "N", "E", "S", "W"];
 
   private boardnum: number;
   private vul: string;

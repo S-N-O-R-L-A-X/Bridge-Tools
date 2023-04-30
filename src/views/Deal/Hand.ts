@@ -12,6 +12,17 @@ export default class Hand {
     this.shape = { S: 0, H: 0, D: 0, C: 0 };
   }
 
+  getMostCards() {
+    const M = Math.max(...Object.values(this.shape));
+    const ret = [];
+    for (const [key, val] of Object.entries(this.shape)) {
+      if (val === M) {
+        ret.push(key);
+      }
+    }
+    return ret;
+  }
+
   add(card: Card): void {
     this.cards.push(card);
     this.hand[card.suit].push(card.rank);
