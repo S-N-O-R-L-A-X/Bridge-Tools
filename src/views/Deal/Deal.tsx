@@ -1,6 +1,7 @@
 import Hand from "./Hand";
 import Board from "./Board";
 import { useState, ChangeEventHandler, ChangeEvent } from "react";
+import ShowCards from "../../Components/ShowCards/ShowCards";
 
 function deal(boardSize: number) {
   const boards: Hand[][] = [];
@@ -37,14 +38,17 @@ export default function Deal() {
     <>
       <input value={board_size} onChange={handleChange}></input>
       <button onClick={handleClick}>Get new boards</button>
-      {
+      {/* {
         <div>
           {boards.map((board: Hand[]) =>
             <div>{...board.map((hand) => hand.show())}</div>
           )}
         </div>
-      }
+      } */}
+      {boards.length > 0 &&
+        <ShowCards all_hands={boards[0]} />
 
+      }
     </>
   )
 }
