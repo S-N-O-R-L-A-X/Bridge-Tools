@@ -1,11 +1,10 @@
 .board-container {
   display: grid;
-  grid-template-rows: 8rem;
-  grid-template-columns: 8rem;
   grid-template-areas:
     'NW Nhand NE'
     'Whand blank Ehand'
     'SW Shand SE';
+  grid-gap: 1rem;
 }
 
 .Nhand {
