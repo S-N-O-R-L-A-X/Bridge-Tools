@@ -42,16 +42,19 @@ export default function Deal() {
 
   return (
     <>
-      <input value={board_size} onChange={handleInput}></input>
-      <fieldset>
-        <legend>Choose your deal's features:</legend>
+      <div className="deal-setting">
+        <input value={board_size} onChange={handleInput}></input>
+        <fieldset>
+          <legend>Choose your deal's features:</legend>
 
-        <div>
-          <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
-        </div>
-      </fieldset>
+          <div>
+            <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
+          </div>
+        </fieldset>
 
-      <button onClick={handleClick}>Get new boards</button>
+        <button onClick={handleClick}>Get new boards</button>
+
+      </div>
       <ShowAllBoards all_boards={boards} beautify={beautify} />
     </>
   )

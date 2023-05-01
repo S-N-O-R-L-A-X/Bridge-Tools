@@ -1,8 +1,8 @@
-p,
-label {
+.deal-setting p,
+.deal-setting label {
   font: 1rem 'Fira Sans', sans-serif;
 }
 
-input {
+.deal-setting input {
   margin: 0.4rem;
 }
