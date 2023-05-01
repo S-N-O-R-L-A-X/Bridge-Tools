@@ -1,7 +1,21 @@
 import Card from "./Card";
 import Hand from "./Hand";
 
-export default function handFilter(hand: Hand, points: [number, number] = [0, 37], shapes: string[] | null = null, maxsuit: number = 13, minsuit: number = 0, havesuit: number[] | null = null, solid: boolean = false, maxace: number = 4, minace: number = 0, cards: Card[] = []): boolean {
+interface handFilterProps {
+  hand: Hand;
+  points?: [number, number];
+  shapes?: string[] | null;
+  maxsuit?: number;
+  minsuit?: number;
+  havesuit?: number[] | null;
+  solid?: boolean;
+  maxace?: number;
+  minace?: number;
+  cards?: Card[];
+}
+
+export default function handFilter(props: handFilterProps): boolean {
+  const { hand, points = [0, 37], shapes = null, maxsuit = 13, minsuit = 0, havesuit = null, solid = false, maxace = 4, minace = 0, cards = [] } = props;
   if (hand.points < points[0] || hand.points > points[1]) {
     return false;
   }
@@ -15,13 +29,13 @@ export default function handFilter(hand: Hand, points: [number, number] = [0, 37
     }
   }
 
-  // if (hand.shape[max((hand.shape))] > maxsuit) {
-  //   return false;
-  // }
+  if (hand.shape[hand.getMostCards()[0]] > maxsuit) {
+    return false;
+  }
 
-  // if (hand.shape[min(hand.shape)] < minsuit) {
-  //   return false;
-  // }
+  if (hand.shape[hand.getFewestCards()[0]] < minsuit) {
+    return false;
+  }
 
   if (havesuit !== null) {
     let have = false;
@@ -42,9 +56,9 @@ export default function handFilter(hand: Hand, points: [number, number] = [0, 37
 
     for (const card of hand.cards) {
       for (let i = 0; i < 4; i++) {
-        // if (new Card(max(hand.shape), highcard[i]).suit === card.suit && new Card(max(hand.shape), highcard[i]).rank === card.rank) {
-        //   highcardnum++;
-        // }
+        if (new Card(hand.getMostCards()[0], highcard[i]).suit === card.suit && new Card(hand.getMostCards()[0], highcard[i]).rank === card.rank) {
+          highcardnum++;
+        }
       }
     }
 

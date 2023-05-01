@@ -1,7 +1,7 @@
 import Hand from "./Hand";
 import Board from "./Board";
-import { useState, ChangeEventHandler, ChangeEvent } from "react";
-import ShowCards from "../../Components/ShowCards/ShowCards";
+import handFilter from "./HandFilter";
+import { useState, ChangeEvent } from "react";
 import ShowAllBoards from "../../Components/ShowAllBoards/ShowAllBoards";
 
 import "./index.css";
@@ -15,11 +15,12 @@ function deal(boardSize: number) {
       B.shuffle();
       B.deal(players);
       boards.push(players);
-      break;
-      // if (handFilter(players[0], [24, 37]) || handFilter(players[0], [22, 23]) || handFilter(players[0], [18, 23])) {
-      //   boards.push(players);
-      //   break;
-      // }
+      // break;
+
+      if (handFilter({ hand: players[0], points: [24, 37] })) {
+        boards.push(players);
+        break;
+      }
     }
   }
   return boards;

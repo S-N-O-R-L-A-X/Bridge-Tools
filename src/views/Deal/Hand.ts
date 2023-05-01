@@ -23,6 +23,17 @@ export default class Hand {
     return ret;
   }
 
+  getFewestCards() {
+    const M = Math.min(...Object.values(this.shape));
+    const ret = [];
+    for (const [key, val] of Object.entries(this.shape)) {
+      if (val === M) {
+        ret.push(key);
+      }
+    }
+    return ret;
+  }
+
   add(card: Card): void {
     this.cards.push(card);
     this.hand[card.suit].push(card.rank);
