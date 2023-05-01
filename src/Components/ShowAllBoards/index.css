@@ -1,3 +1,4 @@
 .all-boards {
   display: flex;
+  flex-wrap: wrap;
 }
