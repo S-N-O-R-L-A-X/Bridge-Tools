@@ -38,7 +38,7 @@ export default class Hand {
     }
   }
 
-  show(): string[] {
+  showWithColors(): string[] {
     const show: string[] = [];
     this.sortHand();
 
@@ -47,5 +47,17 @@ export default class Hand {
     }
 
     return show;
+  }
+
+  showWithoutColors(): string[] {
+    const show: string[] = [];
+    this.sortHand();
+
+    for (const key in this.hand) {
+      show.push(this.hand[key].join(""));
+    }
+
+    return show;
+
   }
 }

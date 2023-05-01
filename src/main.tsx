@@ -5,7 +5,7 @@ import App from './App'
 import './index.css'
 import Deal from './views/Deal/Deal'
 
-export const route_info = [
+const route_info = [
   {
     path: "/",
     element: <App />,

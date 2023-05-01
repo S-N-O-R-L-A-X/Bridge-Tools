@@ -10,22 +10,22 @@ interface ShowCardsProps {
 }
 
 export default function ShowCards(props: ShowCardsProps) {
-  const { all_hands, board_number } = props;
+  const { all_hands, board_number, ...rest } = props;
   const [Nhand, Shand, Whand, Ehand] = all_hands;
   return (
     <div className="board-container">
       <div className="board-number">{board_number}</div>
       <div className="Nhand">
-        <ShowOneHand position="N" hand={Nhand}></ShowOneHand>
+        <ShowOneHand position="N" hand={Nhand} {...rest}></ShowOneHand>
       </div>
       <div className="Shand">
-        <ShowOneHand position="S" hand={Shand}></ShowOneHand>
+        <ShowOneHand position="S" hand={Shand} {...rest}></ShowOneHand>
       </div>
       <div className="Whand">
-        <ShowOneHand position="W" hand={Whand}></ShowOneHand>
+        <ShowOneHand position="W" hand={Whand} {...rest}></ShowOneHand>
       </div>
       <div className="Ehand">
-        <ShowOneHand position="E" hand={Ehand}></ShowOneHand>
+        <ShowOneHand position="E" hand={Ehand} {...rest}></ShowOneHand>
       </div>
     </div>
   )

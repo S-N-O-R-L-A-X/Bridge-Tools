@@ -4,6 +4,8 @@ import { useState, ChangeEventHandler, ChangeEvent } from "react";
 import ShowCards from "../../Components/ShowCards/ShowCards";
 import ShowAllBoards from "../../Components/ShowAllBoards/ShowAllBoards";
 
+import "./index.css";
+
 function deal(boardSize: number) {
   const boards: Hand[][] = [];
   while (boardSize--) {
@@ -26,30 +28,32 @@ function deal(boardSize: number) {
 export default function Deal() {
   const [board_size, setBoard_size] = useState<string>("");
   const [boards, setBoards] = useState<Hand[][]>([]);
+  const [beautify, setBeautify] = useState<boolean>(false);
   function handleClick() {
     setBoards(deal(Number(board_size)))
-    console.log(boards);
   }
 
-  function handleChange(e: ChangeEvent) {
+  function handleInput(e: ChangeEvent) {
     setBoard_size((e.target as HTMLInputElement).value)
+  }
+
+  function handleBeautify(e: ChangeEvent) {
+    setBeautify((e.target as HTMLInputElement).checked)
   }
 
   return (
     <>
-      <input value={board_size} onChange={handleChange}></input>
-      <button onClick={handleClick}>Get new boards</button>
-      {/* {
+      <input value={board_size} onChange={handleInput}></input>
+      <fieldset>
+        <legend>Choose your deal's features:</legend>
+
         <div>
-          {boards.map((board: Hand[]) =>
-            <div>{...board.map((hand) => hand.show())}</div>
-          )}
+          <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
         </div>
-      } */}
-      {/* {boards.length > 0 &&
-        <ShowCards all_hands={boards[0]} />
-      } */}
-      <ShowAllBoards all_boards={boards} />
+      </fieldset>
+
+      <button onClick={handleClick}>Get new boards</button>
+      <ShowAllBoards all_boards={boards} beautify={beautify} />
     </>
   )
 }
