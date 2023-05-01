@@ -5,7 +5,7 @@ function App() {
 
   return (
     <div className="App">
-      This is Bridge Tools.<br />
+      This is Bridge Tools written by 小米 and <a href="https://github.com/S-N-O-R-L-A-X">SNORLAX</a><br />
       <Deal />
     </div>
   )

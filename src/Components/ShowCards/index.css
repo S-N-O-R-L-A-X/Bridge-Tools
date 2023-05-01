@@ -1,11 +1,16 @@
 .board-container {
   display: grid;
   grid-template-areas:
-    'NW Nhand NE'
+    'board-number Nhand NE'
     'Whand blank Ehand'
     'SW Shand SE';
   grid-gap: 1rem;
   margin: 1rem;
+}
+
+.board-number {
+  grid-area: board-number;
+  font-size: 2rem;
 }
 
 .Nhand {

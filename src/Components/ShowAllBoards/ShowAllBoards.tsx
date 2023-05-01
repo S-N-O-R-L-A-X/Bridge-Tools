@@ -9,7 +9,7 @@ export default function ShowAllBoards(props: ShowAllBoardsProps) {
   const { all_boards } = props;
   return (
     <div className="all-boards">
-      {all_boards.map((board: Hand[], key) => <ShowCards key={key} all_hands={board} />)}
+      {all_boards.map((board: Hand[], idx) => <ShowCards key={idx} all_hands={board} board_number={idx + 1} />)}
     </div>
   )
 }
