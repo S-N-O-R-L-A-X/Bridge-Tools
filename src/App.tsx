@@ -6,9 +6,12 @@ import Deal from './views/Deal/Deal'
 function App() {
   return (
     <div className="App">
-      <div><Sidebar /></div>
-      These are Bridge Tools written by 小米 and <a href="https://github.com/S-N-O-R-L-A-X">SNORLAX</a><br />
-      <Outlet />
+      <Sidebar />
+      <div className="main">
+        These are Bridge Tools written by 小米 and <a href="https://github.com/S-N-O-R-L-A-X">SNORLAX</a><br />
+        <Outlet />
+
+      </div>
     </div>
   )
 }

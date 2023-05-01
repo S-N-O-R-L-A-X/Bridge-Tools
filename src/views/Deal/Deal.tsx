@@ -14,8 +14,6 @@ function deal(boardSize: number) {
       const B = new Board(Math.floor(Math.random() * 16));
       B.shuffle();
       B.deal(players);
-      boards.push(players);
-      // break;
 
       if (handFilter({ hand: players[0], points: [24, 37] })) {
         boards.push(players);

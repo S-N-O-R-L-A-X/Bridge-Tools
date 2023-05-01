@@ -11,7 +11,6 @@ export default function ShowOneHand(props: ShowOneHandProps) {
 
   const { hand, position, beautify = false } = props;
   let className = POSITION2FULL[position];
-  console.log(beautify);
   return (
     <>
       {hand.showWithoutColors().map((suit: string, index: number) => beautify ? <div key={index} className={className + NUMBER2COLOR[index]}> {NUMBER2COLORICON[index] + " " + suit}</div> : <div key={index} className={className + NUMBER2COLOR[index]}> {NUMBER2COLORSHORT[index] + " " + suit}</div>)}

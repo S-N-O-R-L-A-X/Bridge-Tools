@@ -4,3 +4,9 @@
   padding: 2rem;
   text-align: center;
 }
+
+.App .main {
+  position: absolute;
+  left: 20%;
+  top: 0;
+}
