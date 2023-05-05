@@ -55,7 +55,7 @@ export default function Deal() {
 
           <div>
             <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
-            <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />请选择你需要的点力
+            {/* <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />请选择你需要的点力 */}
           </div>
 
           <HandSetting ref={Nref} />
