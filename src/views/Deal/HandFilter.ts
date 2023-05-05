@@ -1,7 +1,7 @@
 import Card from "./Card";
 import Hand from "./Hand";
 
-interface handFilterProps {
+export interface HandFilterProps {
   hand: Hand;
   points?: [number, number];
   shapes?: string[] | null;
@@ -14,7 +14,7 @@ interface handFilterProps {
   cards?: Card[];
 }
 
-export default function handFilter(props: handFilterProps): boolean {
+export default function handFilter(props: HandFilterProps): boolean {
   const { hand, points = [0, 37], shapes = null, maxsuit = 13, minsuit = 0, havesuit = null, solid = false, maxace = 4, minace = 0, cards = [] } = props;
   if (hand.points < points[0] || hand.points > points[1]) {
     return false;
