@@ -10,18 +10,17 @@ export default function HandShape() {
   function handleSpadesChange(e: ChangeEvent) {
     setSpades(Number((e.target as HTMLInputElement).value));
     setRest(13 - spades - hearts - diamonds - clubs);
+    console.log(rest);
   }
 
   function handleHeartsChange(e: ChangeEvent) {
     setHearts(Number((e.target as HTMLInputElement).value));
     setRest(13 - spades - hearts - diamonds - clubs);
-
   }
 
   function handleDiamondsChange(e: ChangeEvent) {
     setDiamonds(Number((e.target as HTMLInputElement).value));
     setRest(13 - spades - hearts - diamonds - clubs);
-
   }
 
   function handleClubsChange(e: ChangeEvent) {
@@ -33,25 +32,29 @@ export default function HandShape() {
     <>
       <select
         name="spades"
+        defaultValue={spades}
         onChange={handleSpadesChange}
       >
-        {new Array(spades + rest + 1).fill(0).map((_, idx) => idx === spades ? <option value={idx} selected>{idx}</option> : <option value={idx}>{idx}</option>)}
+        {new Array(spades + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
       </select>
       <select
+        defaultValue={hearts}
         onChange={handleHeartsChange}
       >
-        {new Array(hearts + rest + 1).fill(0).map((_, idx) => idx === hearts ? <option value={idx} selected>{idx}</option> : <option value={idx}>{idx}</option>)}
+        {new Array(hearts + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
       </select>
       <select
+        defaultValue={diamonds}
         onChange={handleDiamondsChange}
       >
 
-        {new Array(diamonds + rest + 1).fill(0).map((_, idx) => idx === diamonds ? <option value={idx} selected>{idx}</option> : <option value={idx}>{idx}</option>)}
+        {new Array(diamonds + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
       </select>
       <select
+        defaultValue={clubs}
         onChange={handleClubsChange}
       >
-        {new Array(clubs + rest + 1).fill(0).map((_, idx) => idx === clubs ? <option value={idx} selected>{idx}</option> : <option value={idx}>{idx}</option>)}
+        {new Array(clubs + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
       </select>
 
     </>
