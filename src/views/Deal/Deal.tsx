@@ -5,6 +5,7 @@ import { useState, ChangeEvent } from "react";
 import ShowAllBoards from "../../Components/ShowAllBoards/ShowAllBoards";
 
 import "./index.css";
+import HandSetting from "../../Components/HandSetting/HandSetting";
 
 function deal(boardSize: number) {
   const boards: Hand[][] = [];
@@ -32,7 +33,7 @@ export default function Deal() {
     setBoards(deal(Number(board_size)))
   }
 
-  function handleInput(e: ChangeEvent) {
+  function handleSize(e: ChangeEvent) {
     setBoard_size((e.target as HTMLInputElement).value)
   }
 
@@ -43,12 +44,16 @@ export default function Deal() {
   return (
     <>
       <div className="deal-setting">
-        <input value={board_size} onChange={handleInput}></input>
+        <input value={board_size} onChange={handleSize} placeholder="请输入你需要的牌数"></input>
         <fieldset>
           <legend>Choose your deal's features:</legend>
 
           <div>
             <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
+            <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />请选择你需要的点力
+          </div>
+          <div>
+            <HandSetting />
           </div>
         </fieldset>
 
