@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react"
 
 export default function HandShape() {
   const [spades, setSpades] = useState<number>(4);
@@ -9,24 +9,23 @@ export default function HandShape() {
 
   function handleSpadesChange(e: ChangeEvent) {
     setSpades(Number((e.target as HTMLInputElement).value));
-    setRest(13 - spades - hearts - diamonds - clubs);
-    console.log(rest);
   }
 
   function handleHeartsChange(e: ChangeEvent) {
     setHearts(Number((e.target as HTMLInputElement).value));
-    setRest(13 - spades - hearts - diamonds - clubs);
   }
 
   function handleDiamondsChange(e: ChangeEvent) {
     setDiamonds(Number((e.target as HTMLInputElement).value));
-    setRest(13 - spades - hearts - diamonds - clubs);
   }
 
   function handleClubsChange(e: ChangeEvent) {
     setClubs(Number((e.target as HTMLInputElement).value));
-    setRest(13 - spades - hearts - diamonds - clubs);
   }
+
+  useEffect(() => {
+    setRest(13 - spades - hearts - diamonds - clubs);
+  }, [spades, hearts, diamonds, clubs, rest])
 
   return (
     <>
