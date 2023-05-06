@@ -27,19 +27,23 @@ function deal(boardSize: number, hand_filter: Omit<HandFilterProps, "hand">) {
 }
 
 export default function Deal() {
-  const [board_size, setBoard_size] = useState<string>("");
+  const [board_size, setBoard_size] = useState<number>(1);
   const [boards, setBoards] = useState<Hand[][]>([]);
   const [beautify, setBeautify] = useState<boolean>(false);
 
   const Nref = useRef<HTMLDivElement>(null);
   function handleClick() {
-    const low = (Nref.current?.children[0] as HTMLInputElement).value;
-    const high = (Nref.current?.children[1] as HTMLInputElement).value;
-    setBoards(deal(Number(board_size), { points: [Number(low), Number(high)] }));
+    const low = Number((Nref.current?.children[0] as HTMLInputElement).value);
+    const high = Number((Nref.current?.children[1] as HTMLInputElement).value);
+    const spade = Number((Nref.current?.children[2] as HTMLInputElement).value);
+    const heart = Number((Nref.current?.children[3] as HTMLInputElement).value);
+    const diamond = Number((Nref.current?.children[4] as HTMLInputElement).value);
+    const club = Number((Nref.current?.children[5] as HTMLInputElement).value);
+    setBoards(deal(Number(board_size), { points: [low, high], shapes: [spade, heart, diamond, club] }));
   }
 
   function handleSize(e: ChangeEvent) {
-    setBoard_size((e.target as HTMLInputElement).value);
+    setBoard_size(Number((e.target as HTMLInputElement).value));
   }
 
   function handleBeautify(e: ChangeEvent) {
@@ -49,7 +53,7 @@ export default function Deal() {
   return (
     <>
       <div className="deal-setting">
-        <input value={board_size} onChange={handleSize} placeholder="请输入你需要的牌数"></input>
+        请输入你需要的牌数<input value={board_size} onChange={handleSize} placeholder="请输入你需要的牌数"></input>
         <fieldset>
           <legend>Choose your deal's features:</legend>
 

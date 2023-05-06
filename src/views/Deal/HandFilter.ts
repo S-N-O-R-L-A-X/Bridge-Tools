@@ -4,7 +4,7 @@ import Hand from "./Hand";
 export interface HandFilterProps {
   hand: Hand;
   points?: [number, number];
-  shapes?: string[] | null;
+  shapes?: number[] | null;
   maxsuit?: number;
   minsuit?: number;
   havesuit?: number[] | null;
@@ -21,12 +21,11 @@ export default function handFilter(props: HandFilterProps): boolean {
   }
 
   if (shapes !== null) {
-    for (const shape of shapes) {
-      const [s, h, d, c] = shape.split("-").map(Number);
-      if (hand.shape.S !== s || hand.shape.H !== h || hand.shape.D !== d || hand.shape.C !== c) {
-        return false;
-      }
+    const [s, h, d, c] = shapes;
+    if (hand.shape.S !== s || hand.shape.H !== h || hand.shape.D !== d || hand.shape.C !== c) {
+      return false;
     }
+
   }
 
   if (hand.shape[hand.getMostCards()[0]] > maxsuit) {
