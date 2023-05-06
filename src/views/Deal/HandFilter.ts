@@ -25,7 +25,6 @@ export default function handFilter(props: HandFilterProps): boolean {
     if (hand.shape.S !== s || hand.shape.H !== h || hand.shape.D !== d || hand.shape.C !== c) {
       return false;
     }
-
   }
 
   if (hand.shape[hand.getMostCards()[0]] > maxsuit) {

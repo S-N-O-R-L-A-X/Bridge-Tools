@@ -1,4 +1,5 @@
 import { ChangeEvent, useEffect, useState } from "react"
+import { NUMBER2COLOR } from "../../Utils/maps";
 
 export default function HandShape() {
   const [spades, setSpades] = useState<number>(4);
@@ -23,39 +24,20 @@ export default function HandShape() {
     setClubs(Number((e.target as HTMLInputElement).value));
   }
 
+  const shapes = [spades, hearts, diamonds, clubs];
+  const handleFunctions = [handleSpadesChange, handleHeartsChange, handleDiamondsChange, handleClubsChange];
+
   useEffect(() => {
     setRest(13 - spades - hearts - diamonds - clubs);
   }, [spades, hearts, diamonds, clubs, rest])
 
   return (
     <>
-      <select
-        name="spades"
-        defaultValue={spades}
-        onChange={handleSpadesChange}
-      >
-        {new Array(spades + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
-      </select>
-      <select
-        defaultValue={hearts}
-        onChange={handleHeartsChange}
-      >
-        {new Array(hearts + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
-      </select>
-      <select
-        defaultValue={diamonds}
-        onChange={handleDiamondsChange}
-      >
-
-        {new Array(diamonds + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
-      </select>
-      <select
-        defaultValue={clubs}
-        onChange={handleClubsChange}
-      >
-        {new Array(clubs + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
-      </select>
-
+      {handleFunctions.map((handle, idx) =>
+        <select name={NUMBER2COLOR[idx]} defaultValue={shapes[idx]} onChange={handle}>
+          {new Array(shapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
+        </select>
+      )}
     </>
 
   )
