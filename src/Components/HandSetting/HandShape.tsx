@@ -1,5 +1,5 @@
 import { ChangeEvent, useEffect, useState } from "react"
-import { NUMBER2COLOR } from "../../Utils/maps";
+import { NUMBER2COLOR, NUMBER2COLORICON } from "../../Utils/maps";
 
 export default function HandShape() {
   const [spades, setSpades] = useState<number>(4);
@@ -34,9 +34,12 @@ export default function HandShape() {
   return (
     <>
       {handleFunctions.map((handle, idx) =>
-        <select name={NUMBER2COLOR[idx]} defaultValue={shapes[idx]} onChange={handle}>
-          {new Array(shapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
-        </select>
+        <>
+          {NUMBER2COLORICON[idx]}
+          <select name={NUMBER2COLOR[idx]} defaultValue={shapes[idx]} onChange={handle}>
+            {new Array(shapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
+          </select>
+        </>
       )}
     </>
 
