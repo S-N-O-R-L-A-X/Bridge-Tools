@@ -39,7 +39,9 @@ export default function Deal() {
     const heart = Number((Nref.current?.children[3] as HTMLInputElement).value);
     const diamond = Number((Nref.current?.children[4] as HTMLInputElement).value);
     const club = Number((Nref.current?.children[5] as HTMLInputElement).value);
-    setBoards(deal(Number(board_size), { points: [low, high], shapes: [spade, heart, diamond, club] }));
+    const solid = (Nref.current?.children[6] as HTMLInputElement).checked;
+    console.log(solid);
+    setBoards(deal(Number(board_size), { points: [low, high], shapes: [spade, heart, diamond, club], solid }));
   }
 
   function handleSize(e: ChangeEvent) {

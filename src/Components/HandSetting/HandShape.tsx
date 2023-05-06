@@ -33,6 +33,7 @@ export default function HandShape() {
 
   return (
     <>
+      请输入北家牌型
       {handleFunctions.map((handle, idx) =>
         <>
           {NUMBER2COLORICON[idx]}
