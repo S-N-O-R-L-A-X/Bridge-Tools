@@ -1,7 +1,9 @@
-import { useState, ChangeEvent, HTMLAttributes, forwardRef, Ref } from "react";
+import { useState, ChangeEvent, HTMLAttributes, forwardRef, Ref, createContext } from "react";
 import HandShape from "./HandShape";
 import HandSolid from "./HandSolid";
 import "./index.css";
+
+export const HandSettingContext = createContext<HandSettingProps>({ position: "N" });
 
 interface HandSettingProps extends HTMLAttributes<HTMLElement> {
   position?: "N" | "E" | "S" | "W";
@@ -21,12 +23,14 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
   }
 
   return (
-    <div ref={ref}>
-      请输入北家点力的下限<input value={lowPoints} onChange={handleLowPoints} placeholder="请输入北家点力的下限" className="point"></input>
-      请输入北家点力的上限<input value={highPoints} onChange={handleHighPoints} placeholder="请输入北家点力的上限" className="point"></input>
-      <HandShape />
-      <HandSolid position="N" />
-    </div>
+    <HandSettingContext.Provider value={{ position }}>
+      <div ref={ref}>
+        请输入北家点力的下限<input value={lowPoints} onChange={handleLowPoints} placeholder="请输入北家点力的下限" className="point"></input>
+        请输入北家点力的上限<input value={highPoints} onChange={handleHighPoints} placeholder="请输入北家点力的上限" className="point"></input>
+        <HandShape />
+        <HandSolid position="N" />
+      </div>
+    </HandSettingContext.Provider>
   )
 
 });

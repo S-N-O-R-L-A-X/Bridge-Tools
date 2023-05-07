@@ -1,5 +1,6 @@
 import { ChangeEvent, useEffect, useState } from "react"
 import { NUMBER2COLOR, NUMBER2COLORICON } from "../../Utils/maps";
+import { HandSettingContext } from "./HandSetting";
 
 export default function HandShape() {
   const [spades, setSpades] = useState<number>(4);
@@ -32,17 +33,23 @@ export default function HandShape() {
   }, [spades, hearts, diamonds, clubs, rest])
 
   return (
-    <>
-      请输入北家牌型
-      {handleFunctions.map((handle, idx) =>
-        <>
-          {NUMBER2COLORICON[idx]}
-          <select name={NUMBER2COLOR[idx]} defaultValue={shapes[idx]} onChange={handle}>
-            {new Array(shapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
-          </select>
-        </>
-      )}
-    </>
+    <HandSettingContext.Consumer>
+      {
+        (context) => (
+          <>
+            请输入{context.position}牌型
+            {handleFunctions.map((handle, idx) =>
+              <>
+                {NUMBER2COLORICON[idx]}
+                <select name={NUMBER2COLOR[idx]} defaultValue={shapes[idx]} onChange={handle}>
+                  {new Array(shapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
+                </select>
+              </>
+            )}
+          </>
+        )
+      }
+    </HandSettingContext.Consumer>
 
   )
 }

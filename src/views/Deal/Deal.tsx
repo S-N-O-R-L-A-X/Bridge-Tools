@@ -3,9 +3,9 @@ import Board from "./Board";
 import handFilter, { HandFilterProps } from "./HandFilter";
 import { useState, ChangeEvent, useRef } from "react";
 import ShowAllBoards from "../../Components/ShowAllBoards/ShowAllBoards";
+import HandSetting from "../../Components/HandSetting/HandSetting";
 
 import "./index.css";
-import HandSetting from "../../Components/HandSetting/HandSetting";
 
 function deal(boardSize: number, hand_filter: Omit<HandFilterProps, "hand">) {
   const boards: Hand[][] = [];
@@ -40,7 +40,6 @@ export default function Deal() {
     const diamond = Number((Nref.current?.children[4] as HTMLInputElement).value);
     const club = Number((Nref.current?.children[5] as HTMLInputElement).value);
     const solid = (Nref.current?.children[6] as HTMLInputElement).checked;
-    console.log(solid);
     setBoards(deal(Number(board_size), { points: [low, high], shapes: [spade, heart, diamond, club], solid }));
   }
 
