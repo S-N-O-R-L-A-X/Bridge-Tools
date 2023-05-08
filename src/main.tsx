@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { HashRouter, RouterProvider, createHashRouter, Link, Route, Routes } from 'react-router-dom'
 import App from './App'
 import './index.css'
+import Analysis from './views/Analysis/Analysis'
 import Deal from './views/Deal/Deal'
 
 const route_info = [
@@ -15,6 +16,11 @@ const route_info = [
         path: "/deal",
         title: "发牌",
         element: <Deal />
+      },
+      {
+        path: "/analysis",
+        title: "分析",
+        element: <Analysis />
       },
     ],
   },

@@ -7,6 +7,8 @@ export default function Sidebar() {
       <ul className="sidebarMenuInner">
         <li><Link to="/">Home</Link></li>
         <li><Link to="deal">Deal</Link></li>
+        <li><Link to="analysis">Analysis</Link></li>
+
       </ul>
     </nav>
 
