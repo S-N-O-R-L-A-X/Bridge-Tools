@@ -14,7 +14,6 @@ function deal(boardSize: number, hand_filter: Omit<HandFilterProps, "hand">) {
     while (true) {
       const players: Hand[] = [new Hand(), new Hand(), new Hand(), new Hand()];
       const B = new Board(Math.floor(Math.random() * 16));
-      B.shuffle();
       B.deal(players);
 
       if (handFilter({ hand: players[0], ...hand_filter })) {

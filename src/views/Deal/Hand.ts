@@ -41,6 +41,15 @@ export default class Hand {
     this.shape[card.suit] += 1;
   }
 
+  addCards(cards: Card[]): void {
+    cards.forEach((card) => {
+      this.cards.push(card);
+      this.hand[card.suit].push(card.rank);
+      this.points += card.points;
+      this.shape[card.suit] += 1;
+    })
+  }
+
   // 整理手牌
   sortHand(): void {
     const index = [...Array(13).keys()];
