@@ -23,6 +23,9 @@ export enum NUMBER2COLORICON {
   "♠", "♡", "♢", "♣"
 }
 
+export type Position = "N" | "S" | "E" | "W";
+export type ColorsShort = "S" | "H" | "D" | "C";
+
 export const DEALER = ["W", "N", "E", "S", "W"];
 
 export const VUL = ["EW", "None", "NS", "EW", "Both", "NS", "EW", "Both", "None",

@@ -1,6 +1,6 @@
 import Hand from "./Hand";
 import Card from "./Card";
-import { NUMBER2COLORSHORT, POSITION2FULL } from "../../Utils/maps";
+import { NUMBER2COLORSHORT } from "../../Utils/maps";
 
 function shuffleAlgo(arr: any[]) {
   let n = arr.length, rand;
