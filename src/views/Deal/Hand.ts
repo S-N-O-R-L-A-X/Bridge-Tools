@@ -1,3 +1,4 @@
+import { ColorsShort } from "../../Utils/maps";
 import Card from "./Card";
 export default class Hand {
   cards: Card[];
@@ -12,23 +13,23 @@ export default class Hand {
     this.shape = { S: 0, H: 0, D: 0, C: 0 };
   }
 
-  getMostCards() {
+  getMostCards(): ColorsShort[] {
     const M = Math.max(...Object.values(this.shape));
-    const ret = [];
+    const ret: ColorsShort[] = [];
     for (const [key, val] of Object.entries(this.shape)) {
       if (val === M) {
-        ret.push(key);
+        ret.push(key as ColorsShort);
       }
     }
     return ret;
   }
 
-  getFewestCards() {
+  getFewestCards(): ColorsShort[] {
     const M = Math.min(...Object.values(this.shape));
-    const ret = [];
+    const ret: ColorsShort[] = [];
     for (const [key, val] of Object.entries(this.shape)) {
       if (val === M) {
-        ret.push(key);
+        ret.push(key as ColorsShort);
       }
     }
     return ret;
