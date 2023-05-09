@@ -6,6 +6,7 @@ import ShowAllBoards from "../../Components/ShowAllBoards/ShowAllBoards";
 import HandSetting from "../../Components/HandSetting/HandSetting";
 
 import "./index.css";
+import Card from "./Card";
 
 function deal(boardSize: number, hand_filter: Omit<HandFilterProps, "hand">) {
   const boards: Hand[][] = [];
@@ -14,8 +15,7 @@ function deal(boardSize: number, hand_filter: Omit<HandFilterProps, "hand">) {
     while (true) {
       const players: Hand[] = [new Hand(), new Hand(), new Hand(), new Hand()];
       const B = new Board(Math.floor(Math.random() * 16));
-      B.deal(players);
-
+      B.deal(players, { "N": [new Card("S", "A")] });
       if (handFilter({ hand: players[0], ...hand_filter })) {
         boards.push(players);
         break;

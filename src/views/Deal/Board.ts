@@ -48,7 +48,9 @@ export default class Board {
     // 生成一副新牌
     for (const suit of Card.SUIT) {
       for (const rank in Card.RANK) {
-        this.all_cards.push(new Card(suit, rank));
+        if (!this.known_cards.has(Card.RANK[rank] + NUMBER2COLORSHORT[suit] * 13)) {
+          this.all_cards.push(new Card(suit, rank));
+        }
       }
     }
 
@@ -58,30 +60,28 @@ export default class Board {
 
   public deal(hands: Hand[], fixed_cards?: { [key: string]: Card[] }): void {
     // deal known cards
-
+    const already_have_cards = [0, 0, 0, 0];
     if (fixed_cards) {
       for (const player in fixed_cards) {
-        console.log(player);
         const known_cards: Card[] = fixed_cards[player];
         switch (player) {
-          case "N": hands[0].addCards(known_cards); break;
-          case "S": hands[1].addCards(known_cards); break;
-          case "E": hands[2].addCards(known_cards); break;
-          case "W": hands[3].addCards(known_cards); break;
+          case "N": hands[0].addCards(known_cards); already_have_cards[0] = known_cards.length; break;
+          case "S": hands[1].addCards(known_cards); already_have_cards[1] = known_cards.length; break;
+          case "E": hands[2].addCards(known_cards); already_have_cards[2] = known_cards.length; break;
+          case "W": hands[3].addCards(known_cards); already_have_cards[3] = known_cards.length; break;
         }
+
         known_cards.forEach((known_card) => {
-          this.known_cards.add(Card.RANK[known_card.rank] + (NUMBER2COLORSHORT[known_card.suit]));
+          this.known_cards.add(Card.RANK[known_card.rank] + 13 * (NUMBER2COLORSHORT[known_card.suit]));
         })
       }
     }
-
     this.shuffle();
 
     // 发牌
-    for (let round = 0; round < 13; round++) {
-      for (let player = 0; player < 4; player++) {
-        const top = round * 4 + player;
-        hands[player].add(this.all_cards[top]);
+    for (let i = 0; i < 4; ++i) {
+      for (let j = already_have_cards[i]; j < 13; ++j) {
+        hands[i].add(this.all_cards.pop()!);
       }
     }
 
