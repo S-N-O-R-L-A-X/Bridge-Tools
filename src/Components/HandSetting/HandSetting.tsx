@@ -2,6 +2,7 @@ import { useState, ChangeEvent, HTMLAttributes, forwardRef, Ref, createContext }
 import HandShape from "./HandShape";
 import HandSolid from "./HandSolid";
 import "./index.css";
+import KnownCards from "./KnownCards";
 
 export const HandSettingContext = createContext<HandSettingProps>({ position: "N" });
 
@@ -29,6 +30,8 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
         请输入北家点力的上限<input value={highPoints} onChange={handleHighPoints} placeholder="请输入北家点力的上限" className="point"></input>
         <HandShape />
         <HandSolid />
+        <br />
+        <KnownCards />
       </div>
     </HandSettingContext.Provider>
   )
