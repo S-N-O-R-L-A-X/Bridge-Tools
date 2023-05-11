@@ -1,12 +1,14 @@
 import Hand from "./Hand";
 import Board from "./Board";
 import handFilter, { HandFilterProps } from "./HandFilter";
-import { useState, ChangeEvent, useRef } from "react";
+import { useState, ChangeEvent, useRef, createContext } from "react";
 import ShowAllBoards from "../../Components/ShowAllBoards/ShowAllBoards";
 import HandSetting from "../../Components/HandSetting/HandSetting";
 
 import "./index.css";
 import Card from "./Card";
+
+export const DealContext = createContext({ known_cards: new Array(52).fill(false) });
 
 function deal(boardSize: number, hand_filter: Omit<HandFilterProps, "hand">) {
   const boards: Hand[][] = [];
@@ -29,6 +31,7 @@ export default function Deal() {
   const [board_size, setBoard_size] = useState<number>(1);
   const [boards, setBoards] = useState<Hand[][]>([]);
   const [beautify, setBeautify] = useState<boolean>(false);
+  const [known_cards, setKnown_cards] = useState<boolean[]>(new Array(52).fill(false));
 
   const Nref = useRef<HTMLDivElement>(null);
   function handleClick() {
@@ -61,8 +64,9 @@ export default function Deal() {
             <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
             {/* <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />请选择你需要的点力 */}
           </div>
-
-          <HandSetting ref={Nref} />
+          <DealContext.Provider value={{ known_cards }}>
+            <HandSetting ref={Nref} />
+          </DealContext.Provider>
         </fieldset>
 
         <button onClick={handleClick}>Get new boards</button>
