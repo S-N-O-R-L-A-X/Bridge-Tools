@@ -4,4 +4,6 @@ input.point {
 
 button.unknown {}
 
-button.known {}
+button.known {
+  background-color: bisque;
+}

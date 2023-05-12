@@ -5,7 +5,7 @@ import { HandSettingContext } from "./HandSetting";
 
 export default function KnownOneCards() {
   const [show, setShow] = useState<boolean>(false);
-  const set_known_cards: number[] = [];
+  let set_known_cards: number[] = [];
   const deal_context = useContext(DealContext);
 
   function handleClick() {
@@ -17,7 +17,12 @@ export default function KnownOneCards() {
   }
 
   function handleSubmit() {
-    set_known_cards.forEach((card) => deal_context.known_cards[card] = true)
+    set_known_cards.forEach((card) => deal_context.known_cards[card] = 1)
+    setShow(false);
+  }
+
+  function handleCancel() {
+    set_known_cards = [];
     setShow(false);
   }
 
@@ -33,12 +38,12 @@ export default function KnownOneCards() {
                   {
                     show &&
                     <div>
-                      <div>S {RANK2CARD.map((val, idx) => <button onClick={(e) => handleCardClick(13 * 0 + idx, e)} disabled={context1.known_cards[13 * 0 + idx]} className={context1.known_cards[13 * 0 + idx] ? "known" : "unknown"}>{val}</button>)} </div>
-                      <div>H {RANK2CARD.map((val, idx) => <button onClick={(e) => handleCardClick(13 * 1 + idx, e)} disabled={context1.known_cards[13 * 0 + idx]} className={context1.known_cards[13 * 1 + idx] ? "known" : "unknown"}>{val}</button>)} </div>
-                      <div>D {RANK2CARD.map((val, idx) => <button onClick={(e) => handleCardClick(13 * 2 + idx, e)} disabled={context1.known_cards[13 * 0 + idx]} className={context1.known_cards[13 * 2 + idx] ? "known" : "unknown"}>{val}</button>)} </div>
-                      <div>C {RANK2CARD.map((val, idx) => <button onClick={(e) => handleCardClick(13 * 3 + idx, e)} disabled={context1.known_cards[13 * 0 + idx]} className={context1.known_cards[13 * 3 + idx] ? "known" : "unknown"}>{val}</button>)} </div>
+                      <div>S {RANK2CARD.map((val, idx) => <button onClick={(e) => handleCardClick(13 * 0 + idx, e)} disabled={context1.known_cards[13 * 0 + idx] !== 1 && context1.known_cards[13 * 0 + idx] !== 0} className={context1.known_cards[13 * 0 + idx] ? "known" : "unknown"}>{val}</button>)} </div>
+                      <div>H {RANK2CARD.map((val, idx) => <button onClick={(e) => handleCardClick(13 * 1 + idx, e)} disabled={context1.known_cards[13 * 1 + idx] !== 1 && context1.known_cards[13 * 1 + idx] !== 0} className={context1.known_cards[13 * 1 + idx] ? "known" : "unknown"}>{val}</button>)} </div>
+                      <div>D {RANK2CARD.map((val, idx) => <button onClick={(e) => handleCardClick(13 * 2 + idx, e)} disabled={context1.known_cards[13 * 2 + idx] !== 1 && context1.known_cards[13 * 2 + idx] !== 0} className={context1.known_cards[13 * 2 + idx] ? "known" : "unknown"}>{val}</button>)} </div>
+                      <div>C {RANK2CARD.map((val, idx) => <button onClick={(e) => handleCardClick(13 * 3 + idx, e)} disabled={context1.known_cards[13 * 3 + idx] !== 1 && context1.known_cards[13 * 3 + idx] !== 0} className={context1.known_cards[13 * 3 + idx] ? "known" : "unknown"}>{val}</button>)} </div>
 
-                      <button onClick={handleSubmit}>确认</button> <button onClick={() => setShow(false)}>取消</button>
+                      <button onClick={handleSubmit}>确认</button> <button onClick={handleCancel}>取消</button>
                     </div>
                   }
                 </>

@@ -8,7 +8,7 @@ import HandSetting from "../../Components/HandSetting/HandSetting";
 import "./index.css";
 import Card from "./Card";
 
-export const DealContext = createContext({ known_cards: new Array(52).fill(false) });
+export const DealContext = createContext({ known_cards: new Array(52).fill(0) });
 
 function deal(boardSize: number, hand_filter: Omit<HandFilterProps, "hand">) {
   const boards: Hand[][] = [];
@@ -31,7 +31,7 @@ export default function Deal() {
   const [board_size, setBoard_size] = useState<number>(1);
   const [boards, setBoards] = useState<Hand[][]>([]);
   const [beautify, setBeautify] = useState<boolean>(false);
-  const [known_cards, setKnown_cards] = useState<boolean[]>(new Array(52).fill(false));
+  const [known_cards, setKnown_cards] = useState<number[]>(new Array(52).fill(0));
 
   const Nref = useRef<HTMLDivElement>(null);
   function handleClick() {
