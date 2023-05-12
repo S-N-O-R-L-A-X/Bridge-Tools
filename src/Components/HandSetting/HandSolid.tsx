@@ -1,9 +1,6 @@
 import { ChangeEvent, PropsWithChildren, useState } from "react";
 import { HandSettingContext } from "./HandSetting";
 
-interface HandSolidProps {
-}
-
 export default function HandSolid(props: PropsWithChildren) {
   const [solid, setSolid] = useState<boolean>(false);
   function handleSolid(e: ChangeEvent) {

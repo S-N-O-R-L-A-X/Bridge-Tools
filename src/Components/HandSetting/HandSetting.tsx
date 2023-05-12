@@ -1,4 +1,5 @@
 import { useState, ChangeEvent, HTMLAttributes, forwardRef, Ref, createContext } from "react";
+import { Position } from "../../Utils/maps";
 import HandShape from "./HandShape";
 import HandSolid from "./HandSolid";
 import "./index.css";
@@ -7,7 +8,7 @@ import KnownCards from "./KnownCards";
 export const HandSettingContext = createContext<HandSettingProps>({ position: "N" });
 
 interface HandSettingProps extends HTMLAttributes<HTMLElement> {
-  position?: "N" | "E" | "S" | "W";
+  position?: Position;
 }
 
 const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement>) => {

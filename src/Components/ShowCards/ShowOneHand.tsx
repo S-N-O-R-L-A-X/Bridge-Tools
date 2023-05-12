@@ -1,9 +1,9 @@
 import Hand from "../../views/Deal/Hand";
 import { HTMLAttributes } from "react"
-import { NUMBER2COLOR, NUMBER2COLORICON, NUMBER2COLORSHORT, POSITION2FULL } from "../../Utils/maps";
+import { NUMBER2COLOR, NUMBER2COLORICON, NUMBER2COLORSHORT, Position, POSITION2FULL } from "../../Utils/maps";
 interface ShowOneHandProps extends HTMLAttributes<HTMLElement> {
   hand: Hand;
-  position: "N" | "E" | "S" | "W";
+  position: Position;
   beautify?: boolean;
 }
 
