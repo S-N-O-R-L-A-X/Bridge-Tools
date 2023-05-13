@@ -13,26 +13,27 @@ export default function KnownOneCards() {
   }
 
   function handleCardClick(card: number, e: any) {
-    to_deal_cards.add(card);
-    setTo_deal_cards(new Set(to_deal_cards.add(card)));
+    if (to_deal_cards.has(card)) {
+      to_deal_cards.delete(card)
+      setTo_deal_cards(new Set(to_deal_cards));
+    }
+    else {
+      setTo_deal_cards(new Set(to_deal_cards.add(card)));
+    }
   }
 
   function handleSubmit() {
     to_deal_cards.forEach((card) => deal_context.known_cards[card] === 0 ? deal_context.known_cards[card] = 1 : deal_context.known_cards[card] = 0);
     to_deal_cards.clear();
-    setTo_deal_cards(to_deal_cards);
+    setTo_deal_cards(new Set(to_deal_cards));
     setShow(false);
   }
 
   function handleCancel() {
     to_deal_cards.clear();
-    setTo_deal_cards(to_deal_cards);
+    setTo_deal_cards(new Set(to_deal_cards));
     setShow(false);
   }
-
-  useEffect(() => {
-    console.log(to_deal_cards)
-  }, [to_deal_cards]);
 
   return (
     <DealContext.Consumer>
