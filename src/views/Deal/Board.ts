@@ -1,6 +1,7 @@
 import Hand from "./Hand";
 import Card from "./Card";
 import { NUMBER2COLORSHORT } from "../../Utils/maps";
+import { card2idx } from "../../Utils/utils";
 
 function shuffleAlgo(arr: any[]) {
   let n = arr.length, rand;
@@ -48,7 +49,7 @@ export default class Board {
     // 生成一副新牌
     for (const suit of Card.SUIT) {
       for (const rank in Card.RANK) {
-        if (!this.known_cards.has(Card.RANK[rank] + NUMBER2COLORSHORT[suit] * 13)) {
+        if (!this.known_cards.has(card2idx(new Card(suit, rank)))) {
           this.all_cards.push(new Card(suit, rank));
         }
       }
@@ -72,7 +73,7 @@ export default class Board {
         }
 
         known_cards.forEach((known_card) => {
-          this.known_cards.add(Card.RANK[known_card.rank] + 13 * (NUMBER2COLORSHORT[known_card.suit]));
+          this.known_cards.add(card2idx(known_card));
         })
       }
     }

@@ -7,7 +7,7 @@ import HandSetting from "../../Components/HandSetting/HandSetting";
 
 import "./index.css";
 import Card from "./Card";
-import { idx2Card } from "../../Utils/utils";
+import { idx2card } from "../../Utils/utils";
 
 interface DealContextProps {
   known_cards: number[];
@@ -60,7 +60,7 @@ export default function Deal() {
     const cards: Card[] = [];
     known_cards.forEach((known_card, idx) => {
       if (known_card > 0) {
-        cards.push(idx2Card(idx));
+        cards.push(idx2card(idx));
       }
     })
     setBoards(deal(Number(board_size), { points: [low, high], shapes: [spade, heart, diamond, club], solid, cards }));

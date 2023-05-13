@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { NUMBER2COLOR, RANK2CARD } from "../../Utils/maps";
+import { COLORS, NUMBER2COLOR, RANK2CARD } from "../../Utils/maps";
 import { DealContext } from "../../views/Deal/Deal";
 import { HandSettingContext } from "./HandSetting";
 
@@ -50,7 +50,7 @@ export default function KnownOneCards() {
                     show &&
                     <div>
                       {
-                        ["S", "H", "D", "C"].map((color, key) =>
+                        COLORS.map((color, key) =>
                           <div>{color}  {RANK2CARD.map((val, idx) =>
                             <button onClick={(e) => handleCardClick(13 * key + idx, e)}
                               disabled={context1.known_cards[13 * key + idx] !== 1 && context1.known_cards[13 * key + idx] !== 0}
