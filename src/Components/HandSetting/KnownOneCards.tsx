@@ -7,14 +7,14 @@ export default function KnownOneCards() {
   const [show, setShow] = useState<boolean>(false);
   const [to_deal_cards, setTo_deal_cards] = useState(new Set<number>());
   const deal_context = useContext(DealContext);
-
+  const { known_cards, changeKnown_cards } = deal_context;
   function handleClick() {
     setShow(true);
   }
 
   function handleCardClick(card: number, e: any) {
     if (to_deal_cards.has(card)) {
-      to_deal_cards.delete(card)
+      to_deal_cards.delete(card);
       setTo_deal_cards(new Set(to_deal_cards));
     }
     else {
@@ -23,7 +23,9 @@ export default function KnownOneCards() {
   }
 
   function handleSubmit() {
-    to_deal_cards.forEach((card) => deal_context.known_cards[card] === 0 ? deal_context.known_cards[card] = 1 : deal_context.known_cards[card] = 0);
+    to_deal_cards.forEach((card) => known_cards[card] === 0 ? known_cards[card] = 1 : known_cards[card] = 0);
+    console.log(known_cards);
+    changeKnown_cards([...known_cards]);
     to_deal_cards.clear();
     setTo_deal_cards(new Set(to_deal_cards));
     setShow(false);
