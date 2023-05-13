@@ -44,7 +44,6 @@ export default function Deal() {
   const [known_cards, setKnown_cards] = useState<number[]>(new Array(52).fill(0)); // all cards
 
   function changeKnown_cards(known_cards: number[]) {
-    console.log(known_cards);
     setKnown_cards(known_cards);
   }
 
