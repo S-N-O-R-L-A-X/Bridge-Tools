@@ -7,3 +7,7 @@ button.unknown {}
 button.known {
   background-color: bisque;
 }
+
+button.now {
+  background-color: aquamarine;
+}
