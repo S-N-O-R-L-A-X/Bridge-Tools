@@ -1,7 +1,8 @@
+import { Position } from "../../Utils/maps";
 import Card from "./Card";
 import Hand from "./Hand";
 
-export interface HandFilterProps {
+export interface OneHandFilterProps {
   hand: Hand;
   points?: [number, number];
   shapes?: number[] | null;
@@ -14,7 +15,11 @@ export interface HandFilterProps {
   cards?: Card[];
 }
 
-export default function handFilter(props: HandFilterProps): boolean {
+export interface HandFilterProps {
+  [key: string]: OneHandFilterProps;
+}
+
+function oneHandFilter(props: OneHandFilterProps) {
   const { hand, points = [0, 37], shapes = null, maxsuit = 13, minsuit = 0, havesuit = null, solid = false, maxace = 4, minace = 0, cards = [] } = props;
   if (hand.points < points[0] || hand.points > points[1]) {
     return false;
@@ -86,5 +91,24 @@ export default function handFilter(props: HandFilterProps): boolean {
   //   }
   // }
 
+  return true;
+
+}
+
+
+export default function handFilter(props: HandFilterProps): boolean {
+  const { N, S, E, W } = props;
+  if (N && !oneHandFilter(N)) {
+    return false;
+  }
+  if (S && !oneHandFilter(S)) {
+    return false;
+  }
+  if (E && !oneHandFilter(E)) {
+    return false;
+  }
+  if (W && !oneHandFilter(W)) {
+    return false;
+  }
   return true;
 }
