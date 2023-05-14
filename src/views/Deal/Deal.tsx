@@ -48,6 +48,10 @@ export default function Deal() {
   }
 
   const Nref = useRef<HTMLDivElement>(null);
+  const Sref = useRef<HTMLDivElement>(null);
+  const Eref = useRef<HTMLDivElement>(null);
+  const Wref = useRef<HTMLDivElement>(null);
+
   function handleClick() {
     const low = Number((Nref.current?.children[0] as HTMLInputElement).value);
     const high = Number((Nref.current?.children[1] as HTMLInputElement).value);
@@ -85,7 +89,10 @@ export default function Deal() {
             <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
           </div>
           <DealContext.Provider value={{ known_cards, changeKnown_cards }}>
-            <HandSetting ref={Nref} />
+            <HandSetting ref={Nref} position="N" />
+            <HandSetting ref={Sref} position="S" />
+            <HandSetting ref={Eref} position="E" />
+            <HandSetting ref={Wref} position="W" />
           </DealContext.Provider>
         </fieldset>
         <br />
