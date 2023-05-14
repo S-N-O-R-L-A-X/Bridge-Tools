@@ -1,7 +1,7 @@
 import Hand from "./Hand";
 import Board from "./Board";
 import handFilter, { HandFilterProps } from "./HandFilter";
-import { useState, ChangeEvent, useRef, createContext, useContext } from "react";
+import { useState, ChangeEvent, useRef, createContext } from "react";
 import ShowAllBoards from "../../Components/ShowAllBoards/ShowAllBoards";
 import HandSetting from "../../Components/HandSetting/HandSetting";
 

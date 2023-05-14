@@ -1,6 +1,5 @@
 import Hand from "./Hand";
 import Card from "./Card";
-import { NUMBER2COLORSHORT } from "../../Utils/maps";
 import { card2idx } from "../../Utils/utils";
 
 function shuffleAlgo(arr: any[]) {
