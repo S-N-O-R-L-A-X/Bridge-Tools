@@ -24,7 +24,6 @@ export default function KnownOneCards() {
 
   function handleSubmit() {
     to_deal_cards.forEach((card) => known_cards[card] === 0 ? known_cards[card] = 1 : known_cards[card] = 0);
-    console.log(known_cards);
     changeKnown_cards([...known_cards]);
     to_deal_cards.clear();
     setTo_deal_cards(new Set(to_deal_cards));

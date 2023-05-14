@@ -83,13 +83,12 @@ export default function Deal() {
 
           <div>
             <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
-            {/* <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />请选择你需要的点力 */}
           </div>
           <DealContext.Provider value={{ known_cards, changeKnown_cards }}>
             <HandSetting ref={Nref} />
           </DealContext.Provider>
         </fieldset>
-
+        <br />
         <button onClick={handleClick}>Get new boards</button>
 
       </div>
