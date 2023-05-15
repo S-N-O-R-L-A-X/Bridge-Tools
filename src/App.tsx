@@ -1,7 +1,6 @@
 import { Link, Outlet } from 'react-router-dom'
 import './App.css'
 import Sidebar from './Components/Sidebar/Sidebar'
-import Deal from './views/Deal/Deal'
 
 function App() {
   return (

@@ -5,6 +5,7 @@ import App from './App'
 import './index.css'
 import Analysis from './views/Analysis/Analysis'
 import Deal from './views/Deal/Deal'
+import DealWithHands from './views/Deal/DealWithHands'
 
 const route_info = [
   {
@@ -14,8 +15,13 @@ const route_info = [
     children: [
       {
         path: "/deal",
-        title: "发牌",
+        title: "设置一家牌进行发牌",
         element: <Deal />
+      },
+      {
+        path: "/deal-multi",
+        title: "设置多家牌进行发牌",
+        element: <DealWithHands />
       },
       {
         path: "/analysis",

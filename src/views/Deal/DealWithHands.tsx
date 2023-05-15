@@ -52,7 +52,7 @@ function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
   return boards;
 }
 
-export default function Deal() {
+export default function DealWithHands() {
   const [board_size, setBoard_size] = useState<number>(1);
   const [boards, setBoards] = useState<Hand[][]>([]);
   const [beautify, setBeautify] = useState<boolean>(false);
@@ -100,6 +100,7 @@ export default function Deal() {
 
   return (
     <>
+      此页面仍在建设之中……
       <div className="deal-setting">
         请输入你需要的牌数<input value={board_size} onChange={handleSize} placeholder="请输入你需要的牌数"></input>
         <fieldset>
@@ -109,6 +110,7 @@ export default function Deal() {
             <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
           </div>
           <DealContext.Provider value={{ known_cards, changeKnown_cards }}>
+            目前仅北家设置可用。<br />
             <HandSetting ref={Nref} position="N" getData={getData} />
             <HandSetting ref={Sref} position="S" getData={getData} />
             <HandSetting ref={Eref} position="E" getData={getData} />
