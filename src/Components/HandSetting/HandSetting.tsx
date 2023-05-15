@@ -1,6 +1,6 @@
 import { useState, ChangeEvent, HTMLAttributes, forwardRef, Ref, createContext } from "react";
 import { Position } from "../../Utils/maps";
-import { OneHandFilterProps } from "../../views/Deal/HandFilter";
+import { OneFilterProps, OneHandFilterProps } from "../../views/Deal/HandFilter";
 import HandShape from "./HandShape";
 import HandSolid from "./HandSolid";
 import "./index.css";
@@ -12,7 +12,7 @@ interface HandSettingContextProps extends HTMLAttributes<HTMLElement> {
   position?: Position;
 }
 interface HandSettingProps extends HandSettingContextProps {
-  getData: (position: Position, data: Omit<OneHandFilterProps, "hand">) => void;
+  getData: (position: Position, data: OneFilterProps) => void;
 }
 
 const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement>) => {

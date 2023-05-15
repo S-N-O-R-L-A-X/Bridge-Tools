@@ -15,6 +15,8 @@ export interface OneHandFilterProps {
   cards?: Card[];
 }
 
+export type OneFilterProps = Omit<OneHandFilterProps, "hand">;
+
 export interface HandFilterProps {
   [key: string]: OneHandFilterProps;
 }

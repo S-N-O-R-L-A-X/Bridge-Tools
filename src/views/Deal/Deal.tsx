@@ -1,6 +1,6 @@
 import Hand from "./Hand";
 import Board from "./Board";
-import handFilter, { OneHandFilterProps } from "./HandFilter";
+import handFilter, { OneFilterProps, OneHandFilterProps } from "./HandFilter";
 import { useState, ChangeEvent, useRef, createContext, useCallback } from "react";
 import ShowAllBoards from "../../Components/ShowAllBoards/ShowAllBoards";
 import HandSetting from "../../Components/HandSetting/HandSetting";
@@ -17,7 +17,7 @@ interface DealContextProps {
 
 export const DealContext = createContext<DealContextProps>({ known_cards: new Array(52).fill(0), changeKnown_cards: () => {} });
 
-function deal(boardSize: number, hand_filter: Record<string, Omit<OneHandFilterProps, "hand">>) {
+function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
   const boards: Hand[][] = [];
   while (boardSize--) {
     while (true) {
@@ -67,7 +67,7 @@ export default function Deal() {
   const Eref = useRef<HTMLDivElement>(null);
   const Wref = useRef<HTMLDivElement>(null);
 
-  const getData = useCallback((position: Position, setting: Omit<OneHandFilterProps, "hand">) => {
+  const getData = useCallback((position: Position, setting: OneFilterProps) => {
     console.log(position);
     console.log(setting);
   }, [])
