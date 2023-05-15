@@ -1,18 +1,22 @@
 import { useState, ChangeEvent, HTMLAttributes, forwardRef, Ref, createContext } from "react";
 import { Position } from "../../Utils/maps";
+import { OneHandFilterProps } from "../../views/Deal/HandFilter";
 import HandShape from "./HandShape";
 import HandSolid from "./HandSolid";
 import "./index.css";
 import KnownCards from "./KnownCards";
 
-export const HandSettingContext = createContext<HandSettingProps>({ position: "N" });
+export const HandSettingContext = createContext<HandSettingContextProps>({ position: "N" });
 
-interface HandSettingProps extends HTMLAttributes<HTMLElement> {
+interface HandSettingContextProps extends HTMLAttributes<HTMLElement> {
   position?: Position;
+}
+interface HandSettingProps extends HandSettingContextProps {
+  getData: (position: Position, data: Omit<OneHandFilterProps, "hand">) => void;
 }
 
 const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement>) => {
-  const { position = "N" } = props;
+  const { position = "N", getData } = props;
   const [lowPoints, setLowPoints] = useState<number>(0);
   const [highPoints, setHighPoints] = useState<number>(37);
   const [show, setShow] = useState<boolean>(false);
@@ -30,6 +34,10 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
     setHighPoints(Number((e.target as HTMLInputElement).value));
   }
 
+  function handleSubmit() {
+    getData(position, { points: [lowPoints, highPoints] });
+  }
+
   return (
     <HandSettingContext.Provider value={{ position }}>
       <button onClick={handleShow}>{position}</button>
@@ -42,6 +50,7 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
             <HandSolid />
             <br />
             <KnownCards />
+            <button onClick={handleSubmit}>确认</button>
           </div>
         )
       }

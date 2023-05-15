@@ -3,6 +3,7 @@ import { NUMBER2COLOR, NUMBER2COLORICON } from "../../Utils/maps";
 import { HandSettingContext } from "./HandSetting";
 
 export default function HandShape() {
+  const [show, setShow] = useState<boolean>(false);
   const [spades, setSpades] = useState<number>(4);
   const [hearts, setHearts] = useState<number>(3);
   const [diamonds, setDiamonds] = useState<number>(3);
@@ -25,6 +26,10 @@ export default function HandShape() {
     setClubs(Number((e.target as HTMLInputElement).value));
   }
 
+  function handleClick() {
+    setShow(true);
+  }
+
   const shapes = [spades, hearts, diamonds, clubs];
   const handleFunctions = [handleSpadesChange, handleHeartsChange, handleDiamondsChange, handleClubsChange];
 
@@ -37,15 +42,16 @@ export default function HandShape() {
       {
         (context) => (
           <>
-            请输入{context.position}牌型
-            {handleFunctions.map((handle, idx) =>
-              <>
-                {NUMBER2COLORICON[idx]}
-                <select name={NUMBER2COLOR[idx]} defaultValue={shapes[idx]} onChange={handle}>
-                  {new Array(shapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
-                </select>
-              </>
-            )}
+            <button onClick={handleClick}>输入{context.position}牌型</button>
+            {show &&
+              handleFunctions.map((handle, idx) =>
+                <>
+                  {NUMBER2COLORICON[idx]}
+                  <select name={NUMBER2COLOR[idx]} defaultValue={shapes[idx]} onChange={handle}>
+                    {new Array(shapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
+                  </select>
+                </>)
+            }
           </>
         )
       }
