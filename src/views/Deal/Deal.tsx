@@ -24,7 +24,7 @@ function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
       const players: Hand[] = [new Hand(), new Hand(), new Hand(), new Hand()];
       const B = new Board(Math.floor(Math.random() * 16));
       const { N, S, W, E } = hand_filter;
-
+      console.log(hand_filter);
       let known_cards: Record<string, Card[]> | undefined = undefined;
       if (N.cards || S.cards || W.cards || E.cards) {
         known_cards = {};
@@ -56,7 +56,7 @@ export default function Deal() {
   const [board_size, setBoard_size] = useState<number>(1);
   const [boards, setBoards] = useState<Hand[][]>([]);
   const [beautify, setBeautify] = useState<boolean>(false);
-  const [position, setPosition] = useState<Position>();
+  const [position, setPosition] = useState<Position>("N");
   const [known_cards, setKnown_cards] = useState<number[]>(new Array(52).fill(0)); // all cards
 
   function changeKnown_cards(known_cards: number[]) {
@@ -85,7 +85,9 @@ export default function Deal() {
         cards.push(idx2card(idx));
       }
     })
-    setBoards(deal(Number(board_size), { "N": { points: [low, high], shapes: [spade, heart, diamond, club], solid, cards } }));
+    const hand_filter: Record<string, OneFilterProps> = {};
+    hand_filter[position! as string] = { points: [low, high], shapes: [spade, heart, diamond, club], solid, cards };
+    setBoards(deal(Number(board_size), hand_filter));
   }
 
   function handleSize(e: ChangeEvent) {
