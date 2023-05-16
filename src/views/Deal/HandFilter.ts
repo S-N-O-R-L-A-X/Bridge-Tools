@@ -22,7 +22,6 @@ export interface HandFilterProps {
 }
 
 function oneHandFilter(props: OneHandFilterProps) {
-  console.log(props);
   const { hand, points = [0, 37], shapes = null, maxsuit = 13, minsuit = 0, havesuit = null, solid = false, maxace = 4, minace = 0, cards = [] } = props;
   if (hand.points < points[0] || hand.points > points[1]) {
     return false;
@@ -93,7 +92,7 @@ function oneHandFilter(props: OneHandFilterProps) {
   //     }
   //   }
   // }
-
+  console.log(hand);
   return true;
 
 }
@@ -101,7 +100,6 @@ function oneHandFilter(props: OneHandFilterProps) {
 
 export default function handFilter(props: HandFilterProps): boolean {
   const { N, S, E, W } = props;
-  console.log(props);
   if (N && !oneHandFilter(N)) {
     return false;
   }

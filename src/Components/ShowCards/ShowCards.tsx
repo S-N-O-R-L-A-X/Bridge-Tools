@@ -11,7 +11,7 @@ interface ShowCardsProps {
 
 export default function ShowCards(props: ShowCardsProps) {
   const { all_hands, board_number, ...rest } = props;
-  const [Nhand, Shand, Whand, Ehand] = all_hands;
+  const [Nhand, Shand, Ehand, Whand] = all_hands;
   return (
     <div className="board-container">
       <div className="board-number">{board_number}</div>

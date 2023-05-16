@@ -23,7 +23,7 @@ function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
     while (true) {
       const players: Hand[] = [new Hand(), new Hand(), new Hand(), new Hand()];
       const B = new Board(Math.floor(Math.random() * 16));
-      const { N, S, W, E } = hand_filter;
+      const { N, S, E, W } = hand_filter;
       if (hand_filter["N"]) {
         B.deal(players, { "N": N.cards! });
         if (handFilter({ "N": { hand: players[0], ...hand_filter["N"] } })) {

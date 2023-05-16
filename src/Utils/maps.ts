@@ -1,8 +1,8 @@
 export enum POSITION2FULL {
   "N" = "North",
   "S" = "South",
-  "W" = "West",
-  "E" = "East"
+  "E" = "East",
+  "W" = "West"
 }
 
 export enum NUMBER2COLORSHORT {
