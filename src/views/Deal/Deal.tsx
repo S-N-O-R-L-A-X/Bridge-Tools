@@ -56,6 +56,7 @@ export default function Deal() {
   const [board_size, setBoard_size] = useState<number>(1);
   const [boards, setBoards] = useState<Hand[][]>([]);
   const [beautify, setBeautify] = useState<boolean>(false);
+  const [position, setPosition] = useState<Position>();
   const [known_cards, setKnown_cards] = useState<number[]>(new Array(52).fill(0)); // all cards
 
   function changeKnown_cards(known_cards: number[]) {
@@ -63,9 +64,6 @@ export default function Deal() {
   }
 
   const Nref = useRef<HTMLDivElement>(null);
-  const Sref = useRef<HTMLDivElement>(null);
-  const Eref = useRef<HTMLDivElement>(null);
-  const Wref = useRef<HTMLDivElement>(null);
 
   const getData = useCallback((position: Position, setting: OneFilterProps) => {
     console.log(position);
@@ -98,6 +96,10 @@ export default function Deal() {
     setBeautify((e.target as HTMLInputElement).checked);
   }
 
+  function handlePositionChange(e: any) {
+    setPosition(e.target.value);
+  }
+
   return (
     <>
       <div className="deal-setting">
@@ -108,11 +110,19 @@ export default function Deal() {
           <div>
             <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
           </div>
+          请选择你需要设置的位置：
           <DealContext.Provider value={{ known_cards, changeKnown_cards }}>
-            <HandSetting ref={Nref} position="N" getData={getData} />
-            <HandSetting ref={Sref} position="S" getData={getData} />
-            <HandSetting ref={Eref} position="E" getData={getData} />
-            <HandSetting ref={Wref} position="W" getData={getData} />
+            <div className="position-choice" onChange={handlePositionChange}>
+              <input type="radio" name="position" id="N" value="N" defaultChecked />
+              <label htmlFor="N">N</label>
+              <input type="radio" name="position" id="E" value="E" />
+              <label htmlFor="E">E</label>
+              <input type="radio" name="position" id="S" value="S" />
+              <label htmlFor="S">S</label>
+              <input type="radio" name="position" id="W" value="W" />
+              <label htmlFor="W">W</label>
+            </div>
+            <HandSetting ref={Nref} position={position} getData={getData} />
           </DealContext.Provider>
         </fieldset>
         <br />
