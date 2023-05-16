@@ -24,29 +24,35 @@ function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
       const players: Hand[] = [new Hand(), new Hand(), new Hand(), new Hand()];
       const B = new Board(Math.floor(Math.random() * 16));
       const { N, S, W, E } = hand_filter;
-      console.log(hand_filter);
-      let known_cards: Record<string, Card[]> | undefined = undefined;
-      if (N.cards || S.cards || W.cards || E.cards) {
-        known_cards = {};
+      if (hand_filter["N"]) {
+        B.deal(players, { "N": N.cards! });
+        if (handFilter({ "N": { hand: players[0], ...hand_filter["N"] } })) {
+          boards.push(players);
+          break;
+        }
       }
-      if (N?.cards) {
-        known_cards!["N"] = N.cards;
+      else if (hand_filter["S"]) {
+        B.deal(players, { "S": S.cards! });
+        if (handFilter({ "S": { hand: players[1], ...hand_filter["S"] } })) {
+          boards.push(players);
+          break;
+        }
       }
-      if (S?.cards) {
-        known_cards!["S"] = S.cards;
+      else if (hand_filter["E"]) {
+        B.deal(players, { "E": E.cards! });
+        if (handFilter({ "E": { hand: players[2], ...hand_filter["E"] } })) {
+          boards.push(players);
+          break;
+        }
       }
-      if (E?.cards) {
-        known_cards!["E"] = E.cards;
-      }
-      if (W?.cards) {
-        known_cards!["W"] = W.cards;
+      else {
+        B.deal(players, { "W": W.cards! });
+        if (handFilter({ "W": { hand: players[3], ...hand_filter["W"] } })) {
+          boards.push(players);
+          break;
+        }
       }
 
-      B.deal(players, known_cards);
-      if (handFilter({ "N": { hand: players[0], ...hand_filter["N"] } })) {
-        boards.push(players);
-        break;
-      }
     }
   }
   return boards;
@@ -67,8 +73,6 @@ export default function Deal() {
   const Nref = useRef<HTMLDivElement>(null);
 
   const getData = useCallback((position: Position, setting: OneFilterProps) => {
-    console.log(position);
-    console.log(setting);
     setFilter(setting);
   }, [])
 
