@@ -1,11 +1,12 @@
-import { ChangeEvent, PropsWithChildren, useState } from "react";
+import { ChangeEvent, PropsWithChildren, useContext, useState } from "react";
 import { HandSettingContext } from "./HandSetting";
 
 export default function HandSolid(props: PropsWithChildren) {
-  const [solid, setSolid] = useState<boolean>(false);
+  const context = useContext(HandSettingContext);
   function handleSolid(e: ChangeEvent) {
-    setSolid((e.target as HTMLInputElement).checked);
+    context.setSolid((e.target as HTMLInputElement).checked);
   }
+
   return (
     <HandSettingContext.Consumer>
       {

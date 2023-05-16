@@ -58,6 +58,7 @@ export default function Deal() {
   const [beautify, setBeautify] = useState<boolean>(false);
   const [position, setPosition] = useState<Position>("N");
   const [known_cards, setKnown_cards] = useState<number[]>(new Array(52).fill(0)); // all cards
+  const [filter, setFilter] = useState<OneFilterProps>();
 
   function changeKnown_cards(known_cards: number[]) {
     setKnown_cards(known_cards);
@@ -68,17 +69,10 @@ export default function Deal() {
   const getData = useCallback((position: Position, setting: OneFilterProps) => {
     console.log(position);
     console.log(setting);
+    setFilter(setting);
   }, [])
 
   function handleClick() {
-    const low = Number((Nref.current?.children[0] as HTMLInputElement).value);
-    const high = Number((Nref.current?.children[1] as HTMLInputElement).value);
-    const spade = Number((Nref.current?.children[3] as HTMLInputElement).value);
-    const heart = Number((Nref.current?.children[4] as HTMLInputElement).value);
-    const diamond = Number((Nref.current?.children[5] as HTMLInputElement).value);
-    const club = Number((Nref.current?.children[6] as HTMLInputElement).value);
-    const solid = (Nref.current?.children[7] as HTMLInputElement).checked;
-
     const cards: Card[] = [];
     known_cards.forEach((known_card, idx) => {
       if (known_card > 0) {
@@ -86,7 +80,7 @@ export default function Deal() {
       }
     })
     const hand_filter: Record<string, OneFilterProps> = {};
-    hand_filter[position! as string] = { points: [low, high], shapes: [spade, heart, diamond, club], solid, cards };
+    hand_filter[position! as string] = { ...filter, cards };
     setBoards(deal(Number(board_size), hand_filter));
   }
 

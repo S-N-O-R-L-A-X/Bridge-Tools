@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react"
+import { ChangeEvent, useContext, useEffect, useState } from "react"
 import { NUMBER2COLOR, NUMBER2COLORICON } from "../../Utils/maps";
 import { HandSettingContext } from "./HandSetting";
 
@@ -9,6 +9,8 @@ export default function HandShape() {
   const [diamonds, setDiamonds] = useState<number>(3);
   const [clubs, setClubs] = useState<number>(3);
   const [rest, setRest] = useState<number>(0);
+
+  const context = useContext(HandSettingContext);
 
   function handleSpadesChange(e: ChangeEvent) {
     setSpades(Number((e.target as HTMLInputElement).value));
@@ -35,6 +37,9 @@ export default function HandShape() {
 
   useEffect(() => {
     setRest(13 - spades - hearts - diamonds - clubs);
+    if (show) {
+      context.setShapes([spades, hearts, diamonds, clubs]);
+    }
   }, [spades, hearts, diamonds, clubs, rest])
 
   return (

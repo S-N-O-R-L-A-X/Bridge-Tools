@@ -6,12 +6,18 @@ import HandSolid from "./HandSolid";
 import "./index.css";
 import KnownCards from "./KnownCards";
 
-export const HandSettingContext = createContext<HandSettingContextProps>({ position: "N" });
+export const HandSettingContext = createContext<HandSettingContextProps>({ position: "N", solid: false, setSolid: () => {}, setShapes: () => {} });
 
 interface HandSettingContextProps extends HTMLAttributes<HTMLElement> {
   position?: Position;
+  solid: boolean;
+  setSolid: Function;
+  shapes?: number[];
+  setShapes: Function;
 }
-interface HandSettingProps extends HandSettingContextProps {
+
+interface HandSettingProps extends HTMLAttributes<HTMLElement> {
+  position?: Position;
   getData: (position: Position, data: OneFilterProps) => void;
 }
 
@@ -20,6 +26,8 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
   const [lowPoints, setLowPoints] = useState<number>(0);
   const [highPoints, setHighPoints] = useState<number>(37);
   const [show, setShow] = useState<boolean>(false);
+  const [shapes, setShapes] = useState<number[]>([4, 3, 3, 3]);
+  const [solid, setSolid] = useState<boolean>(false);
 
 
   function handleShow() {
@@ -35,11 +43,11 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
   }
 
   function handleSubmit() {
-    getData(position, { points: [lowPoints, highPoints] });
+    getData(position, { points: [lowPoints, highPoints], shapes, solid });
   }
 
   return (
-    <HandSettingContext.Provider value={{ position }}>
+    <HandSettingContext.Provider value={{ position, setShapes, solid, setSolid }}>
       <button onClick={handleShow}>{position}</button>
       {
         show && (

@@ -42,8 +42,15 @@ function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
         known_cards!["W"] = W.cards;
       }
 
+      const to_pass_filter = {
+        "N": { hand: players[0], ...hand_filter["N"] },
+        "S": { hand: players[1], ...hand_filter["S"] },
+        "E": { hand: players[2], ...hand_filter["E"] },
+        "W": { hand: players[3], ...hand_filter["W"] },
+      }
+
       B.deal(players, known_cards);
-      if (handFilter({ "N": { hand: players[0], ...hand_filter["N"] } })) {
+      if (handFilter(to_pass_filter)) {
         boards.push(players);
         break;
       }
