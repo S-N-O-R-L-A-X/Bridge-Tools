@@ -8,7 +8,7 @@ import HandSetting from "../../Components/HandSetting/HandSetting";
 import "./index.css";
 import Card from "./Card";
 import { idx2card } from "../../Utils/utils";
-import { Position } from "../../Utils/maps";
+import { Position, PROGRAM_POSITIONS } from "../../Utils/maps";
 
 interface DealContextProps {
   known_cards: number[];
@@ -113,14 +113,12 @@ export default function Deal() {
           请选择你需要设置的位置：
           <DealContext.Provider value={{ known_cards, changeKnown_cards }}>
             <div className="position-choice" onChange={handlePositionChange}>
-              <input type="radio" name="position" id="N" value="N" defaultChecked />
-              <label htmlFor="N">N</label>
-              <input type="radio" name="position" id="E" value="E" />
-              <label htmlFor="E">E</label>
-              <input type="radio" name="position" id="S" value="S" />
-              <label htmlFor="S">S</label>
-              <input type="radio" name="position" id="W" value="W" />
-              <label htmlFor="W">W</label>
+              {PROGRAM_POSITIONS.map((pos) => (
+                <>
+                  <input type="radio" name="position" id={pos} value={pos} defaultChecked={pos === "N"} />
+                  <label htmlFor={pos}>{pos}</label>
+                </>
+              ))}
             </div>
             <HandSetting ref={Nref} position={position} getData={getData} />
           </DealContext.Provider>

@@ -1,4 +1,3 @@
-import { Position } from "../../Utils/maps";
 import Card from "./Card";
 import Hand from "./Hand";
 
@@ -92,7 +91,6 @@ function oneHandFilter(props: OneHandFilterProps) {
   //     }
   //   }
   // }
-  console.log(hand);
   return true;
 
 }

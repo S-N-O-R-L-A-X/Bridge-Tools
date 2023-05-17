@@ -8,7 +8,6 @@ interface ShowOneHandProps extends HTMLAttributes<HTMLElement> {
 }
 
 export default function ShowOneHand(props: ShowOneHandProps) {
-
   const { hand, position, beautify = false } = props;
   let className = POSITION2FULL[position];
   return (

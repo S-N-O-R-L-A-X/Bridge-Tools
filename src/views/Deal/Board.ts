@@ -14,7 +14,7 @@ function shuffleAlgo(arr: any[]) {
 
 export default class Board {
   private static readonly VUL = ["EW", "None", "NS", "EW", "Both", "NS", "EW", "Both", "None",
-    "EW", "Both", "None", "NS", "Both", "None", "NS", "EW",];
+    "EW", "Both", "None", "NS", "Both", "None", "NS", "EW"];
   private static readonly DEALER = ["W", "N", "E", "S", "W"];
 
   all_cards: Card[];
@@ -86,9 +86,6 @@ export default class Board {
     }
 
     // 保存发牌结果
-    this.Nhand = hands[0];
-    this.Shand = hands[1];
-    this.Ehand = hands[2];
-    this.Whand = hands[3];
+    [this.Nhand, this.Shand, this.Ehand, this.Whand] = hands;
   }
 }
