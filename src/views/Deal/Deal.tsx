@@ -18,6 +18,7 @@ interface DealContextProps {
 export const DealContext = createContext<DealContextProps>({ known_cards: new Array(52).fill(0), changeKnown_cards: () => {} });
 
 function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
+  console.log(hand_filter)
   const boards: Hand[][] = [];
   while (boardSize--) {
     while (true) {

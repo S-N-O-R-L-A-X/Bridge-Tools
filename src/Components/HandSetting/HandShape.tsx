@@ -32,6 +32,11 @@ export default function HandShape() {
     setShow(true);
   }
 
+  function handleCancel() {
+    context.setShapes(undefined);
+    setShow(false);
+  }
+
   const shapes = [spades, hearts, diamonds, clubs];
   const handleFunctions = [handleSpadesChange, handleHeartsChange, handleDiamondsChange, handleClubsChange];
 
@@ -49,13 +54,21 @@ export default function HandShape() {
           <>
             <button onClick={handleClick}>输入{context.position}牌型</button>
             {show &&
-              handleFunctions.map((handle, idx) =>
+              (
                 <>
-                  {NUMBER2COLORICON[idx]}
-                  <select name={NUMBER2COLOR[idx]} defaultValue={shapes[idx]} onChange={handle}>
-                    {new Array(shapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
-                  </select>
-                </>)
+                  {
+                    handleFunctions.map((handle, idx) =>
+                      <>
+                        {NUMBER2COLORICON[idx]}
+                        <select name={NUMBER2COLOR[idx]} defaultValue={shapes[idx]} onChange={handle}>
+                          {new Array(shapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
+                        </select>
+                      </>)
+
+                  }
+                  <button onClick={handleCancel}>取消设置</button>
+                </>
+              )
             }
           </>
         )

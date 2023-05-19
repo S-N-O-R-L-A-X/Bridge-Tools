@@ -26,7 +26,7 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
   const [lowPoints, setLowPoints] = useState<number>(0);
   const [highPoints, setHighPoints] = useState<number>(37);
   const [show, setShow] = useState<boolean>(false);
-  const [shapes, setShapes] = useState<number[]>([4, 3, 3, 3]);
+  const [shapes, setShapes] = useState<number[]>();
   const [solid, setSolid] = useState<boolean>(false);
 
 
@@ -54,11 +54,13 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
           <div ref={ref}>
             请输入{position}点力的下限<input value={lowPoints} onChange={handleLowPoints} placeholder="请输入点力的下限" className="point"></input>
             请输入{position}点力的上限<input value={highPoints} onChange={handleHighPoints} placeholder="请输入点力的上限" className="point"></input>
-            <HandShape />
             <HandSolid />
             <br />
+            <HandShape />
+            <br />
             <KnownCards />
-            <button onClick={handleSubmit}>确认</button>
+            <br />
+            <button onClick={handleSubmit}>保存设置</button>
           </div>
         )
       }
