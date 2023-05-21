@@ -1,6 +1,6 @@
 import Hand from "./Hand";
 import Board from "./Board";
-import handFilter, { OneFilterProps, OneHandFilterProps } from "./HandFilter";
+import handFilter, { HandFilterProps, OneFilterProps, OneHandFilterProps } from "./HandFilter";
 import { useState, ChangeEvent, useRef, createContext, useCallback } from "react";
 import ShowAllBoards from "../../Components/ShowAllBoards/ShowAllBoards";
 import HandSetting from "../../Components/HandSetting/HandSetting";
@@ -26,7 +26,7 @@ function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
       const { N, S, W, E } = hand_filter;
 
       let known_cards: Record<string, Card[]> | undefined = undefined;
-      if (N.cards || S.cards || W.cards || E.cards) {
+      if (N?.cards || S?.cards || W?.cards || E?.cards) {
         known_cards = {};
       }
       if (N?.cards) {
@@ -64,6 +64,7 @@ export default function DealWithHands() {
   const [boards, setBoards] = useState<Hand[][]>([]);
   const [beautify, setBeautify] = useState<boolean>(false);
   const [known_cards, setKnown_cards] = useState<number[]>(new Array(52).fill(0)); // all cards
+  const [allFilters, setAllFilters] = useState<Record<string, OneFilterProps>>({});
 
   function changeKnown_cards(known_cards: number[]) {
     setKnown_cards(known_cards);
@@ -75,26 +76,27 @@ export default function DealWithHands() {
   const Wref = useRef<HTMLDivElement>(null);
 
   const getData = useCallback((position: Position, setting: OneFilterProps) => {
-    console.log(position);
-    console.log(setting);
+    const tmp = allFilters;
+    tmp[position] = setting;
+    setAllFilters(tmp);
   }, [])
 
   function handleClick() {
-    const low = Number((Nref.current?.children[0] as HTMLInputElement).value);
-    const high = Number((Nref.current?.children[1] as HTMLInputElement).value);
-    const spade = Number((Nref.current?.children[3] as HTMLInputElement).value);
-    const heart = Number((Nref.current?.children[4] as HTMLInputElement).value);
-    const diamond = Number((Nref.current?.children[5] as HTMLInputElement).value);
-    const club = Number((Nref.current?.children[6] as HTMLInputElement).value);
-    const solid = (Nref.current?.children[7] as HTMLInputElement).checked;
-
+    // const low = Number((Nref.current?.children[0] as HTMLInputElement).value);
+    // const high = Number((Nref.current?.children[1] as HTMLInputElement).value);
+    // const spade = Number((Nref.current?.children[3] as HTMLInputElement).value);
+    // const heart = Number((Nref.current?.children[4] as HTMLInputElement).value);
+    // const diamond = Number((Nref.current?.children[5] as HTMLInputElement).value);
+    // const club = Number((Nref.current?.children[6] as HTMLInputElement).value);
+    // const solid = (Nref.current?.children[7] as HTMLInputElement).checked;
+    console.log(allFilters);
     const cards: Card[] = [];
     known_cards.forEach((known_card, idx) => {
       if (known_card > 0) {
         cards.push(idx2card(idx));
       }
     })
-    setBoards(deal(Number(board_size), { "N": { points: [low, high], shapes: [spade, heart, diamond, club], solid, cards } }));
+    setBoards(deal(Number(board_size), allFilters));
   }
 
   function handleSize(e: ChangeEvent) {
