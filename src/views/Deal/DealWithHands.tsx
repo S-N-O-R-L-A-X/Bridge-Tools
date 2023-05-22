@@ -82,13 +82,6 @@ export default function DealWithHands() {
   }, [])
 
   function handleClick() {
-    // const low = Number((Nref.current?.children[0] as HTMLInputElement).value);
-    // const high = Number((Nref.current?.children[1] as HTMLInputElement).value);
-    // const spade = Number((Nref.current?.children[3] as HTMLInputElement).value);
-    // const heart = Number((Nref.current?.children[4] as HTMLInputElement).value);
-    // const diamond = Number((Nref.current?.children[5] as HTMLInputElement).value);
-    // const club = Number((Nref.current?.children[6] as HTMLInputElement).value);
-    // const solid = (Nref.current?.children[7] as HTMLInputElement).checked;
     console.log(allFilters);
     const cards: Card[] = [];
     known_cards.forEach((known_card, idx) => {
@@ -109,7 +102,6 @@ export default function DealWithHands() {
 
   return (
     <>
-      此页面仍在建设之中……
       <div className="deal-setting">
         请输入你需要的牌数<input value={board_size} onChange={handleSize} placeholder="请输入你需要的牌数"></input>
         <fieldset>
@@ -119,7 +111,6 @@ export default function DealWithHands() {
             <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
           </div>
           <DealContext.Provider value={{ known_cards, changeKnown_cards }}>
-            目前仅北家设置可用。<br />
             <HandSetting ref={Nref} position="N" getData={getData} />
             <HandSetting ref={Sref} position="S" getData={getData} />
             <HandSetting ref={Eref} position="E" getData={getData} />
