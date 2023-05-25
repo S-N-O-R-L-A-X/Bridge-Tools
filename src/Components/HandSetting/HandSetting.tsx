@@ -1,5 +1,6 @@
 import { useState, ChangeEvent, HTMLAttributes, forwardRef, Ref, createContext } from "react";
 import { Position } from "../../Utils/maps";
+import Card from "../../views/Deal/Card";
 import { OneFilterProps, OneHandFilterProps } from "../../views/Deal/HandFilter";
 import HandShape from "./HandShape";
 import HandSolid from "./HandSolid";
@@ -28,7 +29,7 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
   const [show, setShow] = useState<boolean>(false);
   const [shapes, setShapes] = useState<number[]>();
   const [solid, setSolid] = useState<boolean>(false);
-
+  const [cards, setCards] = useState<Card[]>([]);
 
   function handleShow() {
     setShow(!show);
@@ -43,7 +44,7 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
   }
 
   function handleSubmit() {
-    getData(position, { points: [lowPoints, highPoints], shapes, solid });
+    getData(position, { points: [lowPoints, highPoints], shapes, solid, cards });
   }
 
   return (

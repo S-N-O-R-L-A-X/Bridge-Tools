@@ -8,14 +8,14 @@ import HandSetting from "../../Components/HandSetting/HandSetting";
 import "./index.css";
 import Card from "./Card";
 import { idx2card } from "../../Utils/utils";
-import { Position } from "../../Utils/maps";
+import { Position, PROGRAM_POSITIONS } from "../../Utils/maps";
 
 interface DealContextProps {
   known_cards: number[];
   changeKnown_cards: Function;
 }
 
-export const DealContext = createContext<DealContextProps>({ known_cards: new Array(52).fill(0), changeKnown_cards: () => {} });
+export const MultiDealContext = createContext<DealContextProps>({ known_cards: new Array(52).fill(-1), changeKnown_cards: () => {} });
 
 function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
   const boards: Hand[][] = [];
@@ -63,10 +63,11 @@ export default function DealWithHands() {
   const [board_size, setBoard_size] = useState<number>(1);
   const [boards, setBoards] = useState<Hand[][]>([]);
   const [beautify, setBeautify] = useState<boolean>(false);
-  const [known_cards, setKnown_cards] = useState<number[]>(new Array(52).fill(0)); // all cards
+  const [known_cards, setKnown_cards] = useState<number[]>(new Array(52).fill(-1)); // all cards
   const [allFilters, setAllFilters] = useState<Record<string, OneFilterProps>>({});
 
   function changeKnown_cards(known_cards: number[]) {
+    console.log(known_cards);
     setKnown_cards(known_cards);
   }
 
@@ -82,13 +83,20 @@ export default function DealWithHands() {
   }, [])
 
   function handleClick() {
-    console.log(allFilters);
-    const cards: Card[] = [];
+    console.log(known_cards);
+    const cards: Card[][] = new Array(4).fill(0).map(() => new Array());
     known_cards.forEach((known_card, idx) => {
-      if (known_card > 0) {
-        cards.push(idx2card(idx));
+      if (known_card > -1) {
+        cards[known_card].push(idx2card(idx));
       }
     })
+    cards.forEach((card, idx) => {
+      if (card.length > 0) {
+        allFilters[PROGRAM_POSITIONS[idx]].cards = card;
+        setAllFilters(allFilters);
+      }
+    })
+    console.log(allFilters);
     setBoards(deal(Number(board_size), allFilters));
   }
 
@@ -110,12 +118,12 @@ export default function DealWithHands() {
           <div>
             <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
           </div>
-          <DealContext.Provider value={{ known_cards, changeKnown_cards }}>
+          <MultiDealContext.Provider value={{ known_cards, changeKnown_cards }}>
             <HandSetting ref={Nref} position="N" getData={getData} />
             <HandSetting ref={Sref} position="S" getData={getData} />
             <HandSetting ref={Eref} position="E" getData={getData} />
             <HandSetting ref={Wref} position="W" getData={getData} />
-          </DealContext.Provider>
+          </MultiDealContext.Provider>
         </fieldset>
         <br />
         <button onClick={handleClick}>Get new boards</button>

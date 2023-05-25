@@ -1,11 +1,13 @@
 import { useContext, useState } from "react";
-import { COLORS, RANK2CARD } from "../../Utils/maps";
-import { DealContext } from "../../views/Deal/Deal";
+import { COLORS, POSITION2NUMBER, PROGRAM_POSITIONS, RANK2CARD } from "../../Utils/maps";
+// import { DealContext } from "../../views/Deal/Deal";
+import { MultiDealContext as DealContext } from "../../views/Deal/DealWithHands";
 import { HandSettingContext } from "./HandSetting";
 
 export default function KnownCards() {
   const [show, setShow] = useState<boolean>(false);
   const [to_deal_cards, setTo_deal_cards] = useState(new Set<number>());
+  const hand_context = useContext(HandSettingContext);
   const deal_context = useContext(DealContext);
   const { known_cards, changeKnown_cards } = deal_context;
   function handleClick() {
@@ -23,7 +25,7 @@ export default function KnownCards() {
   }
 
   function handleSubmit() {
-    to_deal_cards.forEach((card) => known_cards[card] === 0 ? known_cards[card] = 1 : known_cards[card] = 0);
+    to_deal_cards.forEach((card) => known_cards[card] === -1 ? known_cards[card] = POSITION2NUMBER[hand_context.position!] : known_cards[card] = -1);
     changeKnown_cards([...known_cards]);
     to_deal_cards.clear();
     setTo_deal_cards(new Set(to_deal_cards));
@@ -52,8 +54,8 @@ export default function KnownCards() {
                         COLORS.map((color, key) =>
                           <div>{color}  {RANK2CARD.map((val, idx) =>
                             <button onClick={(e) => handleCardClick(13 * key + idx, e)}
-                              disabled={context1.known_cards[13 * key + idx] !== 1 && context1.known_cards[13 * key + idx] !== 0}
-                              className={(context1.known_cards[13 * key + idx] ? "known" : "unknown") + " " + (to_deal_cards.has(13 * key + idx) ? "now" : "")}>
+                              disabled={context1.known_cards[13 * key + idx] !== -1 && context1.known_cards[13 * key + idx] !== 0}
+                              className={(context1.known_cards[13 * key + idx] >= 0 ? "known" : "unknown") + " " + (to_deal_cards.has(13 * key + idx) ? "now" : "")}>
                               {val}
                             </button>)}
                           </div>

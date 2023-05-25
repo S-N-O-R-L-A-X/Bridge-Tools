@@ -15,7 +15,7 @@ interface DealContextProps {
   changeKnown_cards: Function;
 }
 
-export const DealContext = createContext<DealContextProps>({ known_cards: new Array(52).fill(0), changeKnown_cards: () => {} });
+export const DealContext = createContext<DealContextProps>({ known_cards: new Array(52).fill(-1), changeKnown_cards: () => {} });
 
 function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
   console.log(hand_filter)
@@ -64,7 +64,7 @@ export default function Deal() {
   const [boards, setBoards] = useState<Hand[][]>([]);
   const [beautify, setBeautify] = useState<boolean>(false);
   const [position, setPosition] = useState<Position>("N");
-  const [known_cards, setKnown_cards] = useState<number[]>(new Array(52).fill(0)); // all cards
+  const [known_cards, setKnown_cards] = useState<number[]>(new Array(52).fill(-1)); // all cards
   const [filter, setFilter] = useState<OneFilterProps>();
 
   function changeKnown_cards(known_cards: number[]) {
