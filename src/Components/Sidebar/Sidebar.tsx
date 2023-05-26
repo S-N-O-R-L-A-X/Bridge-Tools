@@ -6,7 +6,7 @@ export default function Sidebar() {
     <nav className="sidebar">
       <ul className="sidebarMenuInner">
         <li><Link to="/">Home</Link></li>
-        <li><Link to="deal">Deal With One Hand Setting</Link></li>
+        {/* <li><Link to="deal">Deal With One Hand Setting</Link></li> */}
         <li><Link to="deal-multi">Deal With Multi Hands Setting</Link></li>
         <li><Link to="analysis">Analysis</Link></li>
         <li><a href="https://www.ccba.org.cn/wbf20vp/" target="_blank">imp to vp</a></li>

@@ -67,7 +67,6 @@ export default function DealWithHands() {
   const [allFilters, setAllFilters] = useState<Record<string, OneFilterProps>>({});
 
   function changeKnown_cards(known_cards: number[]) {
-    console.log(known_cards);
     setKnown_cards(known_cards);
   }
 
@@ -84,15 +83,15 @@ export default function DealWithHands() {
 
   function handleClick() {
     console.log(known_cards);
-    const cards: Card[][] = new Array(4).fill(0).map(() => new Array());
+    const all_known_cards: Card[][] = new Array(4).fill(0).map(() => new Array()); // all_known_cards[position]=cards
     known_cards.forEach((known_card, idx) => {
       if (known_card > -1) {
-        cards[known_card].push(idx2card(idx));
+        all_known_cards[known_card].push(idx2card(idx));
       }
     })
-    cards.forEach((card, idx) => {
+    all_known_cards.forEach((card, idx) => {
       if (card.length > 0) {
-        allFilters[PROGRAM_POSITIONS[idx]].cards = card;
+        allFilters[PROGRAM_POSITIONS[idx]] = { cards: card };
         setAllFilters(allFilters);
       }
     })
