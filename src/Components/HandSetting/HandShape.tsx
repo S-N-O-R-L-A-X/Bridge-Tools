@@ -1,5 +1,6 @@
 import { ChangeEvent, useContext, useEffect, useState } from "react"
 import { NUMBER2COLOR, NUMBER2COLORICON } from "../../Utils/maps";
+import HandAmbiguousShape from "./HandAmbiguousShape";
 import { HandSettingContext } from "./HandSetting";
 
 export default function HandShape() {
@@ -66,6 +67,7 @@ export default function HandShape() {
                       </>)
 
                   }
+                  <HandAmbiguousShape />
                   <button onClick={handleCancel}>取消设置</button>
                 </>
               )
