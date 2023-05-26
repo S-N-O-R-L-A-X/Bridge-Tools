@@ -68,9 +68,9 @@ export default function HandAmbiguousShape() {
   useEffect(() => {
     // setRest(13 - spades - hearts - diamonds - clubs);
     if (show) {
-      // context.setShapes([spades, hearts, diamonds, clubs]);
+      context.setAmbiguousShape([[minSpades, maxSpades], [minHearts, maxHearts], [minDiamonds, maxDiamonds], [minClubs, maxClubs]]);
     }
-  }, [minSpades, minHearts, minDiamonds, minClubs, rest])
+  }, [minSpades, minHearts, minDiamonds, minClubs, maxShapes, maxHearts, maxDiamonds, maxClubs, rest])
 
   return (
     <HandSettingContext.Consumer>

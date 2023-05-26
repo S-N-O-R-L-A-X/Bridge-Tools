@@ -12,6 +12,7 @@ export interface OneHandFilterProps {
   maxace?: number;
   minace?: number;
   cards?: Card[];
+  ambiguousShape?: number[][];
 }
 
 export type OneFilterProps = Omit<OneHandFilterProps, "hand">;
@@ -21,7 +22,7 @@ export interface HandFilterProps {
 }
 
 function oneHandFilter(props: OneHandFilterProps) {
-  const { hand, points = [0, 37], shapes = null, maxsuit = 13, minsuit = 0, havesuit = null, solid = false, maxace = 4, minace = 0, cards = [] } = props;
+  const { hand, points = [0, 37], shapes = null, maxsuit = 13, minsuit = 0, havesuit = null, solid = false, maxace = 4, minace = 0, cards = [], ambiguousShape } = props;
   if (hand.points < points[0] || hand.points > points[1]) {
     return false;
   }
@@ -29,6 +30,14 @@ function oneHandFilter(props: OneHandFilterProps) {
   if (shapes !== null) {
     const [s, h, d, c] = shapes;
     if (hand.shape.S !== s || hand.shape.H !== h || hand.shape.D !== d || hand.shape.C !== c) {
+      return false;
+    }
+  }
+
+  if (ambiguousShape) {
+    const [[minSpades, maxSpades], [minHearts, maxHearts], [minDiamonds, maxDiamonds], [minClubs, maxClubs]] = ambiguousShape;
+    if (hand.shape.S < minSpades || hand.shape.S > maxSpades || hand.shape.H < minHearts || hand.shape.H > maxHearts ||
+      hand.shape.D < minDiamonds || hand.shape.D > maxDiamonds || hand.shape.C < minClubs || hand.shape.C > maxClubs) {
       return false;
     }
   }

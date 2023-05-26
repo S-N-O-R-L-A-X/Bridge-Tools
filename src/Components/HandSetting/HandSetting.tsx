@@ -7,7 +7,7 @@ import HandSolid from "./HandSolid";
 import "./index.css";
 import KnownCards from "./KnownCards";
 
-export const HandSettingContext = createContext<HandSettingContextProps>({ position: "N", solid: false, setSolid: () => {}, setShapes: () => {} });
+export const HandSettingContext = createContext<HandSettingContextProps>({ position: "N", solid: false, setSolid: () => {}, setShapes: () => {}, setAmbiguousShape: () => {} });
 
 interface HandSettingContextProps extends HTMLAttributes<HTMLElement> {
   position?: Position;
@@ -15,6 +15,7 @@ interface HandSettingContextProps extends HTMLAttributes<HTMLElement> {
   setSolid: Function;
   shapes?: number[];
   setShapes: Function;
+  setAmbiguousShape: Function;
 }
 
 interface HandSettingProps extends HTMLAttributes<HTMLElement> {
@@ -30,6 +31,7 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
   const [shapes, setShapes] = useState<number[]>();
   const [solid, setSolid] = useState<boolean>(false);
   const [cards, setCards] = useState<Card[]>([]);
+  const [ambiguousShape, setAmbiguousShape] = useState<number[][]>();
 
   function handleShow() {
     setShow(!show);
@@ -44,11 +46,11 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
   }
 
   function handleSubmit() {
-    getData(position, { points: [lowPoints, highPoints], shapes, solid, cards });
+    getData(position, { points: [lowPoints, highPoints], shapes, solid, cards, ambiguousShape });
   }
 
   return (
-    <HandSettingContext.Provider value={{ position, setShapes, solid, setSolid }}>
+    <HandSettingContext.Provider value={{ position, setShapes, solid, setSolid, setAmbiguousShape }}>
       <button onClick={handleShow}>{position}</button>
       {
         show && (
