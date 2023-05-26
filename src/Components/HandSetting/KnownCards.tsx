@@ -46,7 +46,7 @@ export default function KnownCards() {
             {
               (context) =>
                 <>
-                  <button onClick={handleClick}>请输入{context.position}的已知牌张信息</button>
+                  <button onClick={handleClick}>设置{context.position}的已知牌张信息</button>
                   {
                     show &&
                     <div>

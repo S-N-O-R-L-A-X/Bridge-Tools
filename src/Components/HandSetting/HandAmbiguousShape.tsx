@@ -77,29 +77,33 @@ export default function HandAmbiguousShape() {
       {
         (context) => (
           <>
-            <button onClick={handleClick}>需要模糊牌型？</button>
+            <a onClick={handleClick} className="more-setting">需要模糊牌型？</a>
             {show &&
               (
-                <table>
-                  <tr><td>position</td><td>min</td><td>max</td></tr>
-                  {
-                    handleMinFunctions.map((handle, idx) =>
-                      <tr>
-                        <td>{NUMBER2COLORICON[idx]}</td>
-                        <td>
-                          <select name={NUMBER2COLOR[idx]} defaultValue={minShapes[idx]} onChange={handle}>
-                            {new Array(minShapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
-                          </select>
-                        </td>
-                        <td>
-                          <select name={NUMBER2COLOR[idx]} defaultValue={maxShapes[idx]} onChange={handleMaxFunctions[idx]}>
-                            {new Array(maxShapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
-                          </select>
-                        </td>
-                      </tr>)
-                  }
-                  <button onClick={handleCancel}>取消设置</button>
-                </table>
+                <>
+                  <table className="ambiguous-table">
+                    <tr><td>colors</td><td>min</td><td>max</td></tr>
+                    {
+                      handleMinFunctions.map((handle, idx) =>
+                        <tr>
+                          <td>{NUMBER2COLORICON[idx]}</td>
+                          <td>
+                            <select name={NUMBER2COLOR[idx]} defaultValue={minShapes[idx]} onChange={handle}>
+                              {new Array(minShapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
+                            </select>
+                          </td>
+                          <td>
+                            <select name={NUMBER2COLOR[idx]} defaultValue={maxShapes[idx]} onChange={handleMaxFunctions[idx]}>
+                              {new Array(maxShapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
+                            </select>
+                          </td>
+                        </tr>)
+                    }
+
+                  </table>
+                  <a onClick={handleCancel} className="more-setting cancel">取消模糊牌型设置</a>
+
+                </>
               )
             }
           </>

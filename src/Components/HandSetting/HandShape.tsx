@@ -53,7 +53,7 @@ export default function HandShape() {
       {
         (context) => (
           <>
-            <button onClick={handleClick}>输入{context.position}牌型</button>
+            <button onClick={handleClick}>设置{context.position}牌型</button>
             {show &&
               (
                 <>

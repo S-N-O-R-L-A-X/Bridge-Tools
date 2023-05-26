@@ -11,3 +11,25 @@ button.known {
 button.now {
   background-color: aquamarine;
 }
+
+.ambiguous-table {
+  margin: 0 auto;
+}
+
+.more-setting {
+  margin: 0.5rem;
+  padding: 0;
+  color: #FC466B;
+  border: none;
+}
+
+.more-setting:hover {
+  color: #f0094a;
+  cursor: pointer;
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+}
+
+.more-setting.cancel {
+  color: #3F5EFB;
+}
