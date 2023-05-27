@@ -1,44 +1,23 @@
 .alert-wrapper {
   position: fixed;
   top: 0;
-  left: 20%;
-  margin: 0, 5%;
-  width: 100%;
+  left: 50%;
+  transform: translate(-10%);
+  margin: 0 auto;
   z-index: 1050;
-}
-
-.greencross {
-  font-size: 1rem;
-  color: #25ff0b;
-  text-shadow: none;
 }
 
 .alert-simple.alert-success {
   border: 1px solid rgba(36, 241, 6, 0.46);
-  background-color: rgba(7, 149, 66, 0.12156862745098039);
+  background-color: white;
   box-shadow: 0px 0px 2px #259c08;
+  border-radius: 0.5rem;
   color: #0ad406;
-  text-shadow: 2px 1px #00040a;
   transition: 0.5s;
   cursor: pointer;
 }
 
 .alert-success:hover {
   background-color: rgba(7, 149, 66, 0.35);
-  transition: 0.5s;
-}
-
-.alert-simple.alert-info {
-  border: 1px solid rgba(6, 44, 241, 0.46);
-  background-color: rgba(7, 73, 149, 0.12156862745098039);
-  box-shadow: 0px 0px 2px #0396ff;
-  color: #0396ff;
-  text-shadow: 2px 1px #00040a;
-  transition: 0.5s;
-  cursor: pointer;
-}
-
-.alert-info:hover {
-  background-color: rgba(7, 73, 149, 0.35);
   transition: 0.5s;
 }

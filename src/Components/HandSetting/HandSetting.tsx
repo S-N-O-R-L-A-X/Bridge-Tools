@@ -58,7 +58,7 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
     }
     getData(position, filter);
     handleShow();
-    api.success("hi");
+    api.success(`成功保存${position}持牌信息！`);
   }
 
   return (
