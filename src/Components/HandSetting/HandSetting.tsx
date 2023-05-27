@@ -2,10 +2,12 @@ import { useState, ChangeEvent, HTMLAttributes, forwardRef, Ref, createContext }
 import { Position } from "../../Utils/maps";
 import Card from "../../views/Deal/Card";
 import { OneFilterProps, OneHandFilterProps } from "../../views/Deal/HandFilter";
+import api from "../Alert";
 import HandShape from "./HandShape";
 import HandSolid from "./HandSolid";
 import "./index.css";
 import KnownCards from "./KnownCards";
+
 
 export const HandSettingContext = createContext<HandSettingContextProps>({ position: "N", solid: false, setSolid: () => {}, setShapes: () => {}, setAmbiguousShape: () => {}, setShapeType: () => {} });
 
@@ -54,8 +56,9 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
     else {
       filter.ambiguousShape = ambiguousShape;
     }
-
     getData(position, filter);
+    handleShow();
+    api.success("hi");
   }
 
   return (
