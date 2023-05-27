@@ -7,15 +7,15 @@ import HandSolid from "./HandSolid";
 import "./index.css";
 import KnownCards from "./KnownCards";
 
-export const HandSettingContext = createContext<HandSettingContextProps>({ position: "N", solid: false, setSolid: () => {}, setShapes: () => {}, setAmbiguousShape: () => {} });
+export const HandSettingContext = createContext<HandSettingContextProps>({ position: "N", solid: false, setSolid: () => {}, setShapes: () => {}, setAmbiguousShape: () => {}, setShapeType: () => {} });
 
 interface HandSettingContextProps extends HTMLAttributes<HTMLElement> {
   position?: Position;
   solid: boolean;
   setSolid: Function;
-  shapes?: number[];
   setShapes: Function;
   setAmbiguousShape: Function;
+  setShapeType: Function;
 }
 
 interface HandSettingProps extends HTMLAttributes<HTMLElement> {
@@ -32,6 +32,7 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
   const [solid, setSolid] = useState<boolean>(false);
   const [cards, setCards] = useState<Card[]>([]);
   const [ambiguousShape, setAmbiguousShape] = useState<number[][]>();
+  const [shapeType, setShapeType] = useState<boolean>(true);
 
   function handleShow() {
     setShow(!show);
@@ -46,11 +47,19 @@ const HandSetting = forwardRef((props: HandSettingProps, ref: Ref<HTMLDivElement
   }
 
   function handleSubmit() {
-    getData(position, { points: [lowPoints, highPoints], shapes, solid, cards, ambiguousShape });
+    const filter: OneFilterProps = { points: [lowPoints, highPoints], solid, cards };
+    if (shapeType) {
+      filter.shapes = shapes;
+    }
+    else {
+      filter.ambiguousShape = ambiguousShape;
+    }
+
+    getData(position, filter);
   }
 
   return (
-    <HandSettingContext.Provider value={{ position, setShapes, solid, setSolid, setAmbiguousShape }}>
+    <HandSettingContext.Provider value={{ position, setShapes, solid, setSolid, setAmbiguousShape, setShapeType }}>
       <button onClick={handleShow}>{position}</button>
       {
         show && (

@@ -3,7 +3,6 @@ import { NUMBER2COLOR, NUMBER2COLORICON } from "../../Utils/maps";
 import { HandSettingContext } from "./HandSetting";
 
 export default function HandAmbiguousShape() {
-  const [show, setShow] = useState<boolean>(false);
   const [minSpades, setMinSpades] = useState<number>(0);
   const [minHearts, setMinHearts] = useState<number>(0);
   const [minDiamonds, setMinDiamonds] = useState<number>(0);
@@ -13,7 +12,6 @@ export default function HandAmbiguousShape() {
   const [maxDiamonds, setMaxDiamonds] = useState<number>(13);
   const [maxClubs, setMaxClubs] = useState<number>(13);
 
-  const [rest, setRest] = useState<number>(0);
 
   const context = useContext(HandSettingContext);
 
@@ -57,10 +55,9 @@ export default function HandAmbiguousShape() {
 
   useEffect(() => {
     // setRest(13 - spades - hearts - diamonds - clubs);
-    if (show) {
-      context.setAmbiguousShape([[minSpades, maxSpades], [minHearts, maxHearts], [minDiamonds, maxDiamonds], [minClubs, maxClubs]]);
-    }
-  }, [minSpades, minHearts, minDiamonds, minClubs, maxShapes, maxHearts, maxDiamonds, maxClubs, rest])
+    context.setAmbiguousShape([[minSpades, maxSpades], [minHearts, maxHearts], [minDiamonds, maxDiamonds], [minClubs, maxClubs]]);
+
+  }, [minSpades, minHearts, minDiamonds, minClubs, maxSpades, maxHearts, maxDiamonds, maxClubs])
 
   return (
     <HandSettingContext.Consumer>
@@ -68,23 +65,26 @@ export default function HandAmbiguousShape() {
         (context) => (
           <>
             <table className="ambiguous-table">
-              <tr><td>colors</td><td>min</td><td>max</td></tr>
-              {
-                handleMinFunctions.map((handle, idx) =>
-                  <tr>
-                    <td>{NUMBER2COLORICON[idx]}</td>
-                    <td>
-                      <select name={NUMBER2COLOR[idx]} defaultValue={minShapes[idx]} onChange={handle}>
-                        {new Array(minShapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
-                      </select>
-                    </td>
-                    <td>
-                      <select name={NUMBER2COLOR[idx]} defaultValue={maxShapes[idx]} onChange={handleMaxFunctions[idx]}>
-                        {new Array(maxShapes[idx] + rest + 1).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
-                      </select>
-                    </td>
-                  </tr>)
-              }
+              <tbody>
+                <tr><td>colors</td><td>min</td><td>max</td></tr>
+                {
+                  handleMinFunctions.map((handle, idx) =>
+                    <tr>
+
+                      <td>{NUMBER2COLORICON[idx]}</td>
+                      <td>
+                        <select name={NUMBER2COLOR[idx]} defaultValue={minShapes[idx]} onChange={handle}>
+                          {new Array(14).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
+                        </select>
+                      </td>
+                      <td>
+                        <select name={NUMBER2COLOR[idx]} defaultValue={maxShapes[idx]} onChange={handleMaxFunctions[idx]}>
+                          {new Array(14).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
+                        </select>
+                      </td>
+                    </tr>)
+                }
+              </tbody>
             </table>
           </>
         )

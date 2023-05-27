@@ -1,10 +1,8 @@
 import { ChangeEvent, useContext, useEffect, useState } from "react"
 import { NUMBER2COLOR, NUMBER2COLORICON } from "../../Utils/maps";
-import HandAmbiguousShape from "./HandAmbiguousShape";
 import { HandSettingContext } from "./HandSetting";
 
 export default function HandSpecificShape() {
-  const [show, setShow] = useState<boolean>(false);
   const [spades, setSpades] = useState<number>(4);
   const [hearts, setHearts] = useState<number>(3);
   const [diamonds, setDiamonds] = useState<number>(3);
@@ -29,23 +27,12 @@ export default function HandSpecificShape() {
     setClubs(Number((e.target as HTMLInputElement).value));
   }
 
-  function handleClick() {
-    setShow(true);
-  }
-
-  function handleCancel() {
-    context.setShapes(undefined);
-    setShow(false);
-  }
-
   const shapes = [spades, hearts, diamonds, clubs];
   const handleFunctions = [handleSpadesChange, handleHeartsChange, handleDiamondsChange, handleClubsChange];
 
   useEffect(() => {
     setRest(13 - spades - hearts - diamonds - clubs);
-    if (show) {
-      context.setShapes([spades, hearts, diamonds, clubs]);
-    }
+    context.setShapes([spades, hearts, diamonds, clubs]);
   }, [spades, hearts, diamonds, clubs, rest])
 
   return (

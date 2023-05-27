@@ -1,5 +1,4 @@
 import { ChangeEvent, useContext, useEffect, useState } from "react"
-import { NUMBER2COLOR, NUMBER2COLORICON } from "../../Utils/maps";
 import HandAmbiguousShape from "./HandAmbiguousShape";
 import { HandSettingContext } from "./HandSetting";
 import HandSpecificShape from "./HandSpecificShape";
@@ -10,6 +9,10 @@ export default function HandShape() {
 
   const context = useContext(HandSettingContext);
 
+  function changeShape() {
+    setSpecificShape(!specificShape);
+    context.setShapeType(!specificShape);
+  }
 
   function handleClick() {
     setShow(true);
@@ -17,6 +20,7 @@ export default function HandShape() {
 
   function handleCancel() {
     context.setShapes(undefined);
+    context.setAmbiguousShape(undefined);
     setShow(false);
   }
 
@@ -29,7 +33,7 @@ export default function HandShape() {
             {show &&
               (
                 <>
-                  <span onChange={() => setSpecificShape(!specificShape)}>
+                  <span onChange={changeShape}>
                     <input type="radio" name="shape" id="specific" defaultChecked /><label htmlFor="specific">精确牌型</label>
                     <input type="radio" name="shape" id="ambiguous" /><label htmlFor="ambiguous">模糊牌型</label>
                   </span>

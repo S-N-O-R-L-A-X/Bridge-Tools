@@ -76,6 +76,7 @@ export default function DealWithHands() {
   const Wref = useRef<HTMLDivElement>(null);
 
   const getData = useCallback((position: Position, setting: OneFilterProps) => {
+    console.log(setting);
     const tmp = allFilters;
     tmp[position] = setting;
     setAllFilters(tmp);
