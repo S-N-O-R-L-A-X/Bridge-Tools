@@ -8,9 +8,9 @@ interface AlertProps extends HTMLAttributes<HTMLElement> {
 }
 
 export default function Alert(props: AlertProps) {
-  return (
-    <div className="alert alert-simple alert-success">
-      ✅ {props.text}
-    </div>
-  )
+  switch (props.type) {
+    case "error": return <div className="alert-simple alert-error">❌ {props.text}</div>;
+    case "success": return <div className="alert-simple alert-success">✅ {props.text}</div>;
+    default: return <div className="alert-simple">❓ Something goes wrong...</div>;
+  }
 }
