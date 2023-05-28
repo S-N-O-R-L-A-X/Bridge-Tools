@@ -4,6 +4,7 @@ import { HashRouter, RouterProvider, createHashRouter, Link, Route, Routes } fro
 import App from './App'
 import './index.css'
 import Analysis from './views/Analysis/Analysis'
+import BridgeSovler from './views/Analysis/BridgeSolverOnline'
 import Deal from './views/Deal/Deal'
 import DealWithHands from './views/Deal/DealWithHands'
 
@@ -27,6 +28,11 @@ const route_info = [
         path: "/analysis",
         title: "分析",
         element: <Analysis />
+      },
+      {
+        path: "/solver",
+        title: "分析",
+        element: <BridgeSovler />
       },
     ],
   },

@@ -29,12 +29,12 @@ export enum NUMBER2COLORICON {
 
 export type Position = "N" | "S" | "E" | "W";
 export type ColorsShort = "S" | "H" | "D" | "C";
+export type TRUMP = ColorsShort | "NT";
 
 export const DEALER = ["W", "N", "E", "S", "W"];
 
 export const VUL = ["EW", "None", "NS", "EW", "Both", "NS", "EW", "Both", "None",
   "EW", "Both", "None", "NS", "Both", "None", "NS", "EW",];
-
 
 export const POSITION2NUMBER = { "N": 0, "S": 1, "E": 2, "W": 3 };
 export const PROGRAM_POSITIONS: Position[] = ["N", "S", "E", "W"];

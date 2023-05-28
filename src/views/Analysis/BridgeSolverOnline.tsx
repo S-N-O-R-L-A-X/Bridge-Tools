@@ -1,0 +1,60 @@
+/**
+ * https://dds.bridgewebs.com/cgi-bin/bsol2/ddummy
+ * @param trumps c|d|h|s
+ * example url: https://dds.bridgewebs.com/cgi-bin/bsol2/ddummy?trumps=c&leader=e&dealstr=752.42.842.A9842xAKQ.AKJ9.AQT.KT7xJT98.QT76.J976.Jx643.853.K53.Q653&requesttoken=1685252040620&request=g&uniqueTID=1685252040620&_=1685251967516
+ * example url: https://dds.bridgewebs.com/cgi-bin/bsol2/ddummy?request=m&dealstr=W:Q2.52.AJ63.A8532xJT98.JT98.KQT8.TxK53.KQ74.75.KQJ7xA764.A63.942.964&vul=None&sockref=1685264885620&uniqueTID=1685264885622&_=1685263070398
+*/
+import { useState } from "react";
+
+interface RequestSpecificTrump {
+  trumps: "s" | "h" | "d" | "c" | "n";
+  leader: "n" | "s" | "e" | "w";
+  request: "g";
+  requesttoken?: number;
+  uniqueTID: number; // get by new Date().getTime()
+  dealstr: string; // W N E S
+}
+
+interface RequestBoard {
+  dealstr: string;
+  sockref?: number;
+  request: "m"; // g means steps in analysis, m means get straight
+  uniqueTID: number; // get by new Date().getTime()
+  vul?: "None"
+}
+
+export default function BridgeSovler() {
+  const [predictedContract, setPredictedContract] = useState();
+  function handleClick() {
+    const tid = new Date().getTime();
+    const params: RequestBoard = {
+      dealstr: "W:",
+      sockref: 0,
+      request: "m",
+      uniqueTID: 0,
+    }
+
+    params.sockref = tid;
+    params.uniqueTID = tid;
+    params.dealstr += "Q2.52.AJ63.A8532xJT98.JT98.KQT8.TxK53.KQ74.75.KQJ7xA764.A63.942.964";
+    let url = "https://dds.bridgewebs.com/cgi-bin/bsol2/ddummy?";
+    for (const [key, value] of Object.entries(params)) {
+      url += key + "=" + value + "&";
+    }
+    url = url.substring(0, url.length - 1);
+    console.log(url);
+    fetch(url).then((res) => {
+      return res.json()
+    }).then((x: any) => {
+      console.log(x);
+      setPredictedContract(x.scoreNS)
+    })
+  }
+  return (
+    <>
+      <button onClick={handleClick}>analyse</button>
+      <p>{predictedContract}</p>
+    </>
+  )
+
+}
