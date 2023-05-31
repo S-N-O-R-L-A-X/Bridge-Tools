@@ -8,7 +8,7 @@ import { PropsWithChildren, ReactNode } from "react";
 interface ShowCardsProps extends PropsWithChildren {
   all_hands: Hand[];
   board_number: number;
-  doubleDummy: ReactNode;
+  doubleDummy?: ReactNode;
 }
 
 export default function ShowCards(props: ShowCardsProps) {
