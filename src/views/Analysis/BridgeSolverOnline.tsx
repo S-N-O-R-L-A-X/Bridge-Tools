@@ -26,6 +26,7 @@ interface RequestBoard {
 export default function BridgeSovler() {
   const [predictedContract, setPredictedContract] = useState<string>();
   const [predictedScore, setPredictedScore] = useState<string>();
+  const [ddtricks, setDDtricks] = useState<string>();
   function handleClick() {
     const tid = new Date().getTime();
     const params: RequestBoard = {
@@ -47,6 +48,7 @@ export default function BridgeSovler() {
       return res.json()
     }).then((x: any) => {
       console.log(x);
+      setDDtricks(x.sess.ddtricks);
       setPredictedContract(x.contractsNS.substring(3));
       setPredictedScore(x.scoreNS)
     })
@@ -54,7 +56,7 @@ export default function BridgeSovler() {
   return (
     <>
       <button onClick={handleClick}>analyse</button>
-      <PlayBoard predictedContract={predictedContract} predictedScore={predictedScore} />
+      <PlayBoard predictedContract={predictedContract} predictedScore={predictedScore} ddtricks={ddtricks} />
     </>
   )
 

@@ -3,7 +3,7 @@
   grid-template-areas:
     'board-number Nhand predicted'
     'Whand blank Ehand'
-    'SW Shand SE';
+    'SW Shand double-dummy';
   grid-gap: 1rem;
   margin: 1rem;
 }
@@ -31,4 +31,8 @@
 
 .predicted {
   grid-area: predicted;
+}
+
+.double-dummy {
+  grid-area: double-dummy;
 }
