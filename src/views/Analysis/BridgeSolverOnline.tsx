@@ -4,6 +4,7 @@
  * example url: https://dds.bridgewebs.com/cgi-bin/bsol2/ddummy?request=m&dealstr=W:Q2.52.AJ63.A8532xJT98.JT98.KQT8.TxK53.KQ74.75.KQJ7xA764.A63.942.964&vul=None&sockref=1685264885620&uniqueTID=1685264885622&_=1685263070398
 */
 import { useState } from "react";
+import PlayBoard from "../../Components/PlayBoard/PlayBoard";
 
 interface RequestSpecificTrump {
   trumps: "s" | "h" | "d" | "c" | "n";
@@ -53,8 +54,7 @@ export default function BridgeSovler() {
   return (
     <>
       <button onClick={handleClick}>analyse</button>
-      <p>{predictedContract}</p>
-      <p>{predictedScore}</p>
+      <PlayBoard predictedContract={predictedContract} predictedScore={predictedScore} />
     </>
   )
 

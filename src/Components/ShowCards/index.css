@@ -1,7 +1,7 @@
 .board-container {
   display: grid;
   grid-template-areas:
-    'board-number Nhand NE'
+    'board-number Nhand predicted'
     'Whand blank Ehand'
     'SW Shand SE';
   grid-gap: 1rem;
@@ -27,4 +27,8 @@
 
 .Ehand {
   grid-area: Ehand;
+}
+
+.predicted {
+  grid-area: predicted;
 }
