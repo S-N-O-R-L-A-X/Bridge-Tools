@@ -1,4 +1,4 @@
-import { CONTRACTCOLORS } from "../../Utils/maps";
+import { CONTRACTCOLORS, PROGRAM_POSITIONS } from "../../Utils/maps";
 
 interface ShowTricksProps {
   ddtricks: (string | number)[][] | string;
@@ -29,8 +29,8 @@ export default function ShowTricks(props: ShowTricksProps) {
   return (
     <table>
       <tbody>
-        <tr>{CONTRACTCOLORS.map((v) => <td>{v}</td>)}</tr>
-        {tricks.map((trick) => <tr>{trick.map((t) => <td>{t}</td>)}</tr>)}
+        <tr><td></td>{CONTRACTCOLORS.map((v) => <td>{v}</td>)}</tr>
+        {tricks.map((trick, idx) => <tr><td>{PROGRAM_POSITIONS[idx]}</td>{trick.map((t) => <td>{t}</td>)}</tr>)}
       </tbody>
     </table>
   )

@@ -30,7 +30,8 @@ export default function BridgeSovler(props: BridgeSolverProps) {
   const [predictedContract, setPredictedContract] = useState<string>();
   const [predictedScore, setPredictedScore] = useState<string>();
   const [ddtricks, setDDtricks] = useState<string>("");
-  async function handleClick() {
+
+  async function analyzeOL() {
     const res = await callDDSOL(allHands);
     setDDtricks(res.sess.ddtricks);
     setPredictedContract(res.contractsNS.substring(3));
@@ -38,14 +39,13 @@ export default function BridgeSovler(props: BridgeSolverProps) {
   }
 
   useEffect(() => {
-    handleClick();
+    analyzeOL();
   }, [allHands]);
 
   const ShowTricksInstance = <ShowTricks ddtricks={ddtricks} />;
 
   return (
     <>
-      <button onClick={handleClick}>analyse</button>
       <ShowCards all_hands={allHands} board_number={1} doubleDummy={ShowTricksInstance} >
         <p>{predictedContract}</p>
         <p>{predictedScore}</p>
