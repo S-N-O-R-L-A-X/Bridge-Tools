@@ -128,7 +128,8 @@ export default function DealWithAnalysis() {
         <button onClick={handleClick}>Get new boards</button>
 
       </div>
-      <BridgeSovler allHands={boards[0]} />
+      {boards[0] && <BridgeSovler allHands={boards[0]} />}
+
     </>
   )
 }
