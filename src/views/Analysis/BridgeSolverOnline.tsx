@@ -3,8 +3,11 @@
  * example url: https://dds.bridgewebs.com/cgi-bin/bsol2/ddummy?trumps=c&leader=e&dealstr=752.42.842.A9842xAKQ.AKJ9.AQT.KT7xJT98.QT76.J976.Jx643.853.K53.Q653&requesttoken=1685252040620&request=g&uniqueTID=1685252040620&_=1685251967516
  * example url: https://dds.bridgewebs.com/cgi-bin/bsol2/ddummy?request=m&dealstr=W:Q2.52.AJ63.A8532xJT98.JT98.KQT8.TxK53.KQ74.75.KQJ7xA764.A63.942.964&vul=None&sockref=1685264885620&uniqueTID=1685264885622&_=1685263070398
 */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PlayBoard from "../../Components/PlayBoard/PlayBoard";
+import ShowTricks from "../../Components/PlayBoard/ShowTricks";
+import ShowCards from "../../Components/ShowCards/ShowCards";
+import Hand from "../Deal/Hand";
 
 interface RequestSpecificTrump {
   trumps: "s" | "h" | "d" | "c" | "n";
@@ -23,10 +26,15 @@ interface RequestBoard {
   vul?: "None"
 }
 
-export default function BridgeSovler() {
+interface BridgeSolverProps {
+  allHands?: Hand[];
+}
+
+export default function BridgeSovler(props: BridgeSolverProps) {
+  const { allHands = [] } = props;
   const [predictedContract, setPredictedContract] = useState<string>();
   const [predictedScore, setPredictedScore] = useState<string>();
-  const [ddtricks, setDDtricks] = useState<string>();
+  const [ddtricks, setDDtricks] = useState<string>("");
   function handleClick() {
     const tid = new Date().getTime();
     const params: RequestBoard = {
@@ -53,10 +61,20 @@ export default function BridgeSovler() {
       setPredictedScore(x.scoreNS)
     })
   }
+
+  useEffect(() => {
+    handleClick();
+  }, []);
+
+  const ShowTricksInstance = <ShowTricks ddtricks={ddtricks} />;
+
   return (
     <>
       <button onClick={handleClick}>analyse</button>
-      <PlayBoard predictedContract={predictedContract} predictedScore={predictedScore} ddtricks={ddtricks} />
+      <ShowCards all_hands={allHands} board_number={1} doubleDummy={ShowTricksInstance} >
+        <p>{predictedContract}</p>
+        <p>{predictedScore}</p>
+      </ShowCards>
     </>
   )
 

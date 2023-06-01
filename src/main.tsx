@@ -6,6 +6,7 @@ import './index.css'
 import Analysis from './views/Analysis/Analysis'
 import BridgeSovler from './views/Analysis/BridgeSolverOnline'
 import Deal from './views/Deal/Deal'
+import DealWithAnalysis from './views/Deal/DealWithAnalysis'
 import DealWithHands from './views/Deal/DealWithHands'
 
 const route_info = [
@@ -33,6 +34,11 @@ const route_info = [
         path: "/solver",
         title: "分析",
         element: <BridgeSovler />
+      },
+      {
+        path: "/deal-analysis",
+        title: "分析",
+        element: <DealWithAnalysis />
       },
     ],
   },
