@@ -39,7 +39,7 @@ export default function BridgeSovler(props: BridgeSolverProps) {
 
   useEffect(() => {
     handleClick();
-  }, []);
+  }, [allHands]);
 
   const ShowTricksInstance = <ShowTricks ddtricks={ddtricks} />;
 

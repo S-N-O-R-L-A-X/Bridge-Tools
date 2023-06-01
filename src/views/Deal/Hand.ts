@@ -49,13 +49,13 @@ export default class Hand {
       this.points += card.points;
       this.shape[card.suit] += 1;
     })
+    this.sortHand();
   }
 
   // 整理手牌
   sortHand(): void {
-    const index = [...Array(13).keys()];
     for (const key in this.hand) {
-      this.hand[key].sort((a, b) => index[Card.RANK[a]] - index[Card.RANK[b]]);
+      this.hand[key].sort((a, b) => Card.RANK[a] - Card.RANK[b]);
     }
   }
 
