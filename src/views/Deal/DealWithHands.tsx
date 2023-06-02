@@ -9,13 +9,9 @@ import "./index.css";
 import Card from "./Card";
 import { idx2card } from "../../Utils/utils";
 import { Position, PROGRAM_POSITIONS } from "../../Utils/maps";
+import { DealContextProps } from "../../Utils/interfaces-for-components";
 
-interface DealContextProps {
-  known_cards: number[];
-  changeKnown_cards: Function;
-}
-
-export const MultiDealContext = createContext<DealContextProps>({ known_cards: new Array(52).fill(-1), changeKnown_cards: () => {} });
+export const MultiDealContext = createContext<DealContextProps>({ known_cards: new Array(52).fill(-1), changeKnown_cards: () => {}, contextType: "multi" });
 
 function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
   const boards: Hand[][] = [];
@@ -76,14 +72,12 @@ export default function DealWithHands() {
   const Wref = useRef<HTMLDivElement>(null);
 
   const getData = useCallback((position: Position, setting: OneFilterProps) => {
-    console.log(setting);
     const tmp = allFilters;
     tmp[position] = setting;
     setAllFilters(tmp);
   }, [])
 
   function handleClick() {
-    console.log(known_cards);
     const all_known_cards: Card[][] = new Array(4).fill(0).map(() => new Array()); // all_known_cards[position]=cards
     known_cards.forEach((known_card, idx) => {
       if (known_card > -1) {
@@ -118,7 +112,7 @@ export default function DealWithHands() {
           <div>
             <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
           </div>
-          <MultiDealContext.Provider value={{ known_cards, changeKnown_cards }}>
+          <MultiDealContext.Provider value={{ known_cards, changeKnown_cards, contextType: "multi" }}>
             <HandSetting ref={Nref} position="N" getData={getData} />
             <HandSetting ref={Sref} position="S" getData={getData} />
             <HandSetting ref={Eref} position="E" getData={getData} />

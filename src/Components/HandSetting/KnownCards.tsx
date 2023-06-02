@@ -1,14 +1,20 @@
 import { useContext, useState } from "react";
 import { COLORS, POSITION2NUMBER, RANK2CARD } from "../../Utils/maps";
-import { MultiDealContext as DealContext } from "../../views/Deal/DealWithHands";
+import { AnalysisDealContext } from "../../views/Deal/DealWithAnalysis";
+import { MultiDealContext } from "../../views/Deal/DealWithHands";
 import { HandSettingContext } from "./HandSetting";
+
 
 export default function KnownCards() {
   const [show, setShow] = useState<boolean>(false);
   const [to_deal_cards, setTo_deal_cards] = useState(new Set<number>());
   const hand_context = useContext(HandSettingContext);
-  const deal_context = useContext(DealContext);
+  const deal_context = useContext(MultiDealContext);
+  const context2 = useContext(AnalysisDealContext);
+  console.log(deal_context);
+  console.log(context2);
   const { known_cards, changeKnown_cards } = deal_context;
+  const Component = context2.contextType === "multi" ? MultiDealContext : MultiDealContext;
   function handleClick() {
     setShow(true);
   }
@@ -38,7 +44,7 @@ export default function KnownCards() {
   }
 
   return (
-    <DealContext.Consumer>
+    <Component.Consumer>
       {
         (context1) =>
           <HandSettingContext.Consumer>
@@ -67,6 +73,6 @@ export default function KnownCards() {
             }
           </HandSettingContext.Consumer>
       }
-    </DealContext.Consumer >
+    </Component.Consumer >
   )
 }
