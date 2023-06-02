@@ -42,12 +42,12 @@ export default function HandSpecificShape() {
           <>
             {
               handleFunctions.map((handle, idx) =>
-                <>
+                <span key={idx}>
                   {NUMBER2COLORICON[idx]}
                   <select name={NUMBER2COLOR[idx]} defaultValue={shapes[idx]} onChange={handle}>
                     {new Array(shapes[idx] + rest + 1).fill(0).map((_, idx) => <option key={idx} value={idx}>{idx}</option>)}
                   </select>
-                </>)
+                </span>)
             }
           </>
         )

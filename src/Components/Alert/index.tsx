@@ -58,7 +58,7 @@ export const AlertContainer = () => {
     <div className="alert-container">
       {
         notices.map(({ text, key, type }) => (
-          <Alert type={type} text={text} />
+          <Alert key={key} type={type} text={text} />
         ))
       }
     </div>

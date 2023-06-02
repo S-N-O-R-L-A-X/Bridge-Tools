@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react"
+import { useContext, useState } from "react"
 import HandAmbiguousShape from "./HandAmbiguousShape";
 import { HandSettingContext } from "./HandSetting";
 import HandSpecificShape from "./HandSpecificShape";

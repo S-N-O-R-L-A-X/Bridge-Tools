@@ -54,9 +54,7 @@ export default function HandAmbiguousShape() {
   const handleMaxFunctions = [handleMaxSpadesChange, handleMaxHeartsChange, handleMaxDiamondsChange, handleMaxClubsChange];
 
   useEffect(() => {
-    // setRest(13 - spades - hearts - diamonds - clubs);
     context.setAmbiguousShape([[minSpades, maxSpades], [minHearts, maxHearts], [minDiamonds, maxDiamonds], [minClubs, maxClubs]]);
-
   }, [minSpades, minHearts, minDiamonds, minClubs, maxSpades, maxHearts, maxDiamonds, maxClubs])
 
   return (
@@ -69,17 +67,16 @@ export default function HandAmbiguousShape() {
                 <tr><td>colors</td><td>min</td><td>max</td></tr>
                 {
                   handleMinFunctions.map((handle, idx) =>
-                    <tr>
-
+                    <tr key={idx}>
                       <td>{NUMBER2COLORICON[idx]}</td>
                       <td>
                         <select name={NUMBER2COLOR[idx]} defaultValue={minShapes[idx]} onChange={handle}>
-                          {new Array(14).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
+                          {new Array(14).fill(0).map((_, idx) => <option key={idx} value={idx}>{idx}</option>)}
                         </select>
                       </td>
                       <td>
                         <select name={NUMBER2COLOR[idx]} defaultValue={maxShapes[idx]} onChange={handleMaxFunctions[idx]}>
-                          {new Array(14).fill(0).map((_, idx) => <option value={idx}>{idx}</option>)}
+                          {new Array(14).fill(0).map((_, idx) => <option key={idx} value={idx}>{idx}</option>)}
                         </select>
                       </td>
                     </tr>)

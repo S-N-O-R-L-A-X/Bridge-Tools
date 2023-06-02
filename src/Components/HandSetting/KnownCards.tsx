@@ -1,6 +1,5 @@
 import { useContext, useState } from "react";
-import { COLORS, POSITION2NUMBER, PROGRAM_POSITIONS, RANK2CARD } from "../../Utils/maps";
-// import { DealContext } from "../../views/Deal/Deal";
+import { COLORS, POSITION2NUMBER, RANK2CARD } from "../../Utils/maps";
 import { MultiDealContext as DealContext } from "../../views/Deal/DealWithHands";
 import { HandSettingContext } from "./HandSetting";
 
@@ -52,8 +51,8 @@ export default function KnownCards() {
                     <div>
                       {
                         COLORS.map((color, key) =>
-                          <div>{color}  {RANK2CARD.map((val, idx) =>
-                            <button onClick={(e) => handleCardClick(13 * key + idx, e)}
+                          <div key={key}>{color}  {RANK2CARD.map((val, idx) =>
+                            <button key={key + idx} onClick={(e) => handleCardClick(13 * key + idx, e)}
                               disabled={context1.known_cards[13 * key + idx] !== -1 && context1.known_cards[13 * key + idx] !== 0}
                               className={(context1.known_cards[13 * key + idx] >= 0 ? "known" : "unknown") + " " + (to_deal_cards.has(13 * key + idx) ? "now" : "")}>
                               {val}
