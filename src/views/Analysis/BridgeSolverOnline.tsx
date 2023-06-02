@@ -4,7 +4,6 @@
  * example url: https://dds.bridgewebs.com/cgi-bin/bsol2/ddummy?request=m&dealstr=W:Q2.52.AJ63.A8532xJT98.JT98.KQT8.TxK53.KQ74.75.KQJ7xA764.A63.942.964&vul=None&sockref=1685264885620&uniqueTID=1685264885622&_=1685263070398
 */
 import { useEffect, useState } from "react";
-import PlayBoard from "../../Components/PlayBoard/PlayBoard";
 import ShowTricks from "../../Components/PlayBoard/ShowTricks";
 import ShowCards from "../../Components/ShowCards/ShowCards";
 import { callDDSOL } from "../../Utils/callInterface";
@@ -25,11 +24,11 @@ interface BridgeSolverProps {
   allHands?: Hand[];
 }
 
-export default function BridgeSovler(props: BridgeSolverProps) {
+export default function BridgeSolver(props: BridgeSolverProps) {
   const { allHands = [] } = props;
   const [predictedContract, setPredictedContract] = useState<string>();
   const [predictedScore, setPredictedScore] = useState<string>();
-  const [ddtricks, setDDtricks] = useState<string>("");
+  const [ddtricks, setDDtricks] = useState<string>();
 
   async function analyzeOL() {
     const res = await callDDSOL(allHands);

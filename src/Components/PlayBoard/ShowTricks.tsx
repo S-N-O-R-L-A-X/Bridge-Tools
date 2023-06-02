@@ -1,12 +1,11 @@
 import { CONTRACTCOLORS, PROGRAM_POSITIONS } from "../../Utils/maps";
 
 interface ShowTricksProps {
-  ddtricks: (string | number)[][] | string;
+  ddtricks?: (string | number)[][] | string;
 }
 
 export default function ShowTricks(props: ShowTricksProps) {
-  const { ddtricks } = props;
-
+  const { ddtricks = "*".repeat(20) } = props;
   let tricks = [];
   if (typeof ddtricks === "string") {
     for (let i = 0; i < 4; ++i) {
@@ -29,8 +28,8 @@ export default function ShowTricks(props: ShowTricksProps) {
   return (
     <table>
       <tbody>
-        <tr><td></td>{CONTRACTCOLORS.map((v) => <td>{v}</td>)}</tr>
-        {tricks.map((trick, idx) => <tr><td>{PROGRAM_POSITIONS[idx]}</td>{trick.map((t) => <td>{t}</td>)}</tr>)}
+        <tr><td></td>{CONTRACTCOLORS.map((v) => <td key={v}>{v}</td>)}</tr>
+        {tricks.map((trick, idx) => <tr key={"row" + idx}><td>{PROGRAM_POSITIONS[idx]}</td>{trick.map((t, idx2) => <td key={"row" + idx + "col" + idx2}>{t}</td>)}</tr>)}
       </tbody>
     </table>
   )

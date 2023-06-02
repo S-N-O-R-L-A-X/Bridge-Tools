@@ -10,7 +10,7 @@ import Card from "./Card";
 import { idx2card } from "../../Utils/utils";
 import { Position, PROGRAM_POSITIONS } from "../../Utils/maps";
 import PlayBoard from "../../Components/PlayBoard/PlayBoard";
-import BridgeSovler from "../Analysis/BridgeSolverOnline";
+import BridgeSolver from "../Analysis/BridgeSolverOnline";
 
 interface DealContextProps {
   known_cards: number[];
@@ -128,7 +128,7 @@ export default function DealWithAnalysis() {
         <button onClick={handleClick}>Get new boards</button>
 
       </div>
-      {boards[0] && <BridgeSovler allHands={boards[0]} />}
+      {boards[0] && <BridgeSolver allHands={boards[0]} />}
 
     </>
   )

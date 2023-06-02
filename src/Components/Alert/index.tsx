@@ -1,6 +1,6 @@
-import ReactDOM from 'react-dom/client'
-import { useEffect, useState } from "react"
-import Alert from "./Alert"
+import ReactDOM from 'react-dom/client';
+import { useEffect, useState } from "react";
+import Alert from "./Alert";
 
 export type AlertType = "success" | "error" | "warning" | "info";
 export interface AlertApi {
@@ -16,20 +16,20 @@ export interface Notice {
   type: AlertType;
 }
 
-let seed = 0
-const now = Date.now()
+let seed = 0;
+const now = Date.now();
 const getUuid = (): string => {
-  const id = seed
-  seed += 1
-  return `MESSAGE_${now}_${id}`
+  const id = seed;
+  seed += 1;
+  return `MESSAGE_${now}_${id}`;
 }
 
-let add: (notice: Notice) => void
+let add: (notice: Notice) => void;
 
 export const AlertContainer = () => {
-  const [notices, setNotices] = useState<Notice[]>([])
-  const timeout = 3 * 1000
-  const maxCount = 10
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const timeout = 3 * 1000;
+  const maxCount = 10;
 
   const remove = (notice: Notice) => {
     const { key } = notice
@@ -108,4 +108,4 @@ const api: AlertApi = {
   }
 }
 
-export default api
+export default api;

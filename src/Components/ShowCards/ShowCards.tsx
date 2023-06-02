@@ -19,7 +19,7 @@ export default function ShowCards(props: ShowCardsProps) {
       <div className="predicted">{children}</div>
       <div className="double-dummy">{doubleDummy}</div>
       {all_hands.map((all_hand, idx) => (
-        <div className={PROGRAM_POSITIONS[idx] + "hand"}>
+        <div key={idx} className={PROGRAM_POSITIONS[idx] + "hand"}>
           <ShowOneHand position={PROGRAM_POSITIONS[idx]} hand={all_hand} {...rest}></ShowOneHand>
         </div>
       ))}
