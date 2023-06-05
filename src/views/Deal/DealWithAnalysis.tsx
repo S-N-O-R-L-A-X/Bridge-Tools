@@ -12,7 +12,7 @@ import BridgeSolver from "../Analysis/BridgeSolverOnline";
 import { DealContextProps } from "../../Utils/interfaces-for-components";
 
 
-export const AnalysisDealContext = createContext<DealContextProps>({ contextType: "analysis", known_cards: new Array(52).fill(-1), changeKnown_cards: () => {} });
+import { DealContext } from "../../Utils/interfaces-for-components";
 
 function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
   const boards: Hand[][] = [];
@@ -113,12 +113,12 @@ export default function DealWithAnalysis() {
           <div>
             <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
           </div>
-          <AnalysisDealContext.Provider value={{ known_cards, changeKnown_cards, contextType: "analysis" }}>
+          <DealContext.Provider value={{ known_cards, changeKnown_cards, contextType: "analysis" }}>
             <HandSetting ref={Nref} position="N" getData={getData} />
             <HandSetting ref={Sref} position="S" getData={getData} />
             <HandSetting ref={Eref} position="E" getData={getData} />
             <HandSetting ref={Wref} position="W" getData={getData} />
-          </AnalysisDealContext.Provider>
+          </DealContext.Provider>
         </fieldset>
         <br />
         <button onClick={handleClick}>Get new boards</button>
