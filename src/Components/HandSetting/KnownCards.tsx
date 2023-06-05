@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { COLORS, POSITION2NUMBER, RANK2CARD } from "../../Utils/maps";
-import { DealContext } from "../../Utils/interfaces-for-components";
+import { DealContext } from "../../views/Deal/DealContext";
 import { HandSettingContext } from "./HandSetting";
 
 
@@ -39,35 +39,25 @@ export default function KnownCards() {
   }
 
   return (
-    <DealContext.Consumer>
+    <>
+      <button onClick={handleClick}>设置{hand_context.position}的已知牌张信息</button>
       {
-        (context1) =>
-          <HandSettingContext.Consumer>
-            {
-              (context) =>
-                <>
-                  <button onClick={handleClick}>设置{context.position}的已知牌张信息</button>
-                  {
-                    show &&
-                    <div>
-                      {
-                        COLORS.map((color, key) =>
-                          <div key={key}>{color}  {RANK2CARD.map((val, idx) =>
-                            <button key={key + idx} onClick={(e) => handleCardClick(13 * key + idx, e)}
-                              disabled={context1.known_cards[13 * key + idx] !== -1 && context1.known_cards[13 * key + idx] !== 0}
-                              className={(context1.known_cards[13 * key + idx] >= 0 ? "known" : "unknown") + " " + (to_deal_cards.has(13 * key + idx) ? "now" : "")}>
-                              {val}
-                            </button>)}
-                          </div>
-                        )
-                      }
-                      <button onClick={handleSubmit}>确认</button> <button onClick={handleCancel}>取消</button>
-                    </div>
-                  }
-                </>
-            }
-          </HandSettingContext.Consumer>
+        show &&
+        <div>
+          {
+            COLORS.map((color, key) =>
+              <div key={key}>{color}  {RANK2CARD.map((val, idx) =>
+                <button key={key + idx} onClick={(e) => handleCardClick(13 * key + idx, e)}
+                  disabled={deal_context.known_cards[13 * key + idx] !== -1 && deal_context.known_cards[13 * key + idx] !== 0}
+                  className={(deal_context.known_cards[13 * key + idx] >= 0 ? "known" : "unknown") + " " + (to_deal_cards.has(13 * key + idx) ? "now" : "")}>
+                  {val}
+                </button>)}
+              </div>
+            )
+          }
+          <button onClick={handleSubmit}>确认</button> <button onClick={handleCancel}>取消</button>
+        </div>
       }
-    </DealContext.Consumer >
+    </>
   )
 }

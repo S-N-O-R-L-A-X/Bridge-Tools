@@ -1,7 +1,7 @@
 import Hand from "./Hand";
 import Board from "./Board";
-import handFilter, { HandFilterProps, OneFilterProps, OneHandFilterProps } from "./HandFilter";
-import { useState, ChangeEvent, useRef, createContext, useCallback } from "react";
+import handFilter, { OneFilterProps } from "./HandFilter";
+import { useState, ChangeEvent, useRef, useCallback } from "react";
 import ShowAllBoards from "../../Components/ShowAllBoards/ShowAllBoards";
 import HandSetting from "../../Components/HandSetting/HandSetting";
 
@@ -10,7 +10,7 @@ import Card from "./Card";
 import { idx2card } from "../../Utils/utils";
 import { Position, PROGRAM_POSITIONS } from "../../Utils/maps";
 
-import { DealContext } from "../../Utils/interfaces-for-components";
+import { DealContext } from "./DealContext";
 
 function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
   const boards: Hand[][] = [];
@@ -89,7 +89,6 @@ export default function DealWithHands() {
         setAllFilters(allFilters);
       }
     })
-    console.log(allFilters);
     setBoards(deal(Number(board_size), allFilters));
   }
 

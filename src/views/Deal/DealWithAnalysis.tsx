@@ -1,7 +1,7 @@
 import Hand from "./Hand";
 import Board from "./Board";
 import handFilter, { OneFilterProps } from "./HandFilter";
-import { useState, ChangeEvent, useRef, createContext, useCallback } from "react";
+import { useState, ChangeEvent, useRef, useCallback } from "react";
 import HandSetting from "../../Components/HandSetting/HandSetting";
 
 import "./index.css";
@@ -9,10 +9,7 @@ import Card from "./Card";
 import { idx2card } from "../../Utils/utils";
 import { Position, PROGRAM_POSITIONS } from "../../Utils/maps";
 import BridgeSolver from "../Analysis/BridgeSolverOnline";
-import { DealContextProps } from "../../Utils/interfaces-for-components";
-
-
-import { DealContext } from "../../Utils/interfaces-for-components";
+import { DealContext } from "./DealContext";
 
 function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
   const boards: Hand[][] = [];
@@ -79,7 +76,6 @@ export default function DealWithAnalysis() {
   }, [])
 
   function handleClick() {
-    console.log(known_cards);
     const all_known_cards: Card[][] = new Array(4).fill(0).map(() => new Array()); // all_known_cards[position]=cards
     known_cards.forEach((known_card, idx) => {
       if (known_card > -1) {
