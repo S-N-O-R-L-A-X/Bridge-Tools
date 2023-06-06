@@ -10,6 +10,7 @@ import { idx2card } from "../../Utils/utils";
 import { Position, PROGRAM_POSITIONS } from "../../Utils/maps";
 import BridgeSolver from "../Analysis/BridgeSolverOnline";
 import { DealContext } from "./DealContext";
+import AllBridgeSolverOnline from "../Analysis/AllBridgeSolverOnline";
 
 function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
   const boards: Hand[][] = [];
@@ -120,7 +121,7 @@ export default function DealWithAnalysis() {
         <button onClick={handleClick}>Get new boards</button>
 
       </div>
-      {boards[0] && <BridgeSolver allHands={boards[0]} />}
+      {boards[0] && <AllBridgeSolverOnline all_boards={boards} />}
 
     </>
   )

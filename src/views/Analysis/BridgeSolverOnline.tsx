@@ -22,10 +22,11 @@ interface RequestSpecificTrump {
 
 interface BridgeSolverProps {
   allHands?: Hand[];
+  boardNumber?: number;
 }
 
 export default function BridgeSolver(props: BridgeSolverProps) {
-  const { allHands = [] } = props;
+  const { allHands = [], boardNumber = 1 } = props;
   const [predictedContract, setPredictedContract] = useState<string>();
   const [predictedScore, setPredictedScore] = useState<string>();
   const [ddtricks, setDDtricks] = useState<string>();
@@ -45,7 +46,7 @@ export default function BridgeSolver(props: BridgeSolverProps) {
 
   return (
     <>
-      <ShowCards all_hands={allHands} board_number={1} doubleDummy={ShowTricksInstance} >
+      <ShowCards all_hands={allHands} board_number={boardNumber} doubleDummy={ShowTricksInstance} >
         <p>{predictedContract}</p>
         <p>{predictedScore}</p>
       </ShowCards>
