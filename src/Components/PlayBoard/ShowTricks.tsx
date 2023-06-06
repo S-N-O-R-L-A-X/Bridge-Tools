@@ -11,8 +11,8 @@ export default function ShowTricks(props: ShowTricksProps) {
     for (let i = 0; i < 4; ++i) {
       const player_trick = [];
       for (let j = 0; j < 5; ++j) {
-        if (ddtricks[i * 4 + j] !== "*") {
-          player_trick.push(parseInt(ddtricks[i * 4 + j], 16));
+        if (ddtricks[i * 5 + j] !== "*") {
+          player_trick.push(parseInt(ddtricks[i * 5 + j], 16));
         }
         else {
           player_trick.push("*");
