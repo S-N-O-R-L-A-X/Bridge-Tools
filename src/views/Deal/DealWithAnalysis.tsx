@@ -8,7 +8,6 @@ import "./index.css";
 import Card from "./Card";
 import { idx2card } from "../../Utils/utils";
 import { Position, PROGRAM_POSITIONS } from "../../Utils/maps";
-import BridgeSolver from "../Analysis/BridgeSolverOnline";
 import { DealContext } from "./DealContext";
 import AllBridgeSolverOnline from "../Analysis/AllBridgeSolverOnline";
 
@@ -19,7 +18,6 @@ function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
       const players: Hand[] = [new Hand(), new Hand(), new Hand(), new Hand()];
       const B = new Board(Math.floor(Math.random() * 16));
       const { N, S, W, E } = hand_filter;
-
       let known_cards: Record<string, Card[]> | undefined = undefined;
       if (N?.cards || S?.cards || W?.cards || E?.cards) {
         known_cards = {};
@@ -85,7 +83,7 @@ export default function DealWithAnalysis() {
     })
     all_known_cards.forEach((card, idx) => {
       if (card.length > 0) {
-        allFilters[PROGRAM_POSITIONS[idx]] = { cards: card };
+        allFilters[PROGRAM_POSITIONS[idx]] = { ...allFilters[PROGRAM_POSITIONS[idx]], cards: card };
         setAllFilters(allFilters);
       }
     })

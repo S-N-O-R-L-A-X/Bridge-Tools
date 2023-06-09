@@ -85,7 +85,7 @@ export default function DealWithHands() {
     })
     all_known_cards.forEach((card, idx) => {
       if (card.length > 0) {
-        allFilters[PROGRAM_POSITIONS[idx]] = { cards: card };
+        allFilters[PROGRAM_POSITIONS[idx]] = { ...allFilters[PROGRAM_POSITIONS[idx]], cards: card };
         setAllFilters(allFilters);
       }
     })
