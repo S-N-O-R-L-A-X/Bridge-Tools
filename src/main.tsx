@@ -48,7 +48,7 @@ const router = createHashRouter(route_info);
 
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
+  <React.Fragment>
     <RouterProvider router={router} />
-  </React.StrictMode>,
+  </React.Fragment>,
 )

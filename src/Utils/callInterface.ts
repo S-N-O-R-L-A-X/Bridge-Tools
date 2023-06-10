@@ -1,4 +1,5 @@
 import Hand from "../views/Deal/Hand";
+import { retry } from "./utils";
 
 interface RequestBoard {
   dealstr: string;
@@ -48,6 +49,6 @@ export async function callDDSOL(hands: Hand[]) {
     url += key + "=" + value + "&";
   }
   url = url.substring(0, url.length - 1); // delete last &
-  const res = await fetch(url);
+  const res = await retry(fetch, url) as Response;
   return res.json();
 }
