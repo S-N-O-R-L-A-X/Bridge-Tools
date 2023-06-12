@@ -16,10 +16,19 @@ export async function sleep(millis: number) {
   })
 }
 
-export function retry(fn: Function, params: any, times = 1e9 + 7) {
+export function retryFetch(url: string, times = 1e9 + 7) {
   return new Promise((resolve, reject) => {
     const attempt = () => {
-      fn(params).then(resolve).catch((err: Error) => {
+      fetch(url).then((res: any) => {
+        console.log(res);
+        if (res.ok) {
+          resolve(res);
+        }
+        else {
+          throw new Error(res);
+        }
+      }).catch(async (err: Error) => {
+        await sleep(5000);
         times-- > 0 ? attempt() : reject("fail");
       })
     }
