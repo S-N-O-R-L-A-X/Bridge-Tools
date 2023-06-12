@@ -28,7 +28,7 @@ export function retryFetch(url: string, times = 1e9 + 7) {
           throw new Error(res);
         }
       }).catch(async (err: Error) => {
-        await sleep(5000);
+        await sleep(10000);
         times-- > 0 ? attempt() : reject("fail");
       })
     }
