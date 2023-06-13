@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createHashRouter } from 'react-router-dom'
 import App from './App'
+import PlayBoard from './Components/PlayBoard/PlayBoard'
 import './index.css'
 import Analysis from './views/Analysis/Analysis'
 import BridgeSolver from './views/Analysis/BridgeSolverOnline'
@@ -39,6 +40,11 @@ const route_info = [
         path: "/deal-analysis",
         title: "分析",
         element: <DealWithAnalysis />
+      },
+      {
+        path: "/play-board",
+        title: "打牌面板",
+        element: <PlayBoard />
       },
     ],
   },
