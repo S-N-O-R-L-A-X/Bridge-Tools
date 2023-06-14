@@ -9,7 +9,7 @@ interface ShowCardsProps extends PropsWithChildren {
   all_hands: Hand[];
   board_number: number;
   doubleDummy?: ReactNode;
-  canClick: boolean;
+  canClick?: boolean;
 }
 
 export default function ShowCards(props: ShowCardsProps) {
