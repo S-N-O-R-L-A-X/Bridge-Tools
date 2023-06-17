@@ -3,6 +3,8 @@ import Hand from "../../views/Deal/Hand";
 import ShowCards from "../ShowCards/ShowCards";
 import ShowTricks from "./ShowTricks";
 
+import "./PlayBoard.css";
+
 interface PlayBoardProps {
   predictedContract?: string;
   predictedScore?: string;
@@ -18,10 +20,11 @@ export default function PlayBoard(props: PlayBoardProps) {
 
   return (
     <div>
-      <ShowCards all_hands={examples} board_number={1} doubleDummy={ShowTricksInstance} canClick>
+      <iframe id="bridgeweb-board" name="myiframe" src="https://dds.bridgewebs.com/bridgesolver/upload.htm" style={{ "display": "block" }}></iframe>
+      {/* <ShowCards all_hands={examples} board_number={1} doubleDummy={ShowTricksInstance} canClick>
         <p>{predictedContract}</p>
         <p>{predictedScore}</p>
-      </ShowCards>
+      </ShowCards> */}
     </div>
   )
 }
