@@ -21,6 +21,7 @@ export default function BridgeSolver(props: BridgeSolverProps) {
 	const [ddtricks, setDDtricks] = useState<(string | number)[][]>();
 
 	async function analyzeOffline() {
+		// @ts-ignore
 		const res = calcDDTable(convertAllHandsToPBN(allHands));
 		const table = new Array(4).fill(0).map(() => new Array(5).fill("*"));
 		table[0][0] = res["N"]["N"];

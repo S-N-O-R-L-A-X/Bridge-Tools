@@ -58,6 +58,7 @@ export default function DealWithHands() {
   const [board_size, setBoard_size] = useState<number>(1);
   const [boards, setBoards] = useState<Hand[][]>([]);
   const [beautify, setBeautify] = useState<boolean>(false);
+  const [DDS, setDDS] = useState<boolean>(false);
   const [known_cards, setKnown_cards] = useState<number[]>(new Array(52).fill(-1)); // all cards
   const [allFilters, setAllFilters] = useState<Record<string, OneFilterProps>>({});
 
@@ -100,6 +101,10 @@ export default function DealWithHands() {
     setBeautify((e.target as HTMLInputElement).checked);
   }
 
+  function handleDDS(e: ChangeEvent) {
+    setDDS((e.target as HTMLInputElement).checked);
+  }
+
   return (
     <>
       <div className="deal-setting">
@@ -109,6 +114,7 @@ export default function DealWithHands() {
 
           <div>
             <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
+            <input type="checkbox" id="dds" name="dds" onChange={handleDDS} />是否需要四明手分析？（会更花费时间）
           </div>
           <DealContext.Provider value={{ known_cards, changeKnown_cards, contextType: "multi" }}>
             <HandSetting ref={Nref} position="N" getData={getData} />
@@ -121,7 +127,7 @@ export default function DealWithHands() {
         <button onClick={handleClick}>Get new boards</button>
 
       </div>
-      <ShowAllBoards all_boards={boards} beautify={beautify} />
+      <ShowAllBoards all_boards={boards} beautify={beautify} dds={DDS} />
     </>
   )
 }

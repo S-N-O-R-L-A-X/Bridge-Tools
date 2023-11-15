@@ -36,11 +36,11 @@ const route_info = [
         title: "分析",
         element: <BridgeSolver />
       },
-      {
-        path: "/deal-analysis",
-        title: "分析",
-        element: <DealWithAnalysis />
-      },
+      // {
+      //   path: "/deal-analysis",
+      //   title: "分析",
+      //   element: <DealWithAnalysis />
+      // },
       {
         path: "/play-board",
         title: "打牌面板",
