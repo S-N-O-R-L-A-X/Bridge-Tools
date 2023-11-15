@@ -9,6 +9,7 @@ import BridgeSolver from './views/Analysis/BridgeSolverOnline'
 import Deal from './views/Deal/Deal'
 import DealWithAnalysis from './views/Deal/DealWithAnalysis'
 import DealWithHands from './views/Deal/DealWithHands'
+import DDS from './views/DDS/DDS'
 
 const route_info = [
   {
@@ -45,6 +46,11 @@ const route_info = [
         path: "/play-board",
         title: "打牌面板",
         element: <PlayBoard />
+      },
+      {
+        path: "/dds",
+        title: "dds",
+        element: <DDS />
       },
     ],
   },
