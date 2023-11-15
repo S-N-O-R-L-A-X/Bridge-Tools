@@ -47,11 +47,6 @@ const route_info = [
         title: "打牌面板",
         element: <PlayBoard />
       },
-      {
-        path: "/dds",
-        title: "dds",
-        element: <DDS />
-      },
     ],
   },
 ];
