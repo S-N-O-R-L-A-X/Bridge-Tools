@@ -4,7 +4,7 @@ import "./index.css"
 import BridgeSolver from "../../views/Analysis/BridgeSolverOffline";
 interface ShowAllBoardsProps {
   all_boards: Hand[][];
-  dds: boolean;
+  dds?: boolean;
   beautify?: boolean;
 }
 

@@ -128,7 +128,7 @@ export default function Deal() {
         <button onClick={handleClick}>Get new boards</button>
 
       </div>
-      <ShowAllBoards all_boards={boards} beautify={beautify} />
+      <ShowAllBoards all_boards={boards} beautify={beautify} dds={false}/>
     </>
   )
 }
