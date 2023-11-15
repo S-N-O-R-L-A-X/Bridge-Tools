@@ -1,5 +1,5 @@
 import Hand from "../views/Deal/Hand";
-import { retryFetch } from "./utils";
+import { retryFetch, parseHand } from "./utils";
 
 interface RequestBoard {
   dealstr: string;
@@ -7,28 +7,6 @@ interface RequestBoard {
   request: "m"; // g means steps in analysis, m means get straight
   uniqueTID: number; // get by new Date().getTime()
   vul?: "None"
-}
-
-function parseHand(hand: Hand) {
-  let ret = "";
-  function replace10(cards: string[]) {
-    cards.forEach((card) => {
-      if (card === "10") {
-        ret += "T";
-      }
-      else {
-        ret += card;
-      }
-    })
-  }
-  replace10(hand.hand["S"]);
-  ret += ".";
-  replace10(hand.hand["H"]);
-  ret += ".";
-  replace10(hand.hand["D"]);
-  ret += ".";
-  replace10(hand.hand["C"]);
-  return ret;
 }
 
 export async function callDDSOL(hands: Hand[]) {

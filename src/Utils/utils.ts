@@ -1,4 +1,5 @@
 import Card from "../views/Deal/Card";
+import Hand from "../views/Deal/Hand";
 import { COLORS, NUMBER2COLORSHORT, RANK2CARD } from "./maps";
 
 export function idx2card(idx: number): Card {
@@ -9,6 +10,29 @@ export function idx2card(idx: number): Card {
 export function card2idx(card: Card): number {
   return Card.RANK[card.rank] + 13 * (NUMBER2COLORSHORT[card.suit]);
 }
+
+export function parseHand(hand: Hand) {
+  let ret = "";
+  function replace10(cards: string[]) {
+    cards.forEach((card) => {
+      if (card === "10") {
+        ret += "T";
+      }
+      else {
+        ret += card;
+      }
+    })
+  }
+  replace10(hand.hand["S"]);
+  ret += ".";
+  replace10(hand.hand["H"]);
+  ret += ".";
+  replace10(hand.hand["D"]);
+  ret += ".";
+  replace10(hand.hand["C"]);
+  return ret;
+}
+
 
 export async function sleep(millis: number) {
   await new Promise((resolve, reject) => {
