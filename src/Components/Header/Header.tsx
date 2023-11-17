@@ -5,7 +5,7 @@ export default function Header() {
   }
   return (
     <div>
-      These are Bridge Tools written by 小米 and <a href="https://github.com/S-N-O-R-L-A-X" > SNORLAX</a>
+      These are Bridge Tools written by <a href="https://github.com/S-N-O-R-L-A-X" > SNORLAX</a> with the help of 小米. 
       <a href="https://S-N-O-R-L-A-X.github.io" target="_blank" className="github-corner" aria-label="Go to his homepage">
         <svg viewBox="0 0 250 250" aria-hidden="true">
           <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
