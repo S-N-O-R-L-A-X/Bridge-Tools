@@ -12,7 +12,6 @@ interface BridgeSolverProps {
 function convertAllHandsToPBN(allHands: Hand[]) {
 	let str = "N:";
 	str += parseHand(allHands[0]) + " " + parseHand(allHands[2]) + " " + parseHand(allHands[1]) + " " + parseHand(allHands[3]);
-	console.log(str);
 	return str;
 }
 
@@ -46,7 +45,6 @@ export default function BridgeSolver(props: BridgeSolverProps) {
 		table[3][4] = res["C"]["W"];
 
 		setDDtricks(table);
-		console.log(res);
 	}
 
 	useEffect(() => {
