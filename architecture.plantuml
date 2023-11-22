@@ -1,0 +1,35 @@
+@startuml
+
+class Board {
+	all_cards: Card[]
+  known_cards: Set<number>
+  boardnum: number
+  vul: string
+  dealer: string
+  Nhand: Hand
+  Shand: Hand
+  Ehand: Hand
+  Whand: Hand
+
+	+ shuffle(): void
+	+ deal(hands: Hand[], fixed_cards?: { [key: string]: Card[] }): void
+}
+
+class Hand {
+  cards: Card[]
+  hand: { [key: string]: string[] }
+  points: number
+  shape: { [key: string]: number }
+
+	+ getMostCards(): ColorsShort[]
+	+ getFewestCards(): ColorsShort[]
+	+ add(card: Card): void
+	+ addCards(cards: Card[]): void
+	+ sortHand(): void
+	+ showWithColors(): string[]
+  + showWithoutColors(): string[]
+}
+
+
+
+@enduml
