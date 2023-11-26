@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import ShowTricks from "../../Components/PlayBoard/ShowTricks";
-import ShowCards from "../../Components/ShowCards/ShowCards";
 import Hand from "../Deal/Hand";
 import { parseHand } from "../../Utils/utils";
 
 interface BridgeSolverProps {
 	allHands?: Hand[];
-	boardNumber?: number;
 }
 
 function convertAllHandsToPBN(allHands: Hand[]) {
@@ -15,8 +13,8 @@ function convertAllHandsToPBN(allHands: Hand[]) {
 	return str;
 }
 
-export default function BridgeSolver(props: BridgeSolverProps) {
-	const { allHands = [], boardNumber = 1 } = props;
+export default function OfflineBridgeSolver(props: BridgeSolverProps) {
+	const { allHands = [] } = props;
 	const [ddtricks, setDDtricks] = useState<(string | number)[][]>();
 
 	async function analyzeOffline() {
@@ -51,12 +49,8 @@ export default function BridgeSolver(props: BridgeSolverProps) {
 		analyzeOffline();
 	}, [allHands]);
 
-	const ShowTricksInstance = <ShowTricks ddtricks={ddtricks} />;
-
 	return (
-		<>
-			<ShowCards all_hands={allHands} board_number={boardNumber} doubleDummy={ShowTricksInstance} />
-		</>
+		<ShowTricks ddtricks={ddtricks} />
 	)
 
 }
