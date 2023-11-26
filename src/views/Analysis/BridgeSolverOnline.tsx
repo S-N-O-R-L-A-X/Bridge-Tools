@@ -46,10 +46,10 @@ export default function BridgeSolver(props: BridgeSolverProps) {
 
   return (
     <>
-      <ShowCards all_hands={allHands} board_number={boardNumber} doubleDummy={ShowTricksInstance} >
+      {/* <ShowCards all_hands={allHands} board_number={boardNumber} doubleDummy={ShowTricksInstance} >
         <p>{predictedContract}</p>
         <p>{predictedScore}</p>
-      </ShowCards>
+      </ShowCards> */}
     </>
   )
 

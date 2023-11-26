@@ -18,10 +18,6 @@ export default function MyPlayBoard(props: PlayBoardProps) {
 
   return (
     <div>
-      <ShowCards all_hands={examples} board_number={1} doubleDummy={ShowTricksInstance} canClick>
-        <p>{predictedContract}</p>
-        <p>{predictedScore}</p>
-      </ShowCards>
     </div>
   )
 }
