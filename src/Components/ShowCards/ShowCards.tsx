@@ -3,8 +3,7 @@ import ShowOneHand from "./ShowOneHand";
 
 import "./index.css";
 import { PROGRAM_POSITIONS } from "../../Utils/maps";
-import { PropsWithChildren } from "react";
-import OfflineBridgeSolver from "../../views/Analysis/OfflineBridgeSolver";
+import React, { PropsWithChildren, Suspense } from "react";
 
 interface ShowCardsProps extends PropsWithChildren {
   all_hands: Hand[];
@@ -12,6 +11,8 @@ interface ShowCardsProps extends PropsWithChildren {
   dds: boolean;
   canClick?: boolean;
 }
+
+const OfflineBridgeSolver = React.lazy(() => import("../../views/Analysis/OfflineBridgeSolver"))
 
 export default function ShowCards(props: ShowCardsProps) {
   const { all_hands, board_number, children, dds, ...rest } = props;
@@ -21,7 +22,7 @@ export default function ShowCards(props: ShowCardsProps) {
       <div className="predicted">{children}</div>
       {dds &&
         <div className="double-dummy">
-          <OfflineBridgeSolver allHands={all_hands} />
+          <Suspense fallback={<div>Loading...</div>}> <OfflineBridgeSolver allHands={all_hands} /> </Suspense>
         </div>
       }
 
