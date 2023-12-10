@@ -2,7 +2,6 @@ import Hand from "./Hand";
 import Board from "./Board";
 import handFilter, { OneFilterProps } from "./HandFilter";
 import { useState, ChangeEvent, useRef, useCallback } from "react";
-import ShowAllBoards from "../../Components/ShowAllBoards/ShowAllBoards";
 import HandSetting from "../../Components/HandSetting/HandSetting";
 
 import "./index.css";
@@ -11,6 +10,7 @@ import { idx2card } from "../../Utils/utils";
 import { Position, PROGRAM_POSITIONS } from "../../Utils/maps";
 
 import { DealContext } from "./DealContext";
+import ShowResults from "../Show/ShowResults";
 
 function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
   const boards: Hand[][] = [];
@@ -127,7 +127,7 @@ export default function DealWithHands() {
         <button onClick={handleClick}>Get new boards</button>
 
       </div>
-      <ShowAllBoards all_boards={boards} beautify={beautify} dds={DDS} />
+      <ShowResults all_boards={boards} beautify={beautify} dds={DDS} />
     </>
   )
 }
