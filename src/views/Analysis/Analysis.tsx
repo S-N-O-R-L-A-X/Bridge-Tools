@@ -29,16 +29,18 @@ export default function Analysis() {
     async function countTricks() {
       for (const board of all_boards) {
         if (!board.ddtricks) {
-          board.ddtricks = await analyzeOffline(board.board)
+          board.ddtricks = await analyzeOffline(board.board);
         }
         MatrixAdd(table, board.ddtricks as (string | number)[][]);
       }
-
-      setTable(MatrixDivide(table,all_boards.length||1));
+      return Promise.resolve();
     }
-    countTricks();
-
-  }, [all_boards])
+    countTricks().then(()=>{
+      if (all_boards.length > 0) {
+        setTable(MatrixDivide(table, all_boards.length));
+      }
+    })
+  }, [all_boards.length])
 
   return (
     <>
