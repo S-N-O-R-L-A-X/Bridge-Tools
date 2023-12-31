@@ -26,7 +26,7 @@ export default function ShowTricks(props: ShowTricksProps) {
   }
 
   return (
-    <table>
+    <table className="showTricks">
       <tbody>
         <tr><td></td>{CONTRACTCOLORS.map((v) => <td key={v}>{v}</td>)}</tr>
         {tricks.map((trick, idx) => <tr key={"row" + idx}><td>{PROGRAM_POSITIONS[idx]}</td>{trick.map((t, idx2) => <td key={"row" + idx + "col" + idx2}>{t}</td>)}</tr>)}

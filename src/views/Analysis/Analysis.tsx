@@ -1,7 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import ShowTricks from "../../Components/PlayBoard/ShowTricks";
 import { analyzeOffline } from "../../Utils/utils";
-import { CompleteBoard, ShowResultsContext } from "../Show/ShowResults";
+import { ShowResultsContext } from "../Show/ShowResults";
+import "./analysis.css"
 
 function MatrixAdd(a: number[][], b: (string | number)[][]) {
   for (let i = 0; i < a.length; ++i) {
@@ -35,7 +36,7 @@ export default function Analysis() {
       }
       return Promise.resolve();
     }
-    countTricks().then(()=>{
+    countTricks().then(() => {
       if (all_boards.length > 0) {
         setTable(MatrixDivide(table, all_boards.length));
       }
@@ -43,10 +44,10 @@ export default function Analysis() {
   }, [all_boards.length])
 
   return (
-    <>
-      The average tricks:
-      <ShowTricks ddtricks={table} />
-    </>
+      <fieldset  className="showStatistics">
+        <legend>The average tricks:</legend>
+        <ShowTricks ddtricks={table} />
+      </fieldset>
   )
 }
 
