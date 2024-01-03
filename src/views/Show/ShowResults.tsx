@@ -16,16 +16,17 @@ interface ShowResultsProps {
 
 interface ShowResultsContextProps {
 	all_boards: CompleteBoard[];
+	dds: boolean;
 }
 
-export const ShowResultsContext = createContext<ShowResultsContextProps>({ all_boards: [] });
+export const ShowResultsContext = createContext<ShowResultsContextProps>({ all_boards: [], dds: false });
 
 export default function ShowResults(props: ShowResultsProps) {
-	const { all_boards, ...rest } = props;
+	const { all_boards, dds } = props;
 	return (
-		<ShowResultsContext.Provider value={{ all_boards }}>
-			<Analysis />
-			<ShowAllBoards {...rest} />
+		<ShowResultsContext.Provider value={{ all_boards, dds }}>
+			{dds && <Analysis />}
+			<ShowAllBoards />
 		</ShowResultsContext.Provider>
 	)
 }

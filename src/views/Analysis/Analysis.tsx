@@ -44,7 +44,7 @@ export default function Analysis() {
   }, [all_boards.length])
 
   return (
-      <fieldset  className="showStatistics">
+      <fieldset className="showStatistics">
         <legend>The average tricks:</legend>
         <ShowTricks ddtricks={table} />
       </fieldset>
