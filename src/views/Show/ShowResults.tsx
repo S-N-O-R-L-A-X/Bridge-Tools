@@ -22,11 +22,11 @@ interface ShowResultsContextProps {
 export const ShowResultsContext = createContext<ShowResultsContextProps>({ all_boards: [], dds: false });
 
 export default function ShowResults(props: ShowResultsProps) {
-	const { all_boards, dds } = props;
+	const { all_boards, dds, ...rest } = props;
 	return (
 		<ShowResultsContext.Provider value={{ all_boards, dds }}>
 			{dds && <Analysis />}
-			<ShowAllBoards />
+			<ShowAllBoards {...rest} />
 		</ShowResultsContext.Provider>
 	)
 }

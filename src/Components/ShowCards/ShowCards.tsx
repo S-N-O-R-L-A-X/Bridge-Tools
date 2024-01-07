@@ -10,6 +10,7 @@ interface ShowCardsProps extends PropsWithChildren {
   board_number: number;
   dds: boolean;
   canClick?: boolean;
+  beautify?: boolean;
 }
 
 const OfflineBridgeSolver = React.lazy(() => import("../../views/Analysis/OfflineBridgeSolver"))
