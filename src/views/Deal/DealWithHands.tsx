@@ -1,7 +1,7 @@
 import Hand from "./Hand";
 import Board from "./Board";
 import handFilter, { OneFilterProps } from "./HandFilter";
-import { useState, ChangeEvent, useRef, useCallback } from "react";
+import { useState, ChangeEvent, useRef, useCallback, useMemo } from "react";
 import HandSetting from "../../Components/HandSetting/HandSetting";
 
 import "./index.css";
@@ -127,7 +127,9 @@ export default function DealWithHands() {
         <button onClick={handleClick}>Get new boards</button>
 
       </div>
-      <ShowResults all_boards={boards.map((x) => { return { board: x } })} beautify={beautify} dds={DDS} />
+      {/* <ShowResults all_boards={boards.map((x) => { return { board: x } })} beautify={beautify} dds={DDS} /> */}
+      {useMemo(() => <ShowResults all_boards={boards.map((x) => { return { board: x } })} beautify={beautify} dds={DDS} />
+        , [DDS, beautify, boards])}
     </>
   )
 }

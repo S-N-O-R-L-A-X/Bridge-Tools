@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import React, { createContext } from "react";
 import ShowAllBoards from "../../Components/ShowAllBoards/ShowAllBoards";
 import Hand from "../Deal/Hand";
 import Analysis from "../Analysis/Analysis";
@@ -21,7 +21,7 @@ interface ShowResultsContextProps {
 
 export const ShowResultsContext = createContext<ShowResultsContextProps>({ all_boards: [], dds: false });
 
-export default function ShowResults(props: ShowResultsProps) {
+function ShowResults(props: ShowResultsProps) {
 	const { all_boards, dds, ...rest } = props;
 	return (
 		<ShowResultsContext.Provider value={{ all_boards, dds }}>
@@ -30,3 +30,5 @@ export default function ShowResults(props: ShowResultsProps) {
 		</ShowResultsContext.Provider>
 	)
 }
+
+export default React.memo(ShowResults);

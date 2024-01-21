@@ -41,7 +41,7 @@ export default function Analysis() {
         setTable(MatrixDivide(table, all_boards.length));
       }
     })
-  }, [all_boards.length])
+  }, [all_boards])
 
   return (
       <fieldset className="showStatistics">
