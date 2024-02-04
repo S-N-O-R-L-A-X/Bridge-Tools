@@ -31,4 +31,4 @@ function ShowResults(props: ShowResultsProps) {
 	)
 }
 
-export default React.memo(ShowResults);
+export default ShowResults;
