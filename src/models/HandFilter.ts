@@ -93,13 +93,6 @@ function oneHandFilter(props: OneHandFilterProps) {
     return false;
   }
 
-  // if (cards.length > 0) {
-  //   for (const card of hand.cards) {
-  //     if (!cards.some(c => c.suit === card.suit && c.rank === card.rank)) {
-  //       return false;
-  //     }
-  //   }
-  // }
   return true;
 
 }

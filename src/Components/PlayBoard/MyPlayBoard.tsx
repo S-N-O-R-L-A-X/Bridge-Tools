@@ -1,5 +1,5 @@
-import Board from "../../views/Deal/Board";
-import Hand from "../../views/Deal/Hand";
+import Board from "../../models/Board";
+import Hand from "../../models/Hand";
 import ShowCards from "../ShowCards/ShowCards";
 import ShowTricks from "./ShowTricks";
 

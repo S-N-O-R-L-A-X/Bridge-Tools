@@ -1,4 +1,4 @@
-import Hand from "../Deal/Hand";
+import Hand from "../../models/Hand";
 import BridgeSolver from "./BridgeSolverOnline";
 
 interface AllBridgeSolverOnlineProps {

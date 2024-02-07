@@ -1,4 +1,4 @@
-import Hand from "../../views/Deal/Hand";
+import Hand from "../../models/Hand";
 import { HTMLAttributes, ReactNode } from "react"
 import { NUMBER2COLOR, NUMBER2COLORICON, NUMBER2COLORSHORT, Position, POSITION2FULL } from "../../Utils/maps";
 import { callDDSOL } from "../../Utils/callInterface";

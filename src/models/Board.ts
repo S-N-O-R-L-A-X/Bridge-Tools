@@ -1,6 +1,6 @@
 import Hand from "./Hand";
 import Card from "./Card";
-import { card2idx } from "../../Utils/utils";
+import { card2idx } from "../Utils/utils";
 
 function shuffleAlgo(arr: any[]) {
   let n = arr.length, rand;

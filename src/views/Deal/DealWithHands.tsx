@@ -1,11 +1,11 @@
-import Hand from "./Hand";
-import Board from "./Board";
-import handFilter, { OneFilterProps } from "./HandFilter";
+import Hand from "../../models/Hand";
+import Board from "../../models/Board";
+import handFilter, { OneFilterProps } from "../../models/HandFilter";
 import { useState, ChangeEvent, useRef, useCallback, useMemo } from "react";
 import HandSetting from "../../Components/HandSetting/HandSetting";
 
 import "./index.css";
-import Card from "./Card";
+import Card from "../../models/Card";
 import { idx2card } from "../../Utils/utils";
 import { Position, PROGRAM_POSITIONS } from "../../Utils/maps";
 
@@ -127,9 +127,10 @@ export default function DealWithHands() {
         <button onClick={handleClick}>Get new boards</button>
 
       </div>
-      {/* <ShowResults all_boards={boards.map((x) => { return { board: x } })} beautify={beautify} dds={DDS} /> */}
-      {useMemo(() => <ShowResults all_boards={boards.map((x) => { return { board: x } })} beautify={beautify} dds={DDS} />
-        , [DDS, beautify, boards])}
+      {useMemo(
+        () => <ShowResults all_boards={boards.map((x) => { return { board: x } })} beautify={beautify} dds={DDS} />,
+        [DDS, beautify, boards]
+      )}
     </>
   )
 }

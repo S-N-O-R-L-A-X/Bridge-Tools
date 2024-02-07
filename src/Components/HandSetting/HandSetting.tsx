@@ -1,7 +1,7 @@
 import { useState, ChangeEvent, HTMLAttributes, forwardRef, Ref, createContext } from "react";
 import { Position } from "../../Utils/maps";
-import Card from "../../views/Deal/Card";
-import { OneFilterProps } from "../../views/Deal/HandFilter";
+import Card from "../../models/Card";
+import { OneFilterProps } from "../../models/HandFilter";
 import api from "../Alert";
 import HandShape from "./HandShape";
 import HandSolid from "./HandSolid";

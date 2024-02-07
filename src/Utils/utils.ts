@@ -1,5 +1,5 @@
-import Card from "../views/Deal/Card";
-import Hand from "../views/Deal/Hand";
+import Card from "../models/Card";
+import Hand from "../models/Hand";
 import { COLORS, NUMBER2COLORSHORT, RANK2CARD } from "./maps";
 
 export function idx2card(idx: number): Card {

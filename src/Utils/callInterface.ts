@@ -1,4 +1,4 @@
-import Hand from "../views/Deal/Hand";
+import Hand from "../models/Hand";
 import { retryFetch, parseHand } from "./utils";
 
 interface RequestBoard {

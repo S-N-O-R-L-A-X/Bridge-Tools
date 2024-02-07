@@ -1,4 +1,4 @@
-import { ColorsShort } from "../../Utils/maps";
+import { ColorsShort } from "../Utils/maps";
 
 export default class Card {
   static SUIT: ColorsShort[] = ["S", "H", "D", "C"];

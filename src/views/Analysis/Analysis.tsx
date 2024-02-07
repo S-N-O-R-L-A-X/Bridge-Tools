@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import ShowTricks from "../../Components/PlayBoard/ShowTricks";
 import { analyzeOffline } from "../../Utils/utils";
 import { ShowResultsContext } from "../Show/ShowResults";
@@ -31,7 +31,7 @@ function Analysis() {
   const context = useContext(ShowResultsContext);
   const { all_boards } = context;
 
-  let tmp: number[][]=new Array(4).fill(0).map(() => new Array(5).fill(0))
+  let tmp: number[][] = new Array(4).fill(0).map(() => new Array(5).fill(0));
   useMemo(() => {
     async function countTricks() {
       for (const board of all_boards) {

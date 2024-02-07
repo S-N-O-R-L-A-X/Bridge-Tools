@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import ShowTricks from "../../Components/PlayBoard/ShowTricks";
 import ShowCards from "../../Components/ShowCards/ShowCards";
 import { callDDSOL } from "../../Utils/callInterface";
-import Hand from "../Deal/Hand";
+import Hand from "../../models/Hand";
 
 interface RequestSpecificTrump {
   trumps: "s" | "h" | "d" | "c" | "n";

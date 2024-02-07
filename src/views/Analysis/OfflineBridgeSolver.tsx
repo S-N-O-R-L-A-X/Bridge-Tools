@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import ShowTricks from "../../Components/PlayBoard/ShowTricks";
-import Hand from "../Deal/Hand";
+import Hand from "../../models/Hand";
 import { analyzeOffline } from "../../Utils/utils";
 
 interface BridgeSolverProps {

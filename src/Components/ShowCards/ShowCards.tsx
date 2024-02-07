@@ -1,4 +1,4 @@
-import Hand from "../../views/Deal/Hand";
+import Hand from "../../models/Hand";
 import ShowOneHand from "./ShowOneHand";
 
 import "./index.css";

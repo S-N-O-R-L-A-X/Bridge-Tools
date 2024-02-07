@@ -4,9 +4,7 @@ import { RouterProvider, createHashRouter } from 'react-router-dom'
 import App from './App'
 import PlayBoard from './Components/PlayBoard/PlayBoard'
 import './index.css'
-import Analysis from './views/Analysis/Analysis'
-import BridgeSolver from './views/Analysis/BridgeSolverOnline'
-import DealWithAnalysis from './views/Deal/DealWithAnalysis'
+import BridgeSolver from './views/AnalysisOnline(abandoned)/BridgeSolverOnline'
 import DealWithHands from './views/Deal/DealWithHands'
 
 const route_info = [
@@ -21,20 +19,10 @@ const route_info = [
         element: <DealWithHands />
       },
       {
-        path: "/analysis",
-        title: "分析",
-        element: <Analysis />
-      },
-      {
         path: "/solver",
         title: "分析",
         element: <BridgeSolver />
       },
-      // {
-      //   path: "/deal-analysis",
-      //   title: "分析",
-      //   element: <DealWithAnalysis />
-      // },
       {
         path: "/play-board",
         title: "打牌面板",

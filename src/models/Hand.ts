@@ -1,4 +1,4 @@
-import { ColorsShort } from "../../Utils/maps";
+import { ColorsShort } from "../Utils/maps";
 import Card from "./Card";
 export default class Hand {
   cards: Card[];
