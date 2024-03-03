@@ -1,16 +1,22 @@
+import { useState, ChangeEvent, useRef, useCallback, useMemo } from "react";
+
+// import models
 import Hand from "../../models/Hand";
 import Board from "../../models/Board";
 import handFilter, { OneFilterProps } from "../../models/HandFilter";
-import { useState, ChangeEvent, useRef, useCallback, useMemo } from "react";
-import HandSetting from "../../Components/HandSetting/HandSetting";
-
-import "./index.css";
 import Card from "../../models/Card";
+
+// import utils
 import { idx2card } from "../../Utils/utils";
 import { Position, PROGRAM_POSITIONS } from "../../Utils/maps";
 
+// import other components
+import HandSetting from "../../Components/HandSetting/HandSetting";
 import { DealContext } from "./DealContext";
 import ShowResults from "../Show/ShowResults";
+
+// import css
+import "./index.css";
 
 function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
   const boards: Hand[][] = [];
