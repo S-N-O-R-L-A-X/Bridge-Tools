@@ -6,6 +6,7 @@ import PlayBoard from './Components/PlayBoard/PlayBoard'
 import './index.css'
 import BridgeSolver from './views/AnalysisOnline(abandoned)/BridgeSolverOnline'
 import DealWithHands from './views/Deal/DealWithHands'
+import CalculateContract from './views/CalculateContract/CalculateContract'
 
 const route_info = [
   {
@@ -27,6 +28,11 @@ const route_info = [
         path: "/play-board",
         title: "打牌面板",
         element: <PlayBoard />
+      },
+      {
+        path: "/calc-contract",
+        title: "计算分数",
+        element: <CalculateContract />
       },
     ],
   },

@@ -10,7 +10,7 @@ export default function Sidebar() {
         <li><Link to="deal-multi">Deal With Multi Hands Setting</Link></li>
         <li><Link to="play-board">Play Board</Link></li>
         <li><a href="https://www.ccba.org.cn/wbf20vp/" target="_blank">imp to vp</a></li>
-        {/* <li>Calculate points of contract</li> */}
+        <li><Link to="calc-contract">Calculate points of contract</Link></li>
         <li><a href="http://playbridge.com/pb_shuffle_project.php" target="_blank">一个其他的发牌网站</a></li>
         <li><a href="https://bridge.esmarkkappel.dk/main/main.html" target="_blank">单套结构打法</a></li>
       </ul>
