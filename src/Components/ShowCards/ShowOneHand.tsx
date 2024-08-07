@@ -20,11 +20,15 @@ export default function ShowOneHand(props: ShowOneHandProps) {
     console.log(card);
   }
 
+  const showSuit = (suit: string[], index: number) => {
+    return suit.length > 0 ? (canClick ? suit.map((v: string) => <button onClick={() => handleClick(index, v)}>{v}</button>) : suit) : " —";
+  }
+
   return (
     <>
-      {cards.map((suit: string[], index: number) =>
+      {cards.map((suits: string[], index: number) =>
         <div key={index} className={className + NUMBER2COLOR[index]}>
-          {beautify ? (NUMBER2COLORICON[index] + " ") : (NUMBER2COLORSHORT[index] + " ")} {canClick ? suit.map((v: string) => <button onClick={() => handleClick(index, v)}>{v}</button>) : suit}
+          {beautify ? (NUMBER2COLORICON[index] + " ") : (NUMBER2COLORSHORT[index] + " ")} {showSuit(suits, index)}
         </div>
       )}
     </>
