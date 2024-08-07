@@ -1,0 +1,1 @@
+import{r as t,a as o,j as f,S as i}from"./index-fb1f7ae1.js";function l(e){const{allHands:s=[]}=e,[r,a]=t.useState();return t.useEffect(()=>{o(s).then(n=>{a(n)})},[s]),f.jsx(i,{ddtricks:r})}export{l as default};
