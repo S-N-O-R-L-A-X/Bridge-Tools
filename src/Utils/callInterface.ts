@@ -1,6 +1,6 @@
 import Hand from "../models/Hand";
-import { retryFetch, parseHand } from "./utils";
-
+import { retryFetch } from "./utils";
+import { parseHand } from "./PBN";
 interface RequestBoard {
   dealstr: string;
   sockref?: number;
