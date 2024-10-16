@@ -29,16 +29,48 @@ export function convertAllHandsToPBN(allHands: Hand[]) {
 }
 
 export default function exportPBN(allHands: Hand[], boardNumber: number) {
+	const date=new Date();
 	const pbn = `% PBN 2.1
 % EXPORT
-
-[Date ${new Date().getFullYear()}]
+%Content-type: text/x-pbn; charset=ISO-8859-1
+[Event ""]
+[Site ""]
+[Date "${date.getFullYear()}.${date.getMonth()+1}.${date.getDate()}"]
 [Board "${boardNumber}"]
-[West ""]
-[North ""]
-[East ""]
-[South ""]
-[Deal ${convertAllHandsToPBN(allHands)}]
+[West "?"]
+[North "?"]
+[East "?"]
+[South "?"]
+[Dealer "N"]
+[Vulnerable "None"]
+[Deal "${convertAllHandsToPBN(allHands)}"]
+[Scoring ""]
+[Declarer ""]
+[Contract ""]
+[Result ""]
+[DoubleDummyTricks "********************"]
+[OptimumResultTable "Declarer;Denomination;Result"]
+N NT  0
+N  S  0
+N  H  0
+N  D  0
+N  C  0
+S NT  0
+S  S  0
+S  H  0
+S  D  0
+S  C  0
+E NT  0
+E  S  0
+E  H  0
+E  D  0
+E  C  0
+W NT  0
+W  S  0
+W  H  0
+W  D  0
+W  C  0
+[OptimumScore ""]
 `
 
 	// download

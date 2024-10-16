@@ -37,3 +37,8 @@
 .double-dummy {
   grid-area: double-dummy;
 }
+
+.export {
+  font-size: .75rem;
+  padding: .25rem;
+}
