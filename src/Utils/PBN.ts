@@ -1,3 +1,4 @@
+import Board from "../models/Board";
 import Hand from "../models/Hand";
 
 export function parseHand(hand: Hand) {
@@ -28,22 +29,22 @@ export function convertAllHandsToPBN(allHands: Hand[]) {
 	return str;
 }
 
-export default function exportPBN(allHands: Hand[], boardNumber: number) {
-	const date=new Date();
+export default function exportPBN(board: Board) {
+	const date = new Date();
 	const pbn = `% PBN 2.1
 % EXPORT
 %Content-type: text/x-pbn; charset=ISO-8859-1
 [Event ""]
 [Site ""]
-[Date "${date.getFullYear()}.${date.getMonth()+1}.${date.getDate()}"]
-[Board "${boardNumber}"]
+[Date "${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}"]
+[Board "${board.boardnum}"]
 [West "?"]
 [North "?"]
 [East "?"]
 [South "?"]
 [Dealer "N"]
 [Vulnerable "None"]
-[Deal "${convertAllHandsToPBN(allHands)}"]
+[Deal "${convertAllHandsToPBN(board.getAllHands())}"]
 [Scoring ""]
 [Declarer ""]
 [Contract ""]

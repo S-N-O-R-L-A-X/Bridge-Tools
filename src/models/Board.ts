@@ -88,4 +88,8 @@ export default class Board {
     // 保存发牌结果
     [this.Nhand, this.Shand, this.Ehand, this.Whand] = hands;
   }
+
+  public getAllHands(): Hand[] {
+    return [this.Nhand, this.Shand, this.Ehand, this.Whand];
+  }
 }

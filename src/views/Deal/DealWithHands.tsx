@@ -19,11 +19,11 @@ import ShowResults from "../Show/ShowResults";
 import "./index.css";
 
 function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
-  const boards: Hand[][] = [];
-  while (boardSize--) {
+  const boards: Board[] = [];
+  for (let boardNum = 1; boardNum <= boardSize; ++boardNum) {
     while (true) {
+      const board = new Board(boardNum);
       const players: Hand[] = [new Hand(), new Hand(), new Hand(), new Hand()];
-      const B = new Board(Math.floor(Math.random() * 16));
       const { N, S, W, E } = hand_filter;
 
       let known_cards: Record<string, Card[]> | undefined = undefined;
@@ -50,9 +50,9 @@ function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
         "W": { hand: players[3], ...hand_filter["W"] },
       }
 
-      B.deal(players, known_cards);
+      board.deal(players, known_cards);
       if (handFilter(to_pass_filter)) {
-        boards.push(players);
+        boards.push(board);
         break;
       }
     }
@@ -62,7 +62,7 @@ function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
 
 export default function DealWithHands() {
   const [board_size, setBoard_size] = useState<number>(1);
-  const [boards, setBoards] = useState<Hand[][]>([]);
+  const [boards, setBoards] = useState<Board[]>([]);
   const [beautify, setBeautify] = useState<boolean>(false);
   const [DDS, setDDS] = useState<boolean>(false);
   const [known_cards, setKnown_cards] = useState<number[]>(new Array(52).fill(-1)); // all cards
@@ -134,7 +134,7 @@ export default function DealWithHands() {
 
       </div>
       {useMemo(
-        () => <ShowResults all_boards={boards.map((x) => { return { board: x } })} beautify={beautify} dds={DDS} />,
+        () => <ShowResults all_boards={boards.map((b: Board) => { return { board: b } })} beautify={beautify} dds={DDS} />,
         [DDS, beautify, boards]
       )}
     </>

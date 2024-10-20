@@ -79,6 +79,5 @@ export default class Hand {
     }
 
     return show;
-
   }
 }

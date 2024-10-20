@@ -15,7 +15,7 @@ export default function ShowAllBoards(props: ShowAllBoardsProps) {
         (context) =>
         (
           <div className="all-boards">
-            {context.all_boards.map((board: CompleteBoard, idx: number) => <ShowCards key={idx} all_hands={board.board} board_number={idx + 1} dds={context.dds} {...props} />)}
+            {context.all_boards.map((board: CompleteBoard, idx: number) => <ShowCards key={idx} board={board.board} dds={context.dds} {...props} />)}
           </div>
         )
       }

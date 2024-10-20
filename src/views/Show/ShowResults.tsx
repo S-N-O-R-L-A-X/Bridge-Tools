@@ -1,10 +1,10 @@
 import { createContext } from "react";
 import ShowAllBoards from "../../Components/ShowAllBoards/ShowAllBoards";
-import Hand from "../../models/Hand";
 import Analysis from "../Analysis/Analysis";
+import Board from "../../models/Board";
 
 export interface CompleteBoard {
-	board: Hand[];
+	board: Board;
 	ddtricks?: (string | number)[][] | string;
 }
 
