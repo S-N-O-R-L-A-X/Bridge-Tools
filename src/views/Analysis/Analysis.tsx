@@ -35,10 +35,10 @@ function Analysis() {
   useMemo(() => {
     async function countTricks() {
       for (const board of all_boards) {
-        if (!board.ddtricks) {
-          board.ddtricks = await analyzeOffline(board.board.getAllHands());
+        if (!board.ddsTricks) {
+          board.ddsTricks = await analyzeOffline(board.getAllHands());
         }
-        tmp = MatrixAdd(tmp, board.ddtricks as (string | number)[][]);
+        tmp = MatrixAdd(tmp, board.ddsTricks as (string | number)[][]);
       }
       return Promise.resolve(tmp);
     }

@@ -3,19 +3,14 @@ import ShowAllBoards from "../../Components/ShowAllBoards/ShowAllBoards";
 import Analysis from "../Analysis/Analysis";
 import Board from "../../models/Board";
 
-export interface CompleteBoard {
-	board: Board;
-	ddtricks?: (string | number)[][] | string;
-}
-
 interface ShowResultsProps {
-	all_boards: CompleteBoard[];
+	all_boards: Board[];
 	dds: boolean;
 	beautify?: boolean;
 }
 
 interface ShowResultsContextProps {
-	all_boards: CompleteBoard[];
+	all_boards: Board[];
 	dds: boolean;
 }
 

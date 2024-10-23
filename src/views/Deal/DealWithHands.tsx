@@ -134,7 +134,7 @@ export default function DealWithHands() {
 
       </div>
       {useMemo(
-        () => <ShowResults all_boards={boards.map((b: Board) => { return { board: b } })} beautify={beautify} dds={DDS} />,
+        () => <ShowResults all_boards={boards} beautify={beautify} dds={DDS} />,
         [DDS, beautify, boards]
       )}
     </>
