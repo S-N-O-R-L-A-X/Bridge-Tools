@@ -27,6 +27,7 @@ export default class Board {
   Ehand: Hand;
   Whand: Hand;
   ddsTricks?: string | (string | number)[][];
+  pbn?: string;
 
   constructor(boardnum: number) {
     this.boardnum = boardnum;

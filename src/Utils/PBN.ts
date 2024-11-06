@@ -29,11 +29,9 @@ export function convertAllHandsToPBN(allHands: Hand[]) {
 	return str;
 }
 
-export default function exportPBN(board: Board) {
+export function getPBN(board: Board) {
 	const date = new Date();
-	const pbn = `% PBN 2.1
-% EXPORT
-%Content-type: text/x-pbn; charset=ISO-8859-1
+	const pbn = `
 [Event ""]
 [Site ""]
 [Date "${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}"]
@@ -73,9 +71,24 @@ W  D  0
 W  C  0
 [OptimumScore ""]
 `
+	board.pbn = pbn;
+	return pbn;
+}
+
+export function exportPBNs(boards: Board[]) {
+	let print = `% PBN 2.1
+% EXPORT
+%Content-type: text/x-pbn; charset=ISO-8859-1
+	`;
+	boards.forEach((board) => {
+		if (!board.pbn) {
+			board.pbn = getPBN(board);
+		}
+		print += board.pbn;
+	})
 
 	// download
-	const blob = new Blob([pbn], { type: 'text/plain' });
+	const blob = new Blob([print], { type: 'text/plain' });
 	const url = URL.createObjectURL(blob);
 	// 创建一个临时的 <a> 标签，设置 href 属性为刚刚创建的 URL  
 	const link = document.createElement('a');

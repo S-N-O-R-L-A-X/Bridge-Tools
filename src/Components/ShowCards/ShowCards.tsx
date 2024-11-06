@@ -4,7 +4,7 @@ import ShowOneHand from "./ShowOneHand";
 import "./index.css";
 import { PROGRAM_POSITIONS } from "../../Utils/maps";
 import React, { PropsWithChildren, Suspense } from "react";
-import exportPBN from "../../Utils/PBN";
+import { exportPBNs } from "../../Utils/PBN";
 import Board from "../../models/Board";
 
 interface ShowCardsProps extends PropsWithChildren {
@@ -21,7 +21,7 @@ export default function ShowCards(props: ShowCardsProps) {
   const allHands = board.getAllHands();
   return (
     <div className="board-container">
-      <div className="board-number"><div>{board.boardnum}</div>{dds && <button className="export" onClick={() => exportPBN(board)}>export to PBN</button>}</div>
+      <div className="board-number"><div>{board.boardnum}</div>{dds && <button className="export" onClick={() => exportPBNs([board])}>export to PBN</button>}</div>
       <div className="predicted">{children}</div>
       {dds &&
         <div className="double-dummy">
