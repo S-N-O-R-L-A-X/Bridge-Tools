@@ -1,21 +1,24 @@
 import { useEffect, useState } from "react";
 import ShowTricks from "../../Components/PlayBoard/ShowTricks";
-import Hand from "../../models/Hand";
 import { analyzeOffline } from "../../Utils/utils";
+import Board from "../../models/Board";
 
 interface BridgeSolverProps {
-	allHands?: Hand[];
+	board: Board;
 }
 
 export default function OfflineBridgeSolver(props: BridgeSolverProps) {
-	const { allHands = [] } = props;
+	const { board } = props;
 	const [ddtricks, setDDtricks] = useState<(string | number)[][]>();
 
 	useEffect(() => {
-		analyzeOffline(allHands).then((res) => {
-			setDDtricks(res);
-		})
-	}, [allHands]);
+		if (!board.ddsTricks) {
+			analyzeOffline(board).then((res) => {
+				board.ddsTricks = res;
+			})
+		}
+		setDDtricks(board.ddsTricks);
+	}, [board]);
 
 	return (
 		<ShowTricks ddtricks={ddtricks} />

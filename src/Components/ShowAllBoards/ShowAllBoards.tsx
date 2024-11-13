@@ -9,7 +9,6 @@ interface ShowAllBoardsProps extends PropsWithChildren {
 }
 
 export default function ShowAllBoards(props: ShowAllBoardsProps) {
-
   return (
     <ShowResultsContext.Consumer>
       {

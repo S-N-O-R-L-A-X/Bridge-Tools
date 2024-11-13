@@ -25,7 +25,7 @@ export default function ShowCards(props: ShowCardsProps) {
       <div className="predicted">{children}</div>
       {dds &&
         <div className="double-dummy">
-          <Suspense fallback={<div>Loading...</div>}> <OfflineBridgeSolver allHands={allHands} /> </Suspense>
+          <Suspense fallback={<div>Loading...</div>}> <OfflineBridgeSolver board={board} /> </Suspense>
         </div>
       }
 

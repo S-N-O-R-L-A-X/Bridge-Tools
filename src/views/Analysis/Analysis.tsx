@@ -36,9 +36,9 @@ function Analysis() {
     async function countTricks() {
       for (const board of all_boards) {
         if (!board.ddsTricks) {
-          board.ddsTricks = await analyzeOffline(board.getAllHands());
+          board.ddsTricks = await analyzeOffline(board);
         }
-        tmp = MatrixAdd(tmp, board.ddsTricks as (string | number)[][]);
+        tmp = MatrixAdd(tmp, board.ddsTricks);
       }
       return Promise.resolve(tmp);
     }

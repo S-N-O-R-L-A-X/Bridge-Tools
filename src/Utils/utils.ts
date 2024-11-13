@@ -1,5 +1,5 @@
+import Board from "../models/Board";
 import Card from "../models/Card";
-import Hand from "../models/Hand";
 import { COLORS, NUMBER2COLORSHORT, RANK2CARD } from "./maps";
 import { convertAllHandsToPBN } from "./PBN";
 
@@ -12,9 +12,9 @@ export function card2idx(card: Card): number {
   return Card.RANK[card.rank] + 13 * (NUMBER2COLORSHORT[card.suit]);
 }
 
-export function analyzeOffline(allHands: Hand[]) {
+export function analyzeOffline(board: Board): Promise<(string | number)[][]> {
   // @ts-ignore
-  const res = calcDDTable(convertAllHandsToPBN(allHands));
+  const res = calcDDTable(convertAllHandsToPBN(board.getAllHands()));
   const table = new Array(4).fill(0).map(() => new Array(5).fill("*"));
   table[0][0] = res["N"]["N"];
   table[0][1] = res["S"]["N"];
