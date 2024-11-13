@@ -1,0 +1,1 @@
+import{r,a as c,j as d,S as o}from"./index-c8be26be.js";function n(t){const{board:s}=t,[e,i]=r.useState();return r.useEffect(()=>{s.ddsTricks||c(s).then(a=>{s.ddsTricks=a}),i(s.ddsTricks)},[s]),d.jsx(o,{ddtricks:e})}export{n as default};
