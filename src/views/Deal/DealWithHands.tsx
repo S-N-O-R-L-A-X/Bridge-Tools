@@ -17,6 +17,7 @@ import ShowResults from "../Show/ShowResults";
 
 // import css
 import "./index.css";
+import Probability from "../../Components/Probability/Probability";
 
 function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
   const boards: Board[] = [];
@@ -65,6 +66,7 @@ export default function DealWithHands() {
   const [boards, setBoards] = useState<Board[]>([]);
   const [beautify, setBeautify] = useState<boolean>(false);
   const [DDS, setDDS] = useState<boolean>(false);
+  const [probability, setProbability] = useState<boolean>(false);
   const [known_cards, setKnown_cards] = useState<number[]>(new Array(52).fill(-1)); // all cards
   const [allFilters, setAllFilters] = useState<Record<string, OneFilterProps>>({});
 
@@ -111,6 +113,10 @@ export default function DealWithHands() {
     setDDS((e.target as HTMLInputElement).checked);
   }
 
+  function handleProbability(e: ChangeEvent) {
+    setProbability((e.target as HTMLInputElement).checked);
+  }
+
   return (
     <>
       <div className="deal-setting">
@@ -121,6 +127,7 @@ export default function DealWithHands() {
           <div>
             <input type="checkbox" id="beautify" name="beautify" onChange={handleBeautify} />是否需要美化？
             <input type="checkbox" id="dds" name="dds" onChange={handleDDS} />是否需要四明手分析？（会更花费时间）
+            <input type="checkbox" id="probability" name="probability" onChange={handleProbability} />是否需要概率分析？
           </div>
           <DealContext.Provider value={{ known_cards, changeKnown_cards, contextType: "multi" }}>
             <HandSetting ref={Nref} position="N" getData={getData} />
@@ -133,6 +140,13 @@ export default function DealWithHands() {
         <button onClick={handleClick}>Get new boards</button>
 
       </div>
+      {
+        useMemo(
+          () => probability && <Probability boards={boards} />,
+          [probability, boards]
+        )
+      }
+
       {useMemo(
         () => <ShowResults all_boards={boards} beautify={beautify} dds={DDS} />,
         [DDS, beautify, boards]

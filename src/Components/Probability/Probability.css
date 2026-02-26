@@ -1,0 +1,53 @@
+.suit-probability {
+	margin: 1rem 0;
+	padding: 1rem;
+	border-radius: 8px;
+}
+
+.suit-probability h3 {
+	margin: 0 0 0.5rem 0;
+	font-size: 1rem;
+}
+
+.prob-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.85rem;
+}
+
+.prob-table th,
+.prob-table td {
+	padding: 0.5rem;
+	text-align: center;
+	border: 1px solid #444;
+}
+
+.prob-table th {
+	font-size: 1.2rem;
+}
+
+.prob-table th:first-child {
+	width: 60px;
+}
+
+.position-cell {
+	font-weight: bold;
+}
+
+.prob-cell {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.prob-item {
+	display: flex;
+	justify-content: space-between;
+	gap: 0.3rem;
+	font-size: 0.75rem;
+}
+
+.prob-item .prob {
+	color: #6cf;
+	font-weight: 500;
+}
