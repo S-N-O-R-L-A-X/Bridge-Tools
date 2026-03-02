@@ -1,5 +1,6 @@
 import Board from "../models/Board";
-import { ColorsShort, COLORS, Position } from "./maps";
+import Hand from "../models/Hand";
+import { ColorsShort, COLORS, Position, RANK } from "./maps";
 
 /**
 * 根据发出的牌局统计每家持有各花色特定张数的概率
@@ -63,4 +64,62 @@ export function calculateSuitProbabilities(
 */
 export function formatProbability(prob: number): string {
 	return (prob * 100).toFixed(1) + "%";
+}
+
+/**
+* 根据发出的牌局统计某张牌在各家出现的概率
+* @param boards 发出的牌局数组
+* @returns 概率表 { cardKey: { position: probability } }
+* cardKey 格式为 "花色-点数"，如 "S-A" 表示黑桃A
+*/
+export function calculateCardProbabilities(
+	boards: Board[]
+): Record<string, Record<Position, number>> {
+	const totalBoards = boards.length;
+
+	// 结果概率表：统计每张牌在每个位置出现的次数
+	const counts: Record<string, Record<Position, number>> = {};
+
+	// 初始化所有52张牌的计数
+	COLORS.forEach((suit) => {
+		Object.keys(RANK).forEach((rank) => {
+			const cardKey = `${suit}-${rank}`;
+			counts[cardKey] = { N: 0, S: 0, E: 0, W: 0 };
+		});
+	});
+
+	// 遍历每副牌
+	boards.forEach((board) => {
+		const hands: Record<Position, Hand> = {
+			N: board.Nhand,
+			S: board.Shand,
+			E: board.Ehand,
+			W: board.Whand,
+		};
+
+		// 统计每张牌在哪一家
+		(["N", "S", "E", "W"] as Position[]).forEach((position) => {
+			const hand = hands[position];
+			hand.cards.forEach((card) => {
+				const cardKey = `${card.suit}-${card.rank}`;
+				counts[cardKey][position]++;
+			});
+		});
+	});
+
+	// 转换为概率
+	const result: Record<string, Record<Position, number>> = {};
+
+	if (totalBoards > 0) {
+		Object.entries(counts).forEach(([cardKey, positionCounts]) => {
+			result[cardKey] = {
+				N: positionCounts.N / totalBoards,
+				S: positionCounts.S / totalBoards,
+				E: positionCounts.E / totalBoards,
+				W: positionCounts.W / totalBoards,
+			};
+		});
+	}
+
+	return result;
 }
