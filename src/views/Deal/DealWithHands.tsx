@@ -1,14 +1,14 @@
 import { useState, ChangeEvent, useRef, useCallback, useMemo } from "react";
 
 // import models
-import Hand from "../../models/Hand";
 import Board from "../../models/Board";
-import handFilter, { OneFilterProps } from "../../models/HandFilter";
+import Hand from "../../models/Hand";
+import { OneFilterProps } from "../../models/HandFilter";
 import Card from "../../models/Card";
 
 // import utils
 import { idx2card } from "../../Utils/utils";
-import { Position, PROGRAM_POSITIONS } from "../../Utils/maps";
+import { ColorsShort, Position, PROGRAM_POSITIONS } from "../../Utils/maps";
 
 // import other components
 import HandSetting from "../../Components/HandSetting/HandSetting";
@@ -19,46 +19,52 @@ import ShowResults from "../Show/ShowResults";
 import "./index.css";
 import Probability from "../../Components/Probability/Probability";
 
-function deal(boardSize: number, hand_filter: Record<string, OneFilterProps>) {
-  const boards: Board[] = [];
-  for (let boardNum = 1; boardNum <= boardSize; ++boardNum) {
-    while (true) {
-      const board = new Board(boardNum);
-      const players: Hand[] = [new Hand(), new Hand(), new Hand(), new Hand()];
-      const { N, S, W, E } = hand_filter;
+// Import worker
+import DealWorker from "../../workers/deal.worker?worker";
 
-      let known_cards: Record<string, Card[]> | undefined = undefined;
-      if (N?.cards || S?.cards || W?.cards || E?.cards) {
-        known_cards = {};
-      }
-      if (N?.cards) {
-        known_cards!["N"] = N.cards;
-      }
-      if (S?.cards) {
-        known_cards!["S"] = S.cards;
-      }
-      if (E?.cards) {
-        known_cards!["E"] = E.cards;
-      }
-      if (W?.cards) {
-        known_cards!["W"] = W.cards;
-      }
+// Types for worker data (must match worker's serialized types)
+interface CardData {
+  suit: ColorsShort;
+  rank: string;
+}
 
-      const to_pass_filter = {
-        "N": { hand: players[0], ...hand_filter["N"] },
-        "S": { hand: players[1], ...hand_filter["S"] },
-        "E": { hand: players[2], ...hand_filter["E"] },
-        "W": { hand: players[3], ...hand_filter["W"] },
-      }
+interface HandData {
+  cards: CardData[];
+  hand: { [key: string]: string[] };
+  points: number;
+  shape: { [key: string]: number };
+}
 
-      board.deal(players, known_cards);
-      if (handFilter(to_pass_filter)) {
-        boards.push(board);
-        break;
-      }
-    }
-  }
-  return boards;
+interface BoardData {
+  boardnum: number;
+  vul: string;
+  dealer: string;
+  Nhand: HandData;
+  Shand: HandData;
+  Ehand: HandData;
+  Whand: HandData;
+}
+
+// Convert worker BoardData to Board class instance
+function convertToBoard(data: BoardData): Board {
+  const board = new Board(data.boardnum);
+
+  const convertHand = (handData: HandData): Hand => {
+    const hand = new Hand();
+    handData.cards.forEach(cardData => {
+      const card = new Card(cardData.suit, cardData.rank);
+      hand.add(card);
+    });
+    hand.sortHand();
+    return hand;
+  };
+
+  board.Nhand = convertHand(data.Nhand);
+  board.Shand = convertHand(data.Shand);
+  board.Ehand = convertHand(data.Ehand);
+  board.Whand = convertHand(data.Whand);
+
+  return board;
 }
 
 export default function DealWithHands() {
@@ -69,6 +75,8 @@ export default function DealWithHands() {
   const [probability, setProbability] = useState<boolean>(false);
   const [known_cards, setKnown_cards] = useState<number[]>(new Array(52).fill(-1)); // all cards
   const [allFilters, setAllFilters] = useState<Record<string, OneFilterProps>>({});
+  const [isDealing, setIsDealing] = useState<boolean>(false);
+  const [progress, setProgress] = useState<{ current: number; total: number } | null>(null);
 
   function changeKnown_cards(known_cards: number[]) {
     setKnown_cards(known_cards);
@@ -92,13 +100,50 @@ export default function DealWithHands() {
         all_known_cards[known_card].push(idx2card(idx));
       }
     })
-    all_known_cards.forEach((card, idx) => {
-      if (card.length > 0) {
-        allFilters[PROGRAM_POSITIONS[idx]] = { ...allFilters[PROGRAM_POSITIONS[idx]], cards: card };
-        setAllFilters(allFilters);
+
+    // Build filters with known cards
+    const filters = { ...allFilters };
+    all_known_cards.forEach((cards, idx) => {
+      if (cards.length > 0) {
+        filters[PROGRAM_POSITIONS[idx]] = { ...filters[PROGRAM_POSITIONS[idx]], cards };
       }
-    })
-    setBoards(deal(Number(board_size), allFilters));
+    });
+
+    // Start worker
+    setIsDealing(true);
+    setProgress({ current: 0, total: board_size });
+    setBoards([]);
+
+    const worker = new DealWorker();
+
+    worker.onmessage = (e) => {
+      const { type, boards: workerBoards, current, total, message } = e.data;
+
+      if (type === 'progress') {
+        setProgress({ current, total });
+      } else if (type === 'complete') {
+        const convertedBoards = workerBoards.map(convertToBoard);
+        setBoards(convertedBoards);
+        setIsDealing(false);
+        setProgress(null);
+        worker.terminate();
+      } else if (type === 'error') {
+        console.error('Deal worker error:', message);
+        setIsDealing(false);
+        setProgress(null);
+        worker.terminate();
+        alert(message);
+      }
+    };
+
+    worker.onerror = (err) => {
+      console.error('Worker error:', err);
+      setIsDealing(false);
+      setProgress(null);
+      worker.terminate();
+    };
+
+    worker.postMessage({ boardSize: board_size, filters });
   }
 
   function handleSize(e: ChangeEvent) {
@@ -137,7 +182,9 @@ export default function DealWithHands() {
           </DealContext.Provider>
         </fieldset>
         <br />
-        <button onClick={handleClick}>Get new boards</button>
+        <button onClick={handleClick} disabled={isDealing}>
+          {isDealing ? `发牌中... (${progress?.current || 0}/${progress?.total || 0})` : 'Get new boards'}
+        </button>
 
       </div>
       {

@@ -10,15 +10,25 @@ interface BridgeSolverProps {
 export default function OfflineBridgeSolver(props: BridgeSolverProps) {
 	const { board } = props;
 	const [ddtricks, setDDtricks] = useState<(string | number)[][]>();
+	const [isCalculating, setIsCalculating] = useState(false);
 
 	useEffect(() => {
-		if (!board.ddsTricks) {
-			analyzeOffline(board).then((res) => {
-				board.ddsTricks = res;
-			})
+		if (board.ddsTricks) {
+			setDDtricks(board.ddsTricks);
+			return;
 		}
-		setDDtricks(board.ddsTricks);
+
+		setIsCalculating(true);
+		analyzeOffline(board).then((res) => {
+			board.ddsTricks = res;
+			setDDtricks(res);
+			setIsCalculating(false);
+		});
 	}, [board]);
+
+	if (isCalculating) {
+		return <div style={{ padding: '10px', color: '#666' }}>计算中...</div>;
+	}
 
 	return (
 		<ShowTricks ddtricks={ddtricks} />
