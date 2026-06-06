@@ -1,1 +1,0 @@
-import{r as t,a as l,j as i,S as o}from"./index-735ef076.js";function u(n){const{board:s}=n,[c,e]=t.useState(),[d,r]=t.useState(!1);return t.useEffect(()=>{if(s.ddsTricks){e(s.ddsTricks);return}r(!0),l(s).then(a=>{s.ddsTricks=a,e(a),r(!1)})},[s]),d?i.jsx("div",{style:{padding:"10px",color:"#666"},children:"计算中..."}):i.jsx(o,{ddtricks:c})}export{u as default};
