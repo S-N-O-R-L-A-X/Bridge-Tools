@@ -84,27 +84,53 @@ function generateValidShapes(ambiguousShape: number[][]): Array<{ S: number; H: 
 }
 
 // Generate valid shape distribution for all players that respects total card count
-function generateGlobalShapeDistribution(filters: Record<string, OneFilterProps>): Array<Array<{ S: number; H: number; D: number; C: number }> | null> {
+function generateGlobalShapeDistribution(filters: Record<string, OneFilterProps>, fixed_cards?: { [key: string]: Card[] }): Array<Array<{ S: number; H: number; D: number; C: number }> | null> {
 	const players = ["N", "S", "E", "W"];
 	const allPlayerShapes: Array<Array<{ S: number; H: number; D: number; C: number }>> = [];
 	const hasConstraints: boolean[] = [false, false, false, false];
+	const minRequiredShapes: Array<{ S: number; H: number; D: number; C: number }> = [{ S: 0, H: 0, D: 0, C: 0 }, { S: 0, H: 0, D: 0, C: 0 }, { S: 0, H: 0, D: 0, C: 0 }, { S: 0, H: 0, D: 0, C: 0 }];
+
+	// Calculate minimum required cards from fixed cards
+	if (fixed_cards) {
+		for (const player in fixed_cards) {
+			const playerIdx = players.indexOf(player);
+			if (playerIdx !== -1) {
+				const knownCards = fixed_cards[player];
+				for (const card of knownCards) {
+					minRequiredShapes[playerIdx][card.suit]++;
+				}
+			}
+		}
+	}
 
 	// Generate valid shapes for each player with constraints
 	for (let i = 0; i < 4; i++) {
 		const player = players[i];
 		const filter = filters[player];
+		const minShape = minRequiredShapes[i];
+		
 		if (filter?.ambiguousShape) {
 			const shapes = generateValidShapes(filter.ambiguousShape);
-			if (shapes.length === 0) {
-				return []; // No valid shapes for this player
+			// Filter shapes that are compatible with fixed cards
+			const validShapes = shapes.filter(shape => 
+				shape.S >= minShape.S && shape.H >= minShape.H && 
+				shape.D >= minShape.D && shape.C >= minShape.C
+			);
+			
+			if (validShapes.length === 0) {
+				return []; // No valid shapes for this player considering fixed cards
 			}
-			allPlayerShapes.push(shapes);
+			allPlayerShapes.push(validShapes);
 			hasConstraints[i] = true;
 		} else if (filter?.shapes) {
 			// Fixed shape constraint
 			const [s, h, d, c] = filter.shapes;
 			if (s + h + d + c !== 13) {
 				return []; // Invalid fixed shape
+			}
+			// Check if fixed shape is compatible with fixed cards
+			if (s < minShape.S || h < minShape.H || d < minShape.D || c < minShape.C) {
+				return []; // Fixed shape conflicts with fixed cards
 			}
 			allPlayerShapes.push([{ S: s, H: h, D: d, C: c }]);
 			hasConstraints[i] = true;
@@ -300,6 +326,12 @@ function constrainedDeal(hands: Hand[], fixed_cards?: { [key: string]: Card[] },
 	// Shuffle remaining cards
 	shuffleArray(allCards);
 
+	// Group remaining cards by suit for faster access
+	const cardsBySuit: { [key: string]: Card[] } = { S: [], H: [], D: [], C: [] };
+	for (const card of allCards) {
+		cardsBySuit[card.suit].push(card);
+	}
+
 	// Deal according to target shapes if provided
 	if (targetShapes) {
 		for (let playerIdx = 0; playerIdx < 4; playerIdx++) {
@@ -318,13 +350,15 @@ function constrainedDeal(hands: Hand[], fixed_cards?: { [key: string]: Card[] },
 			// Deal cards according to shape requirements
 			for (const suit of Card.SUIT) {
 				const needed = shape[suit] - currentShape[suit];
+				const suitCards = cardsBySuit[suit];
+				
+				if (suitCards.length < needed) {
+					return false; // Not enough cards of this suit
+				}
+				
+				// Take cards from the end of the suit array
 				for (let i = 0; i < needed; i++) {
-					const cardIdx = allCards.findIndex(c => c.suit === suit);
-					if (cardIdx !== -1) {
-						hand.add(allCards.splice(cardIdx, 1)[0]);
-					} else {
-						return false; // Not enough cards of this suit
-					}
+					hand.add(suitCards.pop()!);
 				}
 			}
 		}
@@ -364,8 +398,24 @@ function deal(boardSize: number, filters: Record<string, OneFilterProps>): Board
 	const useConstrainedDealing = hasShapeConstraints(filters);
 	let validShapeDistributions: Array<Array<{ S: number; H: number; D: number; C: number }> | null> = [];
 	
+	// Build fixed cards from filter for constraint checking
+	let known_cards: Record<string, Card[]> | undefined = undefined;
+	const { N, S, E, W } = filters;
+
+	if (N?.cards || S?.cards || E?.cards || W?.cards) {
+		known_cards = {};
+		const nCards = deserializeCards(N?.cards as CardData[] | undefined);
+		const sCards = deserializeCards(S?.cards as CardData[] | undefined);
+		const eCards = deserializeCards(E?.cards as CardData[] | undefined);
+		const wCards = deserializeCards(W?.cards as CardData[] | undefined);
+		if (nCards) known_cards["N"] = nCards;
+		if (sCards) known_cards["S"] = sCards;
+		if (eCards) known_cards["E"] = eCards;
+		if (wCards) known_cards["W"] = wCards;
+	}
+	
 	if (useConstrainedDealing) {
-		validShapeDistributions = generateGlobalShapeDistribution(filters);
+		validShapeDistributions = generateGlobalShapeDistribution(filters, known_cards);
 		if (validShapeDistributions.length === 0) {
 			self.postMessage({ type: 'error', message: '没有找到符合模糊牌型约束的有效牌型分布，请检查约束条件是否合理' });
 			return boards;
@@ -381,22 +431,6 @@ function deal(boardSize: number, filters: Record<string, OneFilterProps>): Board
 
 			const board = new Board(boardNum);
 			const players: Hand[] = [new Hand(), new Hand(), new Hand(), new Hand()];
-
-			// Build fixed cards from filter
-			let known_cards: Record<string, Card[]> | undefined = undefined;
-			const { N, S, E, W } = filters;
-
-			if (N?.cards || S?.cards || E?.cards || W?.cards) {
-				known_cards = {};
-				const nCards = deserializeCards(N?.cards as CardData[] | undefined);
-				const sCards = deserializeCards(S?.cards as CardData[] | undefined);
-				const eCards = deserializeCards(E?.cards as CardData[] | undefined);
-				const wCards = deserializeCards(W?.cards as CardData[] | undefined);
-				if (nCards) known_cards["N"] = nCards;
-				if (sCards) known_cards["S"] = sCards;
-				if (eCards) known_cards["E"] = eCards;
-				if (wCards) known_cards["W"] = wCards;
-			}
 
 			// Use constrained dealing if we have ambiguous shapes
 			if (useConstrainedDealing) {
