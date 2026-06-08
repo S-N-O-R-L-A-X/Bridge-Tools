@@ -40,18 +40,33 @@ function Analysis() {
     async function countTricks() {
       let tmp: number[][] = new Array(4).fill(0).map(() => new Array(5).fill(0));
       const total = all_boards.length;
-
-      for (let i = 0; i < all_boards.length; i++) {
+      
+      // Process boards in batches for parallel execution
+      const BATCH_SIZE = 10;
+      
+      for (let i = 0; i < all_boards.length; i += BATCH_SIZE) {
         if (cancelled) return;
 
-        const board = all_boards[i];
-        if (!board.ddsTricks) {
-          board.ddsTricks = await analyzeOffline(board);
+        const batch = all_boards.slice(i, i + BATCH_SIZE);
+        
+        // Calculate all boards in this batch in parallel
+        const promises = batch.map(async (board) => {
+          if (!board.ddsTricks) {
+            board.ddsTricks = await analyzeOffline(board);
+          }
+          return board.ddsTricks;
+        });
+        
+        const results = await Promise.all(promises);
+        
+        // Add results to tmp
+        for (const result of results) {
+          tmp = MatrixAdd(tmp, result);
         }
-        tmp = MatrixAdd(tmp, board.ddsTricks);
 
         // Update progress
-        setProgress({ current: i + 1, total });
+        const completed = Math.min(i + BATCH_SIZE, all_boards.length);
+        setProgress({ current: completed, total });
       }
 
       if (!cancelled) {

@@ -12,8 +12,13 @@ export function card2idx(card: Card): number {
   return Card.RANK[card.rank] + 13 * (NUMBER2COLORSHORT[card.suit]);
 }
 
-// Non-blocking DDS calculation - yields to UI between calculations
+// Optimized DDS calculation with caching and parallel support
 export function analyzeOffline(board: Board): Promise<(string | number)[][]> {
+  return import('./DDSWorker').then(module => module.analyzeOffline(board));
+}
+
+// Fallback version using setTimeout (original implementation)
+export function analyzeOfflineLegacy(board: Board): Promise<(string | number)[][]> {
   return new Promise((resolve) => {
     // Use setTimeout to yield to the event loop, preventing UI freeze
     setTimeout(() => {
