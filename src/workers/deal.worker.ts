@@ -84,7 +84,8 @@ function generateValidShapes(ambiguousShape: number[][]): Array<{ S: number; H: 
 }
 
 // Generate valid shape distribution for all players that respects total card count
-function generateGlobalShapeDistribution(filters: Record<string, OneFilterProps>, fixed_cards?: { [key: string]: Card[] }): Array<Array<{ S: number; H: number; D: number; C: number }> | null> {
+// Returns shape specifications for each player; null means "deal randomly"
+function generateGlobalShapeDistribution(filters: Record<string, OneFilterProps>, fixed_cards?: { [key: string]: Card[] }): Array<Array<{ S: number; H: number; D: number; C: number } | null>> {
 	const players = ["N", "S", "E", "W"];
 	const allPlayerShapes: Array<Array<{ S: number; H: number; D: number; C: number }>> = [];
 	const hasConstraints: boolean[] = [false, false, false, false];
@@ -108,15 +109,15 @@ function generateGlobalShapeDistribution(filters: Record<string, OneFilterProps>
 		const player = players[i];
 		const filter = filters[player];
 		const minShape = minRequiredShapes[i];
-		
+
 		if (filter?.ambiguousShape) {
 			const shapes = generateValidShapes(filter.ambiguousShape);
 			// Filter shapes that are compatible with fixed cards
-			const validShapes = shapes.filter(shape => 
-				shape.S >= minShape.S && shape.H >= minShape.H && 
+			const validShapes = shapes.filter(shape =>
+				shape.S >= minShape.S && shape.H >= minShape.H &&
 				shape.D >= minShape.D && shape.C >= minShape.C
 			);
-			
+
 			if (validShapes.length === 0) {
 				return []; // No valid shapes for this player considering fixed cards
 			}
@@ -140,7 +141,7 @@ function generateGlobalShapeDistribution(filters: Record<string, OneFilterProps>
 		}
 	}
 
-	const validDistributions: Array<Array<{ S: number; H: number; D: number; C: number }> | null> = [];
+	const validDistributions: Array<Array<{ S: number; H: number; D: number; C: number } | null>> = [];
 
 	// If no constraints at all, return empty (will use random dealing)
 	if (!hasConstraints.some(Boolean)) {
@@ -181,7 +182,7 @@ function generateGlobalShapeDistribution(filters: Record<string, OneFilterProps>
 						D: 13 - (constrainedShapes[0].D + constrainedShapes[1].D + constrainedShapes[2].D),
 						C: 13 - (constrainedShapes[0].C + constrainedShapes[1].C + constrainedShapes[2].C)
 					};
-					
+
 					// Check if free shape is valid
 					if (freeShape.S >= 0 && freeShape.H >= 0 && freeShape.D >= 0 && freeShape.C >= 0 &&
 						freeShape.S + freeShape.H + freeShape.D + freeShape.C === 13) {
@@ -196,96 +197,30 @@ function generateGlobalShapeDistribution(filters: Record<string, OneFilterProps>
 			}
 		}
 	} else if (constrainedPlayers === 2) {
-		// 2 players have constraints - handle as pairs
+		// 2 players have constraints - only enumerate the constrained pair
 		const constrainedIndices = [0, 1, 2, 3].filter(i => hasConstraints[i]);
-		const freeIndices = [0, 1, 2, 3].filter(i => !hasConstraints[i]);
 
 		for (let shape0 of allPlayerShapes[constrainedIndices[0]]) {
 			for (let shape1 of allPlayerShapes[constrainedIndices[1]]) {
-				const constrainedShapes = [shape0, shape1];
-				
-				// Calculate remaining cards for free players
-				const remainingS = 13 - (constrainedShapes[0].S + constrainedShapes[1].S);
-				const remainingH = 13 - (constrainedShapes[0].H + constrainedShapes[1].H);
-				const remainingD = 13 - (constrainedShapes[0].D + constrainedShapes[1].D);
-				const remainingC = 13 - (constrainedShapes[0].C + constrainedShapes[1].C);
-
-				// Generate all valid splits for the two free players
-				for (let s1 = Math.max(0, remainingS - 13); s1 <= Math.min(13, remainingS); s1++) {
-					const s2 = remainingS - s1;
-					if (s2 < 0 || s2 > 13) continue;
-
-					for (let h1 = Math.max(0, remainingH - 13); h1 <= Math.min(13, remainingH); h1++) {
-						const h2 = remainingH - h1;
-						if (h2 < 0 || h2 > 13) continue;
-
-						for (let d1 = Math.max(0, remainingD - 13); d1 <= Math.min(13, remainingD); d1++) {
-							const d2 = remainingD - d1;
-							if (d2 < 0 || d2 > 13) continue;
-
-							const c1 = 13 - s1 - h1 - d1;
-							const c2 = 13 - s2 - h2 - d2;
-
-							if (c1 === remainingC - c2 && c1 >= 0 && c1 <= 13 && c2 >= 0 && c2 <= 13) {
-								const result: Array<{ S: number; H: number; D: number; C: number }> = [{} as any, {} as any, {} as any, {} as any];
-								result[constrainedIndices[0]] = constrainedShapes[0];
-								result[constrainedIndices[1]] = constrainedShapes[1];
-								result[freeIndices[0]] = { S: s1, H: h1, D: d1, C: c1 };
-								result[freeIndices[1]] = { S: s2, H: h2, D: d2, C: c2 };
-								validDistributions.push(result);
-							}
-						}
-					}
+				// Check that constrained players' suits don't exceed 13 globally
+				if (shape0.S + shape1.S > 13 || shape0.H + shape1.H > 13 ||
+					shape0.D + shape1.D > 13 || shape0.C + shape1.C > 13) {
+					continue;
 				}
+				const result: Array<{ S: number; H: number; D: number; C: number } | null> = [null, null, null, null];
+				result[constrainedIndices[0]] = shape0;
+				result[constrainedIndices[1]] = shape1;
+				validDistributions.push(result);
 			}
 		}
 	} else if (constrainedPlayers === 1) {
-		// Only 1 player has constraint - simpler case
+		// Only 1 player has constraint - just enumerate that player's valid shapes
 		const constrainedIdx = hasConstraints.indexOf(true);
-		const freeIndices = [0, 1, 2, 3].filter(i => i !== constrainedIdx);
 
 		for (let shape of allPlayerShapes[constrainedIdx]) {
-			const remainingS = 13 - shape.S;
-			const remainingH = 13 - shape.H;
-			const remainingD = 13 - shape.D;
-			const remainingC = 13 - shape.C;
-
-			// Generate valid distributions for 3 free players
-			// This is still expensive, but we only do it once upfront
-			for (let s1 = Math.max(0, remainingS - 26); s1 <= Math.min(13, remainingS); s1++) {
-				for (let s2 = Math.max(0, remainingS - s1 - 13); s2 <= Math.min(13, remainingS - s1); s2++) {
-					const s3 = remainingS - s1 - s2;
-					if (s3 < 0 || s3 > 13) continue;
-
-					for (let h1 = Math.max(0, remainingH - 26); h1 <= Math.min(13, remainingH); h1++) {
-						for (let h2 = Math.max(0, remainingH - h1 - 13); h2 <= Math.min(13, remainingH - h1); h2++) {
-							const h3 = remainingH - h1 - h2;
-							if (h3 < 0 || h3 > 13) continue;
-
-							for (let d1 = Math.max(0, remainingD - 26); d1 <= Math.min(13, remainingD); d1++) {
-								for (let d2 = Math.max(0, remainingD - d1 - 13); d2 <= Math.min(13, remainingD - d1); d2++) {
-									const d3 = remainingD - d1 - d2;
-									if (d3 < 0 || d3 > 13) continue;
-
-									const c1 = 13 - s1 - h1 - d1;
-									const c2 = 13 - s2 - h2 - d2;
-									const c3 = 13 - s3 - h3 - d3;
-
-									if (c1 >= 0 && c1 <= 13 && c2 >= 0 && c2 <= 13 && c3 >= 0 && c3 <= 13 &&
-										c1 + c2 + c3 === remainingC) {
-										const result: Array<{ S: number; H: number; D: number; C: number }> = [{} as any, {} as any, {} as any, {} as any];
-										result[constrainedIdx] = shape;
-										result[freeIndices[0]] = { S: s1, H: h1, D: d1, C: c1 };
-										result[freeIndices[1]] = { S: s2, H: h2, D: d2, C: c2 };
-										result[freeIndices[2]] = { S: s3, H: h3, D: d3, C: c3 };
-										validDistributions.push(result);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+			const result: Array<{ S: number; H: number; D: number; C: number } | null> = [null, null, null, null];
+			result[constrainedIdx] = shape;
+			validDistributions.push(result);
 		}
 	}
 
@@ -301,7 +236,8 @@ function shuffleArray<T>(arr: T[]): void {
 }
 
 // Constrained dealing algorithm - generates cards based on shape constraints
-function constrainedDeal(hands: Hand[], fixed_cards?: { [key: string]: Card[] }, targetShapes?: Array<{ S: number; H: number; D: number; C: number }>): boolean {
+// targetShapes entries can be null for players without shape constraints (dealt randomly)
+function constrainedDeal(hands: Hand[], fixed_cards?: { [key: string]: Card[] }, targetShapes?: Array<{ S: number; H: number; D: number; C: number } | null>): boolean {
 	// Create card pool
 	const allCards: Card[] = [];
 	for (const suit of Card.SUIT) {
@@ -326,16 +262,21 @@ function constrainedDeal(hands: Hand[], fixed_cards?: { [key: string]: Card[] },
 	// Shuffle remaining cards
 	shuffleArray(allCards);
 
-	// Group remaining cards by suit for faster access
+	// Group remaining cards by suit for constrained dealing
 	const cardsBySuit: { [key: string]: Card[] } = { S: [], H: [], D: [], C: [] };
 	for (const card of allCards) {
 		cardsBySuit[card.suit].push(card);
 	}
 
-	// Deal according to target shapes if provided
+	// Track which players have been dealt
+	const dealt = [false, false, false, false];
+
+	// Deal according to target shapes for constrained players
 	if (targetShapes) {
 		for (let playerIdx = 0; playerIdx < 4; playerIdx++) {
 			const shape = targetShapes[playerIdx];
+			if (!shape) continue; // null means no shape constraint, deal randomly later
+
 			const hand = hands[playerIdx];
 
 			// Add fixed cards first
@@ -351,34 +292,48 @@ function constrainedDeal(hands: Hand[], fixed_cards?: { [key: string]: Card[] },
 			for (const suit of Card.SUIT) {
 				const needed = shape[suit] - currentShape[suit];
 				const suitCards = cardsBySuit[suit];
-				
+
 				if (suitCards.length < needed) {
 					return false; // Not enough cards of this suit
 				}
-				
+
 				// Take cards from the end of the suit array
 				for (let i = 0; i < needed; i++) {
 					hand.add(suitCards.pop()!);
 				}
 			}
-		}
-	} else {
-		// Random deal for remaining cards
-		for (let playerIdx = 0; playerIdx < 4; playerIdx++) {
-			const hand = hands[playerIdx];
-			const playerName = ["N", "S", "E", "W"][playerIdx];
-			
-			if (fixed_cards?.[playerName]) {
-				hand.addCards(fixed_cards[playerName]);
-			}
 
-			const cardsNeeded = 13 - hand.cards.length;
-			for (let i = 0; i < cardsNeeded; i++) {
-				if (allCards.length > 0) {
-					hand.add(allCards.pop()!);
-				}
-			}
+			dealt[playerIdx] = true;
 		}
+	}
+
+	// Collect remaining cards from all suits into a single pool
+	const remainingCards: Card[] = [];
+	for (const suit of Card.SUIT) {
+		remainingCards.push(...cardsBySuit[suit]);
+	}
+	shuffleArray(remainingCards);
+
+	// Deal remaining cards randomly to players without shape constraints
+	for (let playerIdx = 0; playerIdx < 4; playerIdx++) {
+		if (dealt[playerIdx]) continue;
+
+		const hand = hands[playerIdx];
+		const playerName = ["N", "S", "E", "W"][playerIdx];
+
+		if (fixed_cards?.[playerName]) {
+			hand.addCards(fixed_cards[playerName]);
+		}
+
+		const cardsNeeded = 13 - hand.cards.length;
+		if (remainingCards.length < cardsNeeded) {
+			return false;
+		}
+		for (let i = 0; i < cardsNeeded; i++) {
+			hand.add(remainingCards.pop()!);
+		}
+
+		dealt[playerIdx] = true;
 	}
 
 	return true;
@@ -391,13 +346,14 @@ function hasShapeConstraints(filters: Record<string, OneFilterProps>): boolean {
 
 // Main optimized deal function
 function deal(boardSize: number, filters: Record<string, OneFilterProps>): BoardData[] {
+	console.log(filters);
 	const boards: BoardData[] = [];
 	const MAX_ATTEMPTS = 100000;
-	
+
 	// Pre-calculate valid shape distributions if shape constraints are present
 	const useConstrainedDealing = hasShapeConstraints(filters);
-	let validShapeDistributions: Array<Array<{ S: number; H: number; D: number; C: number }> | null> = [];
-	
+	let validShapeDistributions: Array<Array<{ S: number; H: number; D: number; C: number } | null>> = [];
+
 	// Build fixed cards from filter for constraint checking
 	let known_cards: Record<string, Card[]> | undefined = undefined;
 	const { N, S, E, W } = filters;
@@ -413,7 +369,7 @@ function deal(boardSize: number, filters: Record<string, OneFilterProps>): Board
 		if (eCards) known_cards["E"] = eCards;
 		if (wCards) known_cards["W"] = wCards;
 	}
-	
+
 	if (useConstrainedDealing) {
 		validShapeDistributions = generateGlobalShapeDistribution(filters, known_cards);
 		if (validShapeDistributions.length === 0) {
@@ -439,7 +395,7 @@ function deal(boardSize: number, filters: Record<string, OneFilterProps>): Board
 				if (!targetShapes) {
 					continue;
 				}
-				
+
 				const dealSuccess = constrainedDeal(players, known_cards, targetShapes);
 				if (!dealSuccess) {
 					continue;
