@@ -64,6 +64,35 @@ function deserializeCards(cards?: CardData[]): Card[] | undefined {
 	return cards.map(c => new Card(c.suit, c.rank));
 }
 
+// Compute binomial coefficient C(n, k)
+function binom(n: number, k: number): number {
+	if (k < 0 || k > n) return 0;
+	if (k === 0 || k === n) return 1;
+	let result = 1;
+	for (let i = 1; i <= k; i++) {
+		result = result * (n - k + i) / i;
+	}
+	return result;
+}
+
+// Compute natural probability weight for a shape distribution
+// Weight = number of distinct card deals that produce this shape distribution
+// For each suit, iterates over constrained players computing C(remaining, shape[suit])
+function computeDistributionWeight(distribution: Array<{ S: number; H: number; D: number; C: number } | null>): number {
+	const suits: ('S' | 'H' | 'D' | 'C')[] = ['S', 'H', 'D', 'C'];
+	let weight = 1;
+	for (const suit of suits) {
+		let remaining = 13;
+		for (const shape of distribution) {
+			if (shape) {
+				weight *= binom(remaining, shape[suit]);
+				remaining -= shape[suit];
+			}
+		}
+	}
+	return weight;
+}
+
 // Generate all valid shape distributions for a player given ambiguousShape constraints
 function generateValidShapes(ambiguousShape: number[][]): Array<{ S: number; H: number; D: number; C: number }> {
 	const [[minSpades, maxSpades], [minHearts, maxHearts], [minDiamonds, maxDiamonds], [minClubs, maxClubs]] = ambiguousShape;
@@ -378,6 +407,19 @@ function deal(boardSize: number, filters: Record<string, OneFilterProps>): Board
 		}
 	}
 
+	// Pre-compute natural probability weights for weighted random selection
+	const distributionWeights = useConstrainedDealing
+		? validShapeDistributions.map(d => computeDistributionWeight(d))
+		: [];
+	// Normalize to prevent floating point issues with extreme weights
+	let normalizedWeights: number[] = [];
+	let totalNormalizedWeight = 0;
+	if (distributionWeights.length > 0) {
+		const maxW = Math.max(...distributionWeights);
+		normalizedWeights = distributionWeights.map(w => w / maxW);
+		totalNormalizedWeight = normalizedWeights.reduce((a, b) => a + b, 0);
+	}
+
 	for (let boardNum = 1; boardNum <= boardSize; ++boardNum) {
 		let attempts = 0;
 		let success = false;
@@ -390,10 +432,18 @@ function deal(boardSize: number, filters: Record<string, OneFilterProps>): Board
 
 			// Use constrained dealing if we have ambiguous shapes
 			if (useConstrainedDealing) {
-				// Pick a random valid shape distribution
-				const targetShapes = validShapeDistributions[Math.floor(Math.random() * validShapeDistributions.length)]!;
+				// Weighted random selection by natural probability
+				let r = Math.random() * totalNormalizedWeight;
+				let targetShapes: typeof validShapeDistributions[number] | null = null;
+				for (let i = 0; i < normalizedWeights.length; i++) {
+					r -= normalizedWeights[i];
+					if (r <= 0) {
+						targetShapes = validShapeDistributions[i]!;
+						break;
+					}
+				}
 				if (!targetShapes) {
-					continue;
+					targetShapes = validShapeDistributions[validShapeDistributions.length - 1]!;
 				}
 
 				const dealSuccess = constrainedDeal(players, known_cards, targetShapes);
