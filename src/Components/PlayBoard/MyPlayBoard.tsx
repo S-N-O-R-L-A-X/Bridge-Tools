@@ -67,6 +67,23 @@ function runDDS(pbn: string): (string | number)[][] {
   return t;
 }
 
+function getBestSideTricks(table: (string | number)[][], side: "NS" | "EW"): number {
+  if (side === "NS") {
+    const rows = [0, 1];
+    let best = 0;
+    for (const r of rows)
+      for (let c = 0; c < 5; c++)
+        best = Math.max(best, table[r][c] as number);
+    return best;
+  }
+  const rows = [2, 3];
+  let best = 0;
+  for (const r of rows)
+    for (let c = 0; c < 5; c++)
+      best = Math.max(best, table[r][c] as number);
+  return best;
+}
+
 export default function MyPlayBoard() {
   const [board, setBoard] = useState(() => {
     const b = new Board(Math.floor(Math.random() * 16));
@@ -78,9 +95,8 @@ export default function MyPlayBoard() {
   const [trickNumber, setTrickNumber] = useState(0);
   const [currentPlayer, setCurrentPlayer] = useState<Position>("W");
   const [ddsTable, setDdsTable] = useState<(string | number)[][] | null>(null);
-  const [ddsLoading, setDdsLoading] = useState(false);
-  const [previewCard, setPreviewCard] = useState<{ suit: string; rank: string } | null>(null);
-  const [previewDDS, setPreviewDDS] = useState<(string | number)[][] | null>(null);
+  const [baselineTricks, setBaselineTricks] = useState<number | null>(null);
+  const [cardTricks, setCardTricks] = useState<Record<string, number>>({});
 
   const remainingHands = useMemo(() => {
     const positions: Position[] = ["N", "S", "E", "W"];
@@ -98,32 +114,53 @@ export default function MyPlayBoard() {
   }, [board, playedCards]);
 
   useEffect(() => {
-    if (playedCards.length === 0) {
-      setDdsTable(null);
-      return;
-    }
-    setDdsLoading(true);
+    const pbn = generateRemainingPBN(board, playedCards);
     const id = setTimeout(() => {
       try {
-        const pbn = generateRemainingPBN(board, playedCards);
         if (typeof calcDDTable === "function") setDdsTable(runDDS(pbn));
       } catch { }
-      setDdsLoading(false);
     }, 50);
     return () => clearTimeout(id);
   }, [board, playedCards]);
 
   useEffect(() => {
-    if (!previewCard) { setPreviewDDS(null); return; }
-    const id = setTimeout(() => {
+    const cp = currentPlayer;
+    if (!cp || !remainingHands[cp]) return;
+    if (typeof calcDDTable !== "function") return;
+
+    const side = cp === "N" || cp === "S" ? "NS" : "EW";
+    let cancelled = false;
+
+    function ddsPromise(pbn: string): Promise<(string | number)[][]> {
+      return new Promise(resolve => setTimeout(() => resolve(runDDS(pbn)), 0));
+    }
+
+    async function compute() {
+      await new Promise(r => setTimeout(r, 0));
+      if (cancelled) return;
+
       try {
-        const previewCards = [...playedCards, { position: currentPlayer, suit: previewCard.suit, rank: previewCard.rank }];
-        const pbn = generateRemainingPBN(board, previewCards);
-        if (typeof calcDDTable === "function") setPreviewDDS(runDDS(pbn));
-      } catch { }
-    }, 50);
-    return () => clearTimeout(id);
-  }, [previewCard, playedCards, board, currentPlayer]);
+        const baseTable = await ddsPromise(generateRemainingPBN(board, playedCards));
+        if (!cancelled) setBaselineTricks(getBestSideTricks(baseTable, side));
+      } catch { return; }
+
+      const hand = remainingHands[cp];
+      const entries: { key: string; pbn: string }[] = [];
+      for (const s of COLORS)
+        for (const rank of hand[s])
+          entries.push({ key: s + rank, pbn: generateRemainingPBN(board, [...playedCards, { position: cp, suit: s, rank }]) });
+
+      let tables: (string | number)[][][];
+      try { tables = await Promise.all(entries.map(e => ddsPromise(e.pbn))); } catch { return; }
+      if (cancelled) return;
+      const tricks: Record<string, number> = {};
+      entries.forEach((e, i) => { tricks[e.key] = getBestSideTricks(tables[i], side); });
+      setCardTricks(tricks);
+    }
+
+    compute();
+    return () => { cancelled = true; };
+  }, [currentPlayer, playedCards, board]);
 
   const handleCardClick = useCallback((position: Position, suit: string, rank: string) => {
     if (position !== currentPlayer) return;
@@ -136,7 +173,6 @@ export default function MyPlayBoard() {
     const newCurrentTrick = [...currentTrick, newCard];
 
     setPlayedCards(newPlayedCards);
-    setPreviewCard(null);
 
     if (newCurrentTrick.length === 4) {
       const winner = getTrickWinner(newCurrentTrick);
@@ -162,8 +198,8 @@ export default function MyPlayBoard() {
     setTrickNumber(0);
     setCurrentPlayer(b.dealer as Position);
     setDdsTable(null);
-    setPreviewCard(null);
-    setPreviewDDS(null);
+    setBaselineTricks(null);
+    setCardTricks({});
   }, []);
 
   const gameOver = trickNumber >= 13;
@@ -177,24 +213,35 @@ export default function MyPlayBoard() {
 
     return (
       <div className={`hand-area ${pos.toLowerCase()} ${isCurrent ? "active" : ""}`}>
-        <div className="hand-title">{handLabels[pos]}</div>
+        <div className="hand-title">
+          {handLabels[pos]}
+          {isCurrent && baselineTricks !== null && (
+            <span className="baseline-info">不动: {baselineTricks}墩</span>
+          )}
+        </div>
         {COLORS.map(suit => (
           hand[suit].length > 0 && (
             <div key={suit} className="suit-row">
               <span className={`suit-icon ${SUIT_COLORS[suit]}`}>{SUIT_ICONS[suit]}</span>
               <div className="cards-row">
-                {hand[suit].map(rank => (
-                  <button
-                    key={rank}
-                    className={`card-btn ${isCurrent ? "clickable" : ""} ${SUIT_COLORS[suit]}`}
-                    onClick={() => handleCardClick(pos, suit, rank)}
-                    onMouseEnter={() => isCurrent && setPreviewCard({ suit, rank })}
-                    onMouseLeave={() => setPreviewCard(null)}
-                    disabled={!isCurrent}
-                  >
-                    {rank}
-                  </button>
-                ))}
+                {hand[suit].map(rank => {
+                  const tNum = isCurrent ? cardTricks[suit + rank] : undefined;
+                  let diffClass = "";
+                  if (tNum !== undefined && baselineTricks !== null) {
+                    diffClass = tNum > baselineTricks ? "better" : tNum < baselineTricks ? "worse" : "same";
+                  }
+                  return (
+                    <button
+                      key={rank}
+                      className={`card-btn ${isCurrent ? "clickable" : ""} ${SUIT_COLORS[suit]} ${diffClass}`}
+                      onClick={() => handleCardClick(pos, suit, rank)}
+                      disabled={!isCurrent}
+                    >
+                      <span className="card-rank">{rank}</span>
+                      {tNum !== undefined && <span className="card-tricks">{tNum}</span>}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )
@@ -214,6 +261,8 @@ export default function MyPlayBoard() {
     );
   };
 
+  const tricksLeft = 13 - trickNumber - (currentTrick.length > 0 ? 1 : 0);
+
   return (
     <div className="my-playboard">
       <div className="board-header">
@@ -222,40 +271,36 @@ export default function MyPlayBoard() {
         <button className="new-board-btn" onClick={resetBoard}>发新牌</button>
       </div>
 
-      <div className="bridge-table">
-        <div className="hand-n">{renderHand("N")}</div>
-        <div className="hand-w">{renderHand("W")}</div>
-        <div className="trick-area">
-          <div className="trick-grid">
-            <div className="trick-n">{renderTrickCard("N")}</div>
-            <div className="trick-w">{renderTrickCard("W")}</div>
-            <div className="trick-center">
-              {gameOver ? (
-                <span className="trick-label">打牌结束</span>
-              ) : (
-                <span className="trick-label">第 {trickNumber + 1} 墩</span>
-              )}
+      <div className="playboard-body">
+        <div className="bridge-table">
+          <div className="hand-n">{renderHand("N")}</div>
+          <div className="hand-w">{renderHand("W")}</div>
+          <div className="trick-area">
+            <div className="trick-grid">
+              <div className="trick-n">{renderTrickCard("N")}</div>
+              <div className="trick-w">{renderTrickCard("W")}</div>
+              <div className="trick-center">
+                {gameOver ? (
+                  <span className="trick-label">打牌结束</span>
+                ) : (
+                  <span className="trick-label">第 {trickNumber + 1} 墩</span>
+                )}
+              </div>
+              <div className="trick-e">{renderTrickCard("E")}</div>
+              <div className="trick-s">{renderTrickCard("S")}</div>
             </div>
-            <div className="trick-e">{renderTrickCard("E")}</div>
-            <div className="trick-s">{renderTrickCard("S")}</div>
           </div>
+          <div className="hand-e">{renderHand("E")}</div>
+          <div className="hand-s">{renderHand("S")}</div>
         </div>
-        <div className="hand-e">{renderHand("E")}</div>
-        <div className="hand-s">{renderHand("S")}</div>
-      </div>
 
-      <div className="dds-section">
-        <div className="dds-current">
-          <h3>当前四明手分析</h3>
-          {ddsLoading && <span className="dds-loading">计算中...</span>}
-          {ddsTable ? <ShowTricks ddtricks={ddsTable} /> : <span className="dds-hint">点击牌开始打牌后显示</span>}
-        </div>
-        {previewCard && previewDDS && (
-          <div className="dds-preview">
-            <h3>如打 {SUIT_ICONS[previewCard.suit]}{previewCard.rank} 后</h3>
-            <ShowTricks ddtricks={previewDDS} />
+        <div className="dds-corner">
+          <div className="dds-box">
+            <div className="dds-title">全方面四明手</div>
+            {ddsTable ? <ShowTricks ddtricks={ddsTable} /> : <span className="dds-hint">计算中...</span>}
+            {trickNumber > 0 && <div className="dds-subtitle">还剩 {tricksLeft} 墩</div>}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
