@@ -22,8 +22,7 @@ export function analyzeOfflineLegacy(board: Board): Promise<(string | number)[][
   return new Promise((resolve) => {
     // Use setTimeout to yield to the event loop, preventing UI freeze
     setTimeout(() => {
-      // @ts-ignore - calcDDTable is a global function from WASM
-      const res = calcDDTable(convertAllHandsToPBN(board.getAllHands()));
+      const res = (window as any).calcDDTable(convertAllHandsToPBN(board.getAllHands()));
       const table = new Array(4).fill(0).map(() => new Array(5).fill("*"));
       table[0][0] = res["N"]["N"];
       table[0][1] = res["S"]["N"];

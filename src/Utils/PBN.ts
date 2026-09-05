@@ -25,7 +25,7 @@ export function parseHand(hand: Hand) {
 
 export function convertAllHandsToPBN(allHands: Hand[]) {
 	let str = "N:";
-	str += parseHand(allHands[0]) + " " + parseHand(allHands[2]) + " " + parseHand(allHands[1]) + " " + parseHand(allHands[3]);
+	str += parseHand(allHands[0]) + " " + parseHand(allHands[1]) + " " + parseHand(allHands[2]) + " " + parseHand(allHands[3]);
 	return str;
 }
 

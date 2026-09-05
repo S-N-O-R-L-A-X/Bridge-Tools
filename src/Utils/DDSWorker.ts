@@ -4,8 +4,7 @@
 import Board from "../models/Board";
 import { convertAllHandsToPBN } from "./PBN";
 
-// Global reference to calcDDTable (will be available after dds.js loads)
-declare const calcDDTable: (pbn: string) => any;
+// calcDDTable is available as window.calcDDTable after dds.js loads
 
 // Cache for DDS results
 const ddsCache = new Map<string, (string | number)[][]>();
@@ -43,8 +42,7 @@ async function yieldToUI(): Promise<void> {
 
 // Check if DDS is available
 function isDDSAvailable(): boolean {
-	// @ts-ignore
-	return typeof calcDDTable === 'function';
+	return typeof (window as any).calcDDTable === 'function';
 }
 
 // Optimized calculation with chunking
@@ -73,8 +71,7 @@ export async function analyzeOffline(board: Board): Promise<(string | number)[][
 		throw new Error('DDS library not loaded');
 	}
 
-	// @ts-ignore
-	const res = calcDDTable(pbn);
+	const res = (window as any).calcDDTable(pbn);
 	const table = formatDDTable(res);
 
 	// Cache the result

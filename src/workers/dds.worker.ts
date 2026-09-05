@@ -64,8 +64,7 @@ self.onmessage = async (e: MessageEvent<DDSCalculateMessage>) => {
 			return;
 		}
 
-		// @ts-ignore - calcDDTable is a global function from WASM
-		const res = calcDDTable(pbn);
+		const res = (self as any).calcDDTable(pbn);
 		const table = formatDDTable(res);
 		
 		// Cache the result
