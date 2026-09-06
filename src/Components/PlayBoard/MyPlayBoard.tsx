@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import Board from "../../models/Board";
 import Hand from "../../models/Hand";
 import Card from "../../models/Card";
-import { Position, COLORS } from "../../Utils/maps";
+import { Position, COLORS, ColorsShort, TRUMP } from "../../Utils/maps";
 import ShowTricks from "./ShowTricks";
 import "./MyPlayBoard.css";
 
@@ -12,26 +12,79 @@ interface PlayedCard {
   rank: string;
 }
 
+interface Contract {
+  level: number;
+  strain: TRUMP;
+  declarer: Position;
+}
+
 const PLAY_ORDER: Position[] = ["N", "E", "S", "W"];
+const SUIT_ICONS: Record<string, string> = { S: "♠", H: "♥", D: "♦", C: "♣" };
+const SUIT_COLORS: Record<string, string> = { S: "black", H: "red", D: "red", C: "black" };
+const SUIT_NAMES: Record<string, string> = { S: "♠", H: "♥", D: "♦", C: "♣", NT: "NT" };
+const STRAIN_ORDER: TRUMP[] = ["C", "D", "H", "S", "NT"];
+const RANK_ORDER: Record<string, number> = { A: 12, K: 11, Q: 10, J: 9, "10": 8, "9": 7, "8": 6, "7": 5, "6": 4, "5": 3, "4": 2, "3": 1, "2": 0 };
 
 function nextPosition(pos: Position): Position {
   const idx = PLAY_ORDER.indexOf(pos);
   return PLAY_ORDER[(idx + 1) % 4];
 }
 
-function getTrickWinner(trick: PlayedCard[]): Position {
+function getTrickWinner(trick: PlayedCard[], trump: TRUMP): Position {
   if (trick.length === 0) return "N";
   const ledSuit = trick[0].suit;
-  const rankOrder: Record<string, number> = { A: 12, K: 11, Q: 10, J: 9, "10": 8, "9": 7, "8": 6, "7": 5, "6": 4, "5": 3, "4": 2, "3": 1, "2": 0 };
   let best = trick[0];
   for (const c of trick) {
-    if (c.suit === ledSuit && rankOrder[c.rank] > rankOrder[best.rank]) best = c;
+    const cIsTrump = trump !== "NT" && c.suit === trump;
+    const bestIsTrump = trump !== "NT" && best.suit === trump;
+    const ledIsTrump = trump !== "NT" && ledSuit === trump;
+    if (cIsTrump && !bestIsTrump) {
+      best = c;
+    } else if (cIsTrump && bestIsTrump) {
+      if (RANK_ORDER[c.rank] > RANK_ORDER[best.rank]) best = c;
+    } else if (!cIsTrump && !bestIsTrump) {
+      if (c.suit === ledSuit && best.suit === ledSuit && RANK_ORDER[c.rank] > RANK_ORDER[best.rank]) best = c;
+      else if (c.suit === ledSuit && best.suit !== ledSuit) best = c;
+    }
   }
   return best.position;
 }
 
-const SUIT_ICONS: Record<string, string> = { S: "♠", H: "♥", D: "♦", C: "♣" };
-const SUIT_COLORS: Record<string, string> = { S: "black", H: "red", D: "red", C: "black" };
+function mustFollowSuit(hand: Record<string, string[]>, trick: PlayedCard[], trump: TRUMP): Record<string, boolean> {
+  if (trick.length === 0) {
+    const result: Record<string, boolean> = {};
+    for (const s of COLORS) result[s] = hand[s].length > 0;
+    return result;
+  }
+  const ledSuit = trick[0].suit;
+  const hasLedSuit = hand[ledSuit] && hand[ledSuit].length > 0;
+  const result: Record<string, boolean> = {};
+  if (hasLedSuit) {
+    for (const s of COLORS) result[s] = s === ledSuit;
+  } else {
+    const trumpStr = trump !== "NT" ? trump : null;
+    const hasTrump = trumpStr && hand[trumpStr] && hand[trumpStr].length > 0;
+    if (hasTrump && trumpStr) {
+      for (const s of COLORS) result[s] = s === trumpStr;
+    } else {
+      for (const s of COLORS) result[s] = hand[s].length > 0;
+    }
+  }
+  return result;
+}
+
+function getContractTricks(level: number): number {
+  return level + 6;
+}
+
+function formatContract(contract: Contract): string {
+  const strainStr = contract.strain === "NT" ? "NT" : SUIT_NAMES[contract.strain];
+  return `${contract.level}${strainStr} ${contract.declarer}`;
+}
+
+function calcHCP(hand: Hand): number {
+  return hand.points;
+}
 
 const CLOCKWISE: Position[] = ["N", "E", "S", "W"];
 
@@ -67,33 +120,11 @@ function runDDS(pbn: string): (string | number)[][] {
   for (let r = 0; r < 4; r++)
     for (let c = 0; c < 5; c++) {
       const d = res[denoms[c]];
-      if (d == null) {
-        if (DBG) console.warn('[DDS] runDDS: missing denom', denoms[c], 'in res, pbn:', pbn);
-        throw new Error('DDS result missing ' + denoms[c]);
-      }
+      if (d == null) throw new Error('DDS result missing ' + denoms[c]);
       t[r][c] = d[declarers[r]];
     }
   return t;
 }
-
-function getBestSideTricks(table: (string | number)[][], side: "NS" | "EW"): number {
-  if (side === "NS") {
-    const rows = [0, 1];
-    let best = 0;
-    for (const r of rows)
-      for (let c = 0; c < 5; c++)
-        best = Math.max(best, table[r][c] as number);
-    return best;
-  }
-  const rows = [2, 3];
-  let best = 0;
-  for (const r of rows)
-    for (let c = 0; c < 5; c++)
-      best = Math.max(best, table[r][c] as number);
-  return best;
-}
-
-const DBG = true;
 
 export default function MyPlayBoard() {
   const [board, setBoard] = useState(() => {
@@ -101,14 +132,24 @@ export default function MyPlayBoard() {
     b.deal([new Hand(), new Hand(), new Hand(), new Hand()]);
     return b;
   });
+
+  const [contract, setContract] = useState<Contract | null>(null);
   const [playedCards, setPlayedCards] = useState<PlayedCard[]>([]);
   const [currentTrick, setCurrentTrick] = useState<PlayedCard[]>([]);
   const [trickNumber, setTrickNumber] = useState(0);
   const [currentPlayer, setCurrentPlayer] = useState<Position>("W");
+  const [nsTricks, setNsTricks] = useState(0);
+  const [ewTricks, setEwTricks] = useState(0);
   const [ddsTable, setDdsTable] = useState<(string | number)[][] | null>(null);
   const [baselineTricks, setBaselineTricks] = useState<number | null>(null);
   const [cardTricks, setCardTricks] = useState<Record<string, number>>({});
   const [computing, setComputing] = useState(false);
+
+  const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
+  const [selectedStrain, setSelectedStrain] = useState<TRUMP | null>(null);
+  const [selectedDeclarer, setSelectedDeclarer] = useState<Position | null>(null);
+
+  const contractReady = selectedLevel !== null && selectedStrain !== null && selectedDeclarer !== null;
 
   const remainingHands = useMemo(() => {
     const positions: Position[] = ["N", "S", "E", "W"];
@@ -126,6 +167,7 @@ export default function MyPlayBoard() {
   }, [board, playedCards]);
 
   useEffect(() => {
+    if (!contract) return;
     const pbn = generateRemainingPBN(board, playedCards);
     const id = setTimeout(() => {
       try {
@@ -133,9 +175,10 @@ export default function MyPlayBoard() {
       } catch { }
     }, 50);
     return () => clearTimeout(id);
-  }, [board, playedCards]);
+  }, [board, playedCards, contract]);
 
   useEffect(() => {
+    if (!contract) return;
     const cp = currentPlayer;
     if (!cp || !remainingHands[cp]) return;
     if (typeof (window as any).calcDDTable !== "function") return;
@@ -148,13 +191,11 @@ export default function MyPlayBoard() {
     }
 
     function toPBNRank(r: string) { return r === "10" ? "T" : r; }
-    function fromPBNRank(r: string) { return r === "T" ? "10" : r; }
 
     async function compute() {
       setComputing(true);
       setCardTricks({});
       setBaselineTricks(null);
-      if (DBG) console.log('[DDS] compute start', cp, side);
 
       await new Promise(r => setTimeout(r, 0));
       if (cancelled) return;
@@ -163,40 +204,30 @@ export default function MyPlayBoard() {
       try {
         const basePbn = generateRemainingPBN(board, playedCards);
         baseTable = await ddsPromise(basePbn);
-        const bt = getBestSideTricks(baseTable, side);
-        if (DBG) console.log('[DDS] baseline', bt);
-        if (!cancelled) setBaselineTricks(bt);
-      } catch (e) { if (DBG) console.warn('[DDS] baseline failed', e); setComputing(false); return; }
+        const sideRows = side === "NS" ? [0, 1] : [2, 3];
+        let best = 0;
+        for (const r of sideRows)
+          for (let c = 0; c < 5; c++)
+            best = Math.max(best, baseTable[r][c] as number);
+        if (!cancelled) setBaselineTricks(best);
+      } catch { setComputing(false); return; }
 
       await new Promise(r => setTimeout(r, 0));
       if (cancelled) return;
 
       const hand = remainingHands[cp];
       const tricks: Record<string, number> = {};
-
       const nextPlaysFn = (window as any).nextPlays;
       const leaderPbn = generateRemainingPBN(board, playedCards, cp);
       const curTrickCards = currentTrick.map(c => toPBNRank(c.rank) + c.suit);
 
       const denoms = ["N", "S", "H", "D", "C"];
-      const declarers: Position[] = ["N", "S", "E", "W"];
-      const sideRows = side === "NS" ? [0, 1] : [2, 3];
 
       for (const denom of denoms) {
         if (cancelled) return;
-
         let result: any;
-        try {
-          result = nextPlaysFn(leaderPbn, denom, curTrickCards);
-        } catch (e) {
-          if (DBG) console.warn('[DDS] nextPlays failed', denom, e);
-          continue;
-        }
-
-        if (DBG) console.log('[DDS] nextPlays result', denom, result);
-
+        try { result = nextPlaysFn(leaderPbn, denom, curTrickCards); } catch { continue; }
         if (!result || typeof result !== 'object') continue;
-
         const resultPlays = result.plays;
         if (Array.isArray(resultPlays)) {
           for (const play of resultPlays) {
@@ -208,26 +239,43 @@ export default function MyPlayBoard() {
             if (hand[handKey[0] as keyof typeof hand]?.includes(handKey.slice(1))) {
               tricks[handKey] = val;
               setCardTricks({ ...tricks });
-              if (DBG) console.log('[DDS] nextPlays card', handKey, val, 'denom', denom);
             }
           }
         }
         await new Promise(r => setTimeout(r, 0));
       }
 
-      if (DBG) console.log('[DDS] done tricks', tricks);
       if (!cancelled) setComputing(false);
     }
 
     compute();
     return () => { cancelled = true; };
-  }, [currentPlayer, playedCards, board, currentTrick]);
+  }, [currentPlayer, playedCards, board, currentTrick, contract]);
+
+  const handleConfirmContract = useCallback(() => {
+    if (!contractReady) return;
+    const c: Contract = { level: selectedLevel!, strain: selectedStrain!, declarer: selectedDeclarer! };
+    setContract(c);
+    setPlayedCards([]);
+    setCurrentTrick([]);
+    setTrickNumber(0);
+    setNsTricks(0);
+    setEwTricks(0);
+    setDdsTable(null);
+    setBaselineTricks(null);
+    setCardTricks({});
+    setCurrentPlayer(c.declarer);
+  }, [selectedLevel, selectedStrain, selectedDeclarer, contractReady]);
 
   const handleCardClick = useCallback((position: Position, suit: string, rank: string) => {
+    if (!contract) return;
     if (position !== currentPlayer) return;
     const playedMap: Record<string, Set<string>> = { N: new Set(), S: new Set(), E: new Set(), W: new Set() };
     for (const pc of playedCards) playedMap[pc.position].add(pc.suit + pc.rank);
     if (playedMap[position].has(suit + rank)) return;
+
+    const allowed = mustFollowSuit(remainingHands[position], currentTrick, contract.strain);
+    if (!allowed[suit]) return;
 
     const newCard: PlayedCard = { position, suit, rank };
     const newPlayedCards = [...playedCards, newCard];
@@ -236,7 +284,10 @@ export default function MyPlayBoard() {
     setPlayedCards(newPlayedCards);
 
     if (newCurrentTrick.length === 4) {
-      const winner = getTrickWinner(newCurrentTrick);
+      const winner = getTrickWinner(newCurrentTrick, contract.strain);
+      const winnerSide = winner === "N" || winner === "S" ? "NS" : "EW";
+      if (winnerSide === "NS") setNsTricks(t => t + 1);
+      else setEwTricks(t => t + 1);
       setCurrentTrick([]);
       setCurrentPlayer(winner);
       setTrickNumber(t => t + 1);
@@ -244,125 +295,259 @@ export default function MyPlayBoard() {
       setCurrentTrick(newCurrentTrick);
       setCurrentPlayer(nextPosition(position));
     }
-  }, [currentPlayer, playedCards, currentTrick]);
+  }, [currentPlayer, playedCards, currentTrick, contract, remainingHands]);
 
   useEffect(() => {
-    setCurrentPlayer(board.dealer as Position);
+    if (contract) setCurrentPlayer(contract.declarer);
   }, [board]);
 
   const resetBoard = useCallback(() => {
     const b = new Board(Math.floor(Math.random() * 16));
     b.deal([new Hand(), new Hand(), new Hand(), new Hand()]);
     setBoard(b);
+    setContract(null);
     setPlayedCards([]);
     setCurrentTrick([]);
     setTrickNumber(0);
-    setCurrentPlayer(b.dealer as Position);
+    setNsTricks(0);
+    setEwTricks(0);
+    setCurrentPlayer("W");
     setDdsTable(null);
     setBaselineTricks(null);
     setCardTricks({});
     setComputing(false);
+    setSelectedLevel(null);
+    setSelectedStrain(null);
+    setSelectedDeclarer(null);
   }, []);
 
   const gameOver = trickNumber >= 13;
-  const handLabels: Record<Position, string> = { N: "北 (N)", S: "南 (S)", E: "东 (E)", W: "西 (W)" };
+  const handLabels: Record<Position, string> = { N: "N", S: "S", E: "E", W: "W" };
 
   const renderHand = (pos: Position) => {
     const hand = remainingHands[pos];
     if (!hand) return null;
-    const isCurrent = pos === currentPlayer && !gameOver;
-    const totalCards = COLORS.reduce((sum, s) => sum + hand[s].length, 0);
+    const isCurrent = pos === currentPlayer && !gameOver && contract !== null;
 
     return (
-      <div className={`hand-area ${pos.toLowerCase()} ${isCurrent ? "active" : ""}`}>
-        <div className="hand-title">
-          {handLabels[pos]}
-          {isCurrent && baselineTricks !== null && (
-            <span className="baseline-info">不动: {baselineTricks}墩</span>
-          )}
+      <div className={`bridge-seat ${isCurrent ? "bridge-seat-active" : ""}`}>
+        <div className="bridge-seat-name">
+          <span className="bridge-seat-direction">{handLabels[pos]}</span>
         </div>
-        {COLORS.map(suit => (
-          hand[suit].length > 0 && (
-            <div key={suit} className="suit-row">
-              <span className={`suit-icon ${SUIT_COLORS[suit]}`}>{SUIT_ICONS[suit]}</span>
-              <div className="cards-row">
-                {hand[suit].map((rank, ci) => {
-                  const tNum = isCurrent ? cardTricks[suit + rank] : undefined;
-                  let diffClass = "";
-                  if (tNum !== undefined && baselineTricks !== null) {
-                    diffClass = tNum > baselineTricks ? "better" : tNum < baselineTricks ? "worse" : "same";
-                  }
-                  return (
-                    <button
-                      key={rank}
-                      className={`card-btn ${isCurrent ? "clickable" : ""} ${SUIT_COLORS[suit]} ${diffClass}`}
-                      onClick={() => handleCardClick(pos, suit, rank)}
-                      disabled={!isCurrent}
-                    >
-                      <span className="card-rank">{rank}</span>
-                      {tNum !== undefined && <span className="card-tricks">{tNum}</span>}
-                    </button>
-                  );
-                })}
+        <div className="bridge-suit-list">
+          {COLORS.map(suit => (
+            hand[suit].length > 0 && (
+              <div key={suit} className="bridge-suit-line">
+                <span className={`bridge-suit-label ${SUIT_COLORS[suit] === "red" ? "bridge-card-red" : ""}`}>{SUIT_ICONS[suit]}</span>
+                <div className="bridge-card-row">
+                  {hand[suit].map((rank) => {
+                    const tNum = isCurrent ? cardTricks[suit + rank] : undefined;
+                    let diffClass = "";
+                    if (tNum !== undefined && baselineTricks !== null) {
+                      diffClass = tNum > baselineTricks ? "bridge-card-good" : tNum < baselineTricks ? "bridge-card-worse" : "";
+                    }
+                    const canPlay = isCurrent && contract !== null;
+                    const allowed = canPlay ? mustFollowSuit(hand, currentTrick, contract!.strain) : null;
+                    const isAllowed = allowed ? allowed[suit] : false;
+                    return (
+                      <button
+                        key={rank}
+                        className={`bridge-card ${SUIT_COLORS[suit] === "red" ? "bridge-card-red" : ""} ${canPlay && isAllowed ? "bridge-card-clickable" : ""} ${diffClass}`}
+                        onClick={() => handleCardClick(pos, suit, rank)}
+                        disabled={!canPlay || !isAllowed}
+                      >
+                        <span>{rank}</span>
+                        {tNum !== undefined && baselineTricks !== null && (
+                          <em>{tNum > baselineTricks ? `+${tNum - baselineTricks}` : tNum < baselineTricks ? `${tNum - baselineTricks}` : "="}</em>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )
-        ))}
-        {totalCards === 0 && <div className="empty-hand">—</div>}
+            )
+          ))}
+        </div>
       </div>
     );
   };
 
   const renderTrickCard = (pos: Position) => {
     const card = currentTrick.find(c => c.position === pos);
-    if (!card) return <div className={`trick-slot ${pos.toLowerCase()}`}></div>;
+    if (!card) return <div className="played-card-placeholder trick-card-slot"></div>;
     return (
-      <div className={`trick-card ${SUIT_COLORS[card.suit]}`}>
+      <div className={`trick-card-played ${SUIT_COLORS[card.suit] === "red" ? "bridge-card-red" : ""}`}>
         {SUIT_ICONS[card.suit]}{card.rank}
       </div>
     );
   };
 
-  const tricksLeft = 13 - trickNumber - (currentTrick.length > 0 ? 1 : 0);
-
   return (
     <div className="my-playboard">
-      <div className="board-header">
-        <span>第 {board.boardnum} 副牌 | 有局: {board.vul} | 发牌: {board.dealer}</span>
-        {!gameOver && <span className="current-turn">当前出牌: {handLabels[currentPlayer]}</span>}
-        <button className="new-board-btn" onClick={resetBoard}>发新牌</button>
-      </div>
+      <div className="result-layout">
+        <section className="bridge-table">
+          <div className="vul-board">
+            <svg className="vul-board-svg" viewBox="0 0 224 132">
+              <rect x="2" y="2" width="220" height="128" fill="#fff" stroke="#050505" strokeWidth="4" />
+              <polygon fill="#fff" points="4,4 220,4 162,48 62,48" />
+              <polygon fill="#fff" points="220,4 220,128 162,84 162,48" />
+              <polygon fill="#fff" points="4,128 220,128 162,84 62,84" />
+              <polygon fill="#fff" points="4,4 62,48 62,84 4,128" />
+              <line x1="4" y1="4" x2="62" y2="48" stroke="#050505" strokeWidth="4" />
+              <line x1="220" y1="4" x2="162" y2="48" stroke="#050505" strokeWidth="4" />
+              <line x1="4" y1="128" x2="62" y2="84" stroke="#050505" strokeWidth="4" />
+              <line x1="220" y1="128" x2="162" y2="84" stroke="#050505" strokeWidth="4" />
+              <text x="112" y="26" fill="#111" textAnchor="middle" dominantBaseline="middle" fontSize="22" fontWeight="900">
+                {board.vul === "NS" ? "N" : board.vul === "EW" ? "E" : board.vul === "Both" ? "B" : "D"}
+              </text>
+            </svg>
+            <button className="board-number" onClick={resetBoard}>第 {board.boardnum} 副</button>
+          </div>
 
-      <div className="playboard-body">
-        <div className="bridge-table">
-          <div className="hand-n">{renderHand("N")}</div>
-          <div className="hand-w">{renderHand("W")}</div>
-          <div className="trick-area">
+          <div className="seat seat-north">{renderHand("N")}</div>
+          <div className="seat seat-west">{renderHand("W")}</div>
+
+          <div className="trick-center">
             <div className="trick-grid">
-              <div className="trick-n">{renderTrickCard("N")}</div>
-              <div className="trick-w">{renderTrickCard("W")}</div>
-              <div className="trick-center">
-                {gameOver ? (
-                  <span className="trick-label">打牌结束</span>
-                ) : (
-                  <span className="trick-label">第 {trickNumber + 1} 墩</span>
-                )}
-              </div>
-              <div className="trick-e">{renderTrickCard("E")}</div>
-              <div className="trick-s">{renderTrickCard("S")}</div>
+              <div className="trick-card-slot trick-card-north">{renderTrickCard("N")}</div>
+              <div className="trick-card-slot trick-card-west">{renderTrickCard("W")}</div>
+              <div className="trick-card-slot trick-card-east">{renderTrickCard("E")}</div>
+              <div className="trick-card-slot trick-card-south">{renderTrickCard("S")}</div>
             </div>
           </div>
-          <div className="hand-e">{renderHand("E")}</div>
-          <div className="hand-s">{renderHand("S")}</div>
-        </div>
 
-        <div className="dds-corner">
-          <div className="dds-box">
-            <div className="dds-title">全方面四明手</div>
-            {ddsTable ? <ShowTricks ddtricks={ddsTable} /> : <span className="dds-hint">计算中...</span>}
-            {trickNumber > 0 && <div className="dds-subtitle">还剩 {tricksLeft} 墩</div>}
+          <div className="seat seat-east">{renderHand("E")}</div>
+          <div className="seat seat-south">{renderHand("S")}</div>
+
+          {contract && (
+            <div className="table-status table-status-bottom">
+              <span>{formatContract(contract)} | {getContractTricks(contract.level)} 墩</span>
+              <span>NS:{nsTricks} EW:{ewTricks}/{trickNumber}</span>
+            </div>
+          )}
+        </section>
+
+        <section className="contract-panel">
+          <h4 className="contract-panel-title">定约选择</h4>
+
+          <div className="contract-level-grid">
+            {[1, 2, 3, 4, 5, 6, 7].map(level => (
+              <button
+                key={level}
+                className={`analysis-choice ${selectedLevel === level ? "analysis-choice-active" : ""}`}
+                onClick={() => setSelectedLevel(level)}
+              >
+                {level}
+              </button>
+            ))}
           </div>
-        </div>
+
+          <div className="contract-strain-grid">
+            <button
+              className={`analysis-choice ${selectedStrain === "C" ? "analysis-choice-active" : ""}`}
+              onClick={() => setSelectedStrain("C")}
+            >
+              ♣
+            </button>
+            <button
+              className={`analysis-choice analysis-choice-red ${selectedStrain === "D" ? "analysis-choice-active" : ""}`}
+              onClick={() => setSelectedStrain("D")}
+            >
+              ♦
+            </button>
+            <button
+              className={`analysis-choice analysis-choice-red ${selectedStrain === "H" ? "analysis-choice-active" : ""}`}
+              onClick={() => setSelectedStrain("H")}
+            >
+              ♥
+            </button>
+            <button
+              className={`analysis-choice ${selectedStrain === "S" ? "analysis-choice-active" : ""}`}
+              onClick={() => setSelectedStrain("S")}
+            >
+              ♠
+            </button>
+            <button
+              className={`analysis-choice ${selectedStrain === "NT" ? "analysis-choice-active" : ""}`}
+              onClick={() => setSelectedStrain("NT")}
+            >
+              NT
+            </button>
+          </div>
+
+          <div className="contract-declarer-grid">
+            {(["N", "E", "S", "W"] as Position[]).map(pos => (
+              <button
+                key={pos}
+                className={`analysis-choice ${selectedDeclarer === pos ? "analysis-choice-active" : ""}`}
+                onClick={() => setSelectedDeclarer(pos)}
+              >
+                {pos}
+              </button>
+            ))}
+          </div>
+
+          <button
+            className="confirm-contract-btn"
+            onClick={handleConfirmContract}
+            disabled={!contractReady || contract !== null}
+          >
+            {contract ? `已确认: ${formatContract(contract)}` : "确认定约"}
+          </button>
+
+          {contract && (
+            <button className="reset-btn" onClick={resetBoard}>
+              重新发牌
+            </button>
+          )}
+        </section>
+
+        <aside className="result-info-panel">
+          <div className="info-box">
+            <h4 className="info-box-title">四明手分析</h4>
+            {ddsTable ? <ShowTricks ddtricks={ddsTable} /> : <span className="dds-hint">计算中...</span>}
+            {trickNumber > 0 && <div className="dds-subtitle">还剩 {13 - trickNumber} 墩</div>}
+          </div>
+
+          <div className="info-box">
+            <h4 className="info-box-title">大牌点</h4>
+            <table className="hcp-table">
+              <tbody>
+                <tr>
+                  <td></td>
+                  <td>{calcHCP(board.Nhand)}</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>{calcHCP(board.Whand)}</td>
+                  <td></td>
+                  <td>{calcHCP(board.Ehand)}</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>{calcHCP(board.Shand)}</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {contract && (
+            <div className="info-box">
+              <h4 className="info-box-title">当前定约</h4>
+              <div className="contract-display">
+                <span className="contract-level">{contract.level}</span>
+                <span className={`contract-strain ${contract.strain === "H" || contract.strain === "D" ? "bridge-card-red" : ""}`}>
+                  {SUIT_NAMES[contract.strain]}
+                </span>
+                <span className="contract-declarer">{contract.declarer}</span>
+              </div>
+              <div className="contract-target">
+                需要 {getContractTricks(contract.level)} 墩 | 已得 {nsTricks} 墩
+              </div>
+            </div>
+          )}
+        </aside>
       </div>
     </div>
   );
