@@ -196,6 +196,41 @@
 }
 .trick-card-played.bridge-card-red { color: #e74c3c; border-color: #e74c3c; }
 
+.trick-card-winning-slot {
+  position: relative;
+}
+.trick-card-winning-slot .trick-card-played {
+  border-color: #27ae60;
+  box-shadow: 0 0 0 2px #27ae60;
+}
+.trick-card-winner-badge {
+  position: absolute;
+  top: -0.4rem;
+  right: -0.4rem;
+  background: #27ae60;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: bold;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.trick-status-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #333;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0;
+  user-select: none;
+}
+.trick-status-toggle input {
+  cursor: pointer;
+}
+
 /* Contract panel */
 .contract-panel {
   background: #fff;
@@ -416,4 +451,6 @@
   .hcp-table { color: #ddd; }
   .contract-display { color: #ddd; }
   .bridge-card-red { color: #e74c3c; }
+  .trick-status-toggle { color: #ddd; }
+  .trick-card-winning-slot .trick-card-played { border-color: #27ae60; }
 }

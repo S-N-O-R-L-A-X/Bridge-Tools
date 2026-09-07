@@ -148,6 +148,7 @@ export default function MyPlayBoard() {
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [selectedStrain, setSelectedStrain] = useState<TRUMP | null>(null);
   const [selectedDeclarer, setSelectedDeclarer] = useState<Position | null>(null);
+  const [showTrickStatus, setShowTrickStatus] = useState(false);
 
   const contractReady = selectedLevel !== null && selectedStrain !== null && selectedDeclarer !== null;
 
@@ -343,7 +344,7 @@ export default function MyPlayBoard() {
                   {hand[suit].map((rank) => {
                     const tNum = isCurrent ? cardTricks[suit + rank] : undefined;
                     let diffClass = "";
-                    if (tNum !== undefined && baselineTricks !== null) {
+                    if (showTrickStatus && tNum !== undefined && baselineTricks !== null) {
                       diffClass = tNum > baselineTricks ? "bridge-card-good" : tNum < baselineTricks ? "bridge-card-worse" : "";
                     }
                     const canPlay = isCurrent && contract !== null;
@@ -357,7 +358,7 @@ export default function MyPlayBoard() {
                         disabled={!canPlay || !isAllowed}
                       >
                         <span>{rank}</span>
-                        {tNum !== undefined && baselineTricks !== null && (
+                        {showTrickStatus && tNum !== undefined && baselineTricks !== null && (
                           <em>{tNum > baselineTricks ? `+${tNum - baselineTricks}` : tNum < baselineTricks ? `${tNum - baselineTricks}` : "="}</em>
                         )}
                       </button>
@@ -375,9 +376,15 @@ export default function MyPlayBoard() {
   const renderTrickCard = (pos: Position) => {
     const card = currentTrick.find(c => c.position === pos);
     if (!card) return <div className="played-card-placeholder trick-card-slot"></div>;
+    const isWinning = showTrickStatus && currentTrick.length >= 1 && contract
+      ? getTrickWinner(currentTrick, contract.strain) === pos
+      : false;
     return (
-      <div className={`trick-card-played ${SUIT_COLORS[card.suit] === "red" ? "bridge-card-red" : ""}`}>
-        {SUIT_ICONS[card.suit]}{card.rank}
+      <div className={`trick-card-slot ${isWinning ? "trick-card-winning-slot" : ""}`}>
+        <div className={`trick-card-played ${SUIT_COLORS[card.suit] === "red" ? "bridge-card-red" : ""}`}>
+          {SUIT_ICONS[card.suit]}{card.rank}
+        </div>
+        {isWinning && <span className="trick-card-winner-badge">赢</span>}
       </div>
     );
   };
@@ -494,6 +501,15 @@ export default function MyPlayBoard() {
           >
             {contract ? `已确认: ${formatContract(contract)}` : "确认定约"}
           </button>
+
+          <label className="trick-status-toggle">
+            <input
+              type="checkbox"
+              checked={showTrickStatus}
+              onChange={e => setShowTrickStatus(e.target.checked)}
+            />
+            <span>显示每张牌后的赢墩情况</span>
+          </label>
 
           {contract && (
             <button className="reset-btn" onClick={resetBoard}>
