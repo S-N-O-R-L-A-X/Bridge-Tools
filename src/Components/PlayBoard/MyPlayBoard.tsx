@@ -62,13 +62,7 @@ function mustFollowSuit(hand: Record<string, string[]>, trick: PlayedCard[], tru
   if (hasLedSuit) {
     for (const s of COLORS) result[s] = s === ledSuit;
   } else {
-    const trumpStr = trump !== "NT" ? trump : null;
-    const hasTrump = trumpStr && hand[trumpStr] && hand[trumpStr].length > 0;
-    if (hasTrump && trumpStr) {
-      for (const s of COLORS) result[s] = s === trumpStr;
-    } else {
-      for (const s of COLORS) result[s] = hand[s].length > 0;
-    }
+    for (const s of COLORS) result[s] = hand[s].length > 0;
   }
   return result;
 }
@@ -184,73 +178,60 @@ export default function MyPlayBoard() {
     if (!cp || !remainingHands[cp]) return;
     if (typeof (window as any).calcDDTable !== "function") return;
 
-    const side = cp === "N" || cp === "S" ? "NS" : "EW";
-    let cancelled = false;
-
-    function ddsPromise(pbn: string): Promise<(string | number)[][]> {
-      return new Promise((resolve, reject) => setTimeout(() => { try { resolve(runDDS(pbn)); } catch (e) { reject(e); } }, 0));
-    }
+    const contractNow = contract;
 
     function toPBNRank(r: string) { return r === "10" ? "T" : r; }
+    function fromPBNRank(r: string) { return r === "T" ? "10" : r; }
 
-    async function compute() {
-      setComputing(true);
-      setCardTricks({});
-      setBaselineTricks(null);
+    let cancelled = false;
 
-      await new Promise(r => setTimeout(r, 0));
-      if (cancelled) return;
-
-      let baseTable: (string | number)[][];
-      try {
-        const basePbn = generateRemainingPBN(board, playedCards);
-        baseTable = await ddsPromise(basePbn);
-        const sideRows = side === "NS" ? [0, 1] : [2, 3];
-        let best = 0;
-        for (const r of sideRows)
-          for (let c = 0; c < 5; c++)
-            best = Math.max(best, baseTable[r][c] as number);
-        if (!cancelled) setBaselineTricks(best);
-      } catch { setComputing(false); return; }
-
-      await new Promise(r => setTimeout(r, 0));
-      if (cancelled) return;
-
+    function compute() {
       const hand = remainingHands[cp];
       const tricks: Record<string, number> = {};
       const nextPlaysFn = (window as any).nextPlays;
-      const leaderPbn = generateRemainingPBN(board, playedCards, cp);
+      const leader = currentTrick.length > 0 ? currentTrick[0].position : cp;
+      const completedTrickCards = playedCards.filter(c => !currentTrick.includes(c));
+      const leaderPbn = generateRemainingPBN(board, completedTrickCards, leader);
       const curTrickCards = currentTrick.map(c => toPBNRank(c.rank) + c.suit);
+      const trump: string = contractNow.strain === "NT" ? "N" : contractNow.strain;
 
-      const denoms = ["N", "S", "H", "D", "C"];
+      let result: any;
+      try { result = nextPlaysFn(leaderPbn, trump, curTrickCards); } catch { if (!cancelled) setComputing(false); return; }
+      if (!result || typeof result !== 'object') { if (!cancelled) setComputing(false); return; }
 
-      for (const denom of denoms) {
-        if (cancelled) return;
-        let result: any;
-        try { result = nextPlaysFn(leaderPbn, denom, curTrickCards); } catch { continue; }
-        if (!result || typeof result !== 'object') continue;
-        const resultPlays = result.plays;
-        if (Array.isArray(resultPlays)) {
-          for (const play of resultPlays) {
-            if (!play || typeof play !== 'object') continue;
-            const suit = play.suit, rank = play.rank, val = play.score;
-            if (!suit || !rank || typeof val !== 'number') continue;
-            if (!COLORS.includes(suit)) continue;
-            const handKey = suit + rank;
-            if (hand[handKey[0] as keyof typeof hand]?.includes(handKey.slice(1))) {
-              tricks[handKey] = val;
-              setCardTricks({ ...tricks });
-            }
+      const resultPlays = result.plays;
+      if (Array.isArray(resultPlays)) {
+        for (const play of resultPlays) {
+          if (!play || typeof play !== 'object') continue;
+          const suit = play.suit, rank = fromPBNRank(play.rank), val = play.score;
+          if (!suit || !rank || typeof val !== 'number') continue;
+          if (!COLORS.includes(suit)) continue;
+          if (hand[suit as keyof typeof hand]?.includes(rank)) {
+            tricks[suit + rank] = val;
           }
         }
-        await new Promise(r => setTimeout(r, 0));
       }
+
+      if (cancelled) return;
+      setCardTricks(tricks);
+
+      let best = 0;
+      for (const val of Object.values(tricks)) best = Math.max(best, val);
+      setBaselineTricks(best);
 
       if (!cancelled) setComputing(false);
     }
 
-    compute();
-    return () => { cancelled = true; };
+    setComputing(true);
+    setCardTricks({});
+    setBaselineTricks(null);
+
+    const timer = setTimeout(() => {
+      if (cancelled) return;
+      compute();
+    }, 120);
+
+    return () => { cancelled = true; clearTimeout(timer); };
   }, [currentPlayer, playedCards, board, currentTrick, contract]);
 
   const handleConfirmContract = useCallback(() => {
@@ -265,7 +246,7 @@ export default function MyPlayBoard() {
     setDdsTable(null);
     setBaselineTricks(null);
     setCardTricks({});
-    setCurrentPlayer(c.declarer);
+    setCurrentPlayer(nextPosition(c.declarer));
   }, [selectedLevel, selectedStrain, selectedDeclarer, contractReady]);
 
   const handleCardClick = useCallback((position: Position, suit: string, rank: string) => {
@@ -299,7 +280,7 @@ export default function MyPlayBoard() {
   }, [currentPlayer, playedCards, currentTrick, contract, remainingHands]);
 
   useEffect(() => {
-    if (contract) setCurrentPlayer(contract.declarer);
+    if (contract) setCurrentPlayer(nextPosition(contract.declarer));
   }, [board]);
 
   const resetBoard = useCallback(() => {
