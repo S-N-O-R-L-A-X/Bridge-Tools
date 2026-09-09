@@ -135,7 +135,6 @@ export default function MyPlayBoard() {
   const [nsTricks, setNsTricks] = useState(0);
   const [ewTricks, setEwTricks] = useState(0);
   const [ddsTable, setDdsTable] = useState<(string | number)[][] | null>(null);
-  const [baselineTricks, setBaselineTricks] = useState<number | null>(null);
   const [cardTricks, setCardTricks] = useState<Record<string, number>>({});
   const [computing, setComputing] = useState(false);
 
@@ -199,6 +198,8 @@ export default function MyPlayBoard() {
       try { result = nextPlaysFn(leaderPbn, trump, curTrickCards); } catch { if (!cancelled) setComputing(false); return; }
       if (!result || typeof result !== 'object') { if (!cancelled) setComputing(false); return; }
 
+      const alreadyWon = (cp === "N" || cp === "S") ? nsTricks : ewTricks;
+
       const resultPlays = result.plays;
       if (Array.isArray(resultPlays)) {
         for (const play of resultPlays) {
@@ -206,25 +207,25 @@ export default function MyPlayBoard() {
           const suit = play.suit, rank = fromPBNRank(play.rank), val = play.score;
           if (!suit || !rank || typeof val !== 'number') continue;
           if (!COLORS.includes(suit)) continue;
-          if (hand[suit as keyof typeof hand]?.includes(rank)) {
-            tricks[suit + rank] = val;
+          const assign = (r: string) => {
+            if (hand[suit as keyof typeof hand]?.includes(r)) {
+              tricks[suit + r] = val + alreadyWon;
+            }
+          };
+          assign(rank);
+          if (Array.isArray(play.equals)) {
+            for (const eq of play.equals) assign(fromPBNRank(eq));
           }
         }
       }
 
       if (cancelled) return;
       setCardTricks(tricks);
-
-      let best = 0;
-      for (const val of Object.values(tricks)) best = Math.max(best, val);
-      setBaselineTricks(best);
-
       if (!cancelled) setComputing(false);
     }
 
     setComputing(true);
     setCardTricks({});
-    setBaselineTricks(null);
 
     const timer = setTimeout(() => {
       if (cancelled) return;
@@ -232,7 +233,7 @@ export default function MyPlayBoard() {
     }, 120);
 
     return () => { cancelled = true; clearTimeout(timer); };
-  }, [currentPlayer, playedCards, board, currentTrick, contract]);
+  }, [currentPlayer, playedCards, board, currentTrick, contract, nsTricks, ewTricks]);
 
   const handleConfirmContract = useCallback(() => {
     if (!contractReady) return;
@@ -244,7 +245,6 @@ export default function MyPlayBoard() {
     setNsTricks(0);
     setEwTricks(0);
     setDdsTable(null);
-    setBaselineTricks(null);
     setCardTricks({});
     setCurrentPlayer(nextPosition(c.declarer));
   }, [selectedLevel, selectedStrain, selectedDeclarer, contractReady]);
@@ -295,7 +295,6 @@ export default function MyPlayBoard() {
     setEwTricks(0);
     setCurrentPlayer("W");
     setDdsTable(null);
-    setBaselineTricks(null);
     setCardTricks({});
     setComputing(false);
     setSelectedLevel(null);
@@ -325,8 +324,14 @@ export default function MyPlayBoard() {
                   {hand[suit].map((rank) => {
                     const tNum = isCurrent ? cardTricks[suit + rank] : undefined;
                     let diffClass = "";
-                    if (showTrickStatus && tNum !== undefined && baselineTricks !== null) {
-                      diffClass = tNum > baselineTricks ? "bridge-card-good" : tNum < baselineTricks ? "bridge-card-worse" : "";
+                    let showValue: string | null = null;
+                    if (showTrickStatus && tNum !== undefined && contract) {
+                      const thisIsDeclaring = (contract.declarer === "N" || contract.declarer === "S") === (pos === "N" || pos === "S");
+                      const declTricks = thisIsDeclaring ? tNum : 13 - tNum;
+                      const target = getContractTricks(contract.level);
+                      if (declTricks > target) diffClass = "bridge-card-good";
+                      else if (declTricks < target) diffClass = "bridge-card-worse";
+                      showValue = String(tNum);
                     }
                     const canPlay = isCurrent && contract !== null;
                     const allowed = canPlay ? mustFollowSuit(hand, currentTrick, contract!.strain) : null;
@@ -339,8 +344,8 @@ export default function MyPlayBoard() {
                         disabled={!canPlay || !isAllowed}
                       >
                         <span>{rank}</span>
-                        {showTrickStatus && tNum !== undefined && baselineTricks !== null && (
-                          <em>{tNum > baselineTricks ? `+${tNum - baselineTricks}` : tNum < baselineTricks ? `${tNum - baselineTricks}` : "="}</em>
+                        {showValue !== null && (
+                          <em>{showValue}</em>
                         )}
                       </button>
                     );
