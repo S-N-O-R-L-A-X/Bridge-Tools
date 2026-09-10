@@ -333,6 +333,15 @@
   background: #f0f0f0;
 }
 
+.undo-btn {
+  margin-top: 0.5rem;
+}
+.undo-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #fff;
+}
+
 /* Info panel */
 .result-info-panel {
   display: flex;
@@ -445,6 +454,7 @@
   .analysis-choice-active { background: #4a90d9; color: #fff; }
   .confirm-contract-btn { background: #34495e; }
   .reset-btn { background: #333; color: #ddd; border-color: #555; }
+  .undo-btn:disabled { background: #333; color: #777; border-color: #444; }
   .played-card-placeholder { background: #333; border-color: #555; }
   .trick-card-played { background: #333; color: #ddd; }
   .table-status { background: #333; }

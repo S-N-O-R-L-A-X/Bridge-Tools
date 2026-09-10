@@ -18,6 +18,15 @@ interface Contract {
   declarer: Position;
 }
 
+interface PlaySnapshot {
+  playedCards: PlayedCard[];
+  currentTrick: PlayedCard[];
+  trickNumber: number;
+  currentPlayer: Position;
+  nsTricks: number;
+  ewTricks: number;
+}
+
 const PLAY_ORDER: Position[] = ["N", "E", "S", "W"];
 const SUIT_ICONS: Record<string, string> = { S: "♠", H: "♥", D: "♦", C: "♣" };
 const SUIT_COLORS: Record<string, string> = { S: "black", H: "red", D: "red", C: "black" };
@@ -137,6 +146,7 @@ export default function MyPlayBoard() {
   const [ddsTable, setDdsTable] = useState<(string | number)[][] | null>(null);
   const [cardTricks, setCardTricks] = useState<Record<string, number>>({});
   const [computing, setComputing] = useState(false);
+  const [undoStack, setUndoStack] = useState<PlaySnapshot[]>([]);
 
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [selectedStrain, setSelectedStrain] = useState<TRUMP | null>(null);
@@ -246,6 +256,7 @@ export default function MyPlayBoard() {
     setEwTricks(0);
     setDdsTable(null);
     setCardTricks({});
+    setUndoStack([]);
     setCurrentPlayer(nextPosition(c.declarer));
   }, [selectedLevel, selectedStrain, selectedDeclarer, contractReady]);
 
@@ -263,6 +274,8 @@ export default function MyPlayBoard() {
     const newPlayedCards = [...playedCards, newCard];
     const newCurrentTrick = [...currentTrick, newCard];
 
+    setUndoStack(prev => [...prev, { playedCards, currentTrick, trickNumber, currentPlayer, nsTricks, ewTricks }]);
+
     setPlayedCards(newPlayedCards);
 
     if (newCurrentTrick.length === 4) {
@@ -278,6 +291,18 @@ export default function MyPlayBoard() {
       setCurrentPlayer(nextPosition(position));
     }
   }, [currentPlayer, playedCards, currentTrick, contract, remainingHands]);
+
+  const undoPlay = useCallback(() => {
+    if (undoStack.length === 0) return;
+    const snap = undoStack[undoStack.length - 1];
+    setUndoStack(prev => prev.slice(0, -1));
+    setPlayedCards(snap.playedCards);
+    setCurrentTrick(snap.currentTrick);
+    setTrickNumber(snap.trickNumber);
+    setCurrentPlayer(snap.currentPlayer);
+    setNsTricks(snap.nsTricks);
+    setEwTricks(snap.ewTricks);
+  }, [undoStack]);
 
   useEffect(() => {
     if (contract) setCurrentPlayer(nextPosition(contract.declarer));
@@ -296,6 +321,7 @@ export default function MyPlayBoard() {
     setCurrentPlayer("W");
     setDdsTable(null);
     setCardTricks({});
+    setUndoStack([]);
     setComputing(false);
     setSelectedLevel(null);
     setSelectedStrain(null);
@@ -500,6 +526,16 @@ export default function MyPlayBoard() {
           {contract && (
             <button className="reset-btn" onClick={resetBoard}>
               重新发牌
+            </button>
+          )}
+
+          {contract && (
+            <button
+              className="reset-btn undo-btn"
+              onClick={undoPlay}
+              disabled={undoStack.length === 0}
+            >
+              上一步
             </button>
           )}
         </section>
