@@ -92,7 +92,7 @@ function calcHCP(hand: Hand): number {
 const CLOCKWISE: Position[] = ["N", "E", "S", "W"];
 
 function generateRemainingPBN(board: Board, playedCards: PlayedCard[], leader?: Position): string {
-  const positions: Position[] = leader ? CLOCKWISE : ["N", "S", "E", "W"];
+  const positions: Position[] = CLOCKWISE;
   const startIdx = leader ? CLOCKWISE.indexOf(leader) : 0;
   const playedMap: Record<string, Set<string>> = { N: new Set(), S: new Set(), E: new Set(), W: new Set() };
   for (const pc of playedCards) playedMap[pc.position].add(pc.suit + pc.rank);
@@ -172,17 +172,8 @@ export default function MyPlayBoard() {
 
   useEffect(() => {
     if (!contract) return;
-    const pbn = generateRemainingPBN(board, playedCards);
-    const id = setTimeout(() => {
-      try {
-        if (typeof (window as any).calcDDTable === "function") setDdsTable(runDDS(pbn));
-      } catch { }
-    }, 50);
-    return () => clearTimeout(id);
-  }, [board, playedCards, contract]);
-
-  useEffect(() => {
-    if (!contract) return;
+    if (!showTrickStatus) return;
+    if (trickNumber >= 13) return;
     const cp = currentPlayer;
     if (!cp || !remainingHands[cp]) return;
     if (typeof (window as any).calcDDTable !== "function") return;
@@ -205,10 +196,22 @@ export default function MyPlayBoard() {
       const trump: string = contractNow.strain === "NT" ? "N" : contractNow.strain;
 
       let result: any;
-      try { result = nextPlaysFn(leaderPbn, trump, curTrickCards); } catch { if (!cancelled) setComputing(false); return; }
-      if (!result || typeof result !== 'object') { if (!cancelled) setComputing(false); return; }
+      try { result = nextPlaysFn(leaderPbn, trump, curTrickCards); } catch (e) {
+        console.warn('[nextPlays] threw', { leaderPbn, trump, curTrickCards, error: e });
+        if (!cancelled) setComputing(false); return;
+      }
+      if (!result || typeof result !== 'object') {
+        console.warn('[nextPlays] invalid result', { leaderPbn, trump, curTrickCards, result });
+        if (!cancelled) setComputing(false); return;
+      }
+      if (result.error) {
+        console.warn('[nextPlays] solver error', { leaderPbn, trump, curTrickCards, error: result.error, message: result.message });
+        if (!cancelled) setComputing(false); return;
+      }
 
-      const alreadyWon = (cp === "N" || cp === "S") ? nsTricks : ewTricks;
+      const leaderIsNS = leader === "N" || leader === "S";
+      const cpIsNS = cp === "N" || cp === "S";
+      const remaining = 13 - trickNumber;
 
       const resultPlays = result.plays;
       if (Array.isArray(resultPlays)) {
@@ -219,7 +222,9 @@ export default function MyPlayBoard() {
           if (!COLORS.includes(suit)) continue;
           const assign = (r: string) => {
             if (hand[suit as keyof typeof hand]?.includes(r)) {
-              tricks[suit + r] = val + alreadyWon;
+              const cpScore = leaderIsNS !== cpIsNS ? val : remaining - val;
+              const alreadyWon = cpIsNS ? nsTricks : ewTricks;
+              tricks[suit + r] = cpScore + alreadyWon;
             }
           };
           assign(rank);
@@ -243,7 +248,7 @@ export default function MyPlayBoard() {
     }, 120);
 
     return () => { cancelled = true; clearTimeout(timer); };
-  }, [currentPlayer, playedCards, board, currentTrick, contract, nsTricks, ewTricks]);
+  }, [currentPlayer, playedCards, board, currentTrick, contract, nsTricks, ewTricks, showTrickStatus, trickNumber]);
 
   const handleConfirmContract = useCallback(() => {
     if (!contractReady) return;
@@ -258,7 +263,14 @@ export default function MyPlayBoard() {
     setCardTricks({});
     setUndoStack([]);
     setCurrentPlayer(nextPosition(c.declarer));
-  }, [selectedLevel, selectedStrain, selectedDeclarer, contractReady]);
+
+    const pbn = generateRemainingPBN(board, []);
+    setTimeout(() => {
+      try {
+        if (typeof (window as any).calcDDTable === "function") setDdsTable(runDDS(pbn));
+      } catch { }
+    }, 50);
+  }, [selectedLevel, selectedStrain, selectedDeclarer, contractReady, board]);
 
   const handleCardClick = useCallback((position: Position, suit: string, rank: string) => {
     if (!contract) return;
