@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createHashRouter } from 'react-router-dom'
 import App from './App'
-import PlayBoard from './Components/PlayBoard/PlayBoard'
+import MyPlayBoard from './Components/PlayBoard/MyPlayBoard'
 import './index.css'
 import BridgeSolver from './views/AnalysisOnline(abandoned)/BridgeSolverOnline'
 import DealWithHands from './views/Deal/DealWithHands'
@@ -27,7 +27,7 @@ const route_info = [
       {
         path: "/play-board",
         title: "打牌面板",
-        element: <PlayBoard />
+        element: <MyPlayBoard />
       },
       {
         path: "/calc-contract",

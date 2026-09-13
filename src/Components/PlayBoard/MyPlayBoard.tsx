@@ -174,8 +174,6 @@ export default function MyPlayBoard() {
     if (!contract) return;
     if (!showTrickStatus) return;
     if (trickNumber >= 13) return;
-    const cp = currentPlayer;
-    if (!cp || !remainingHands[cp]) return;
     if (typeof (window as any).calcDDTable !== "function") return;
 
     const contractNow = contract;
@@ -186,45 +184,35 @@ export default function MyPlayBoard() {
     let cancelled = false;
 
     function compute() {
-      const hand = remainingHands[cp];
       const tricks: Record<string, number> = {};
       const nextPlaysFn = (window as any).nextPlays;
-      const leader = currentTrick.length > 0 ? currentTrick[0].position : cp;
+      const leader = currentTrick.length > 0 ? currentTrick[0].position : currentPlayer;
       const completedTrickCards = playedCards.filter(c => !currentTrick.includes(c));
-      const leaderPbn = generateRemainingPBN(board, completedTrickCards, leader);
       const curTrickCards = currentTrick.map(c => toPBNRank(c.rank) + c.suit);
       const trump: string = contractNow.strain === "NT" ? "N" : contractNow.strain;
 
-      let result: any;
-      try { result = nextPlaysFn(leaderPbn, trump, curTrickCards); } catch (e) {
-        console.warn('[nextPlays] threw', { leaderPbn, trump, curTrickCards, error: e });
-        if (!cancelled) setComputing(false); return;
-      }
-      if (!result || typeof result !== 'object') {
-        console.warn('[nextPlays] invalid result', { leaderPbn, trump, curTrickCards, result });
-        if (!cancelled) setComputing(false); return;
-      }
-      if (result.error) {
-        console.warn('[nextPlays] solver error', { leaderPbn, trump, curTrickCards, error: result.error, message: result.message });
-        if (!cancelled) setComputing(false); return;
-      }
+      const positions: Position[] = ["N", "E", "S", "W"];
+      for (const pos of positions) {
+        const hand = remainingHands[pos];
+        if (!hand) continue;
+        const handLeader = curTrickCards.length > 0 ? leader : pos;
+        const handPbn = generateRemainingPBN(board, completedTrickCards, handLeader);
 
-      const leaderIsNS = leader === "N" || leader === "S";
-      const cpIsNS = cp === "N" || cp === "S";
-      const remaining = 13 - trickNumber;
+        let result: any;
+        try { result = nextPlaysFn(handPbn, trump, curTrickCards); } catch { continue; }
+        if (!result || typeof result !== 'object' || result.error || !Array.isArray(result.plays)) continue;
 
-      const resultPlays = result.plays;
-      if (Array.isArray(resultPlays)) {
-        for (const play of resultPlays) {
+        const posIsNS = pos === "N" || pos === "S";
+
+        for (const play of result.plays) {
           if (!play || typeof play !== 'object') continue;
           const suit = play.suit, rank = fromPBNRank(play.rank), val = play.score;
           if (!suit || !rank || typeof val !== 'number') continue;
           if (!COLORS.includes(suit)) continue;
           const assign = (r: string) => {
             if (hand[suit as keyof typeof hand]?.includes(r)) {
-              const cpScore = leaderIsNS !== cpIsNS ? val : remaining - val;
-              const alreadyWon = cpIsNS ? nsTricks : ewTricks;
-              tricks[suit + r] = cpScore + alreadyWon;
+              const alreadyWon = posIsNS ? nsTricks : ewTricks;
+              tricks[pos + suit + r] = val + alreadyWon;
             }
           };
           assign(rank);
@@ -259,17 +247,9 @@ export default function MyPlayBoard() {
     setTrickNumber(0);
     setNsTricks(0);
     setEwTricks(0);
-    setDdsTable(null);
     setCardTricks({});
     setUndoStack([]);
     setCurrentPlayer(nextPosition(c.declarer));
-
-    const pbn = generateRemainingPBN(board, []);
-    setTimeout(() => {
-      try {
-        if (typeof (window as any).calcDDTable === "function") setDdsTable(runDDS(pbn));
-      } catch { }
-    }, 50);
   }, [selectedLevel, selectedStrain, selectedDeclarer, contractReady, board]);
 
   const handleCardClick = useCallback((position: Position, suit: string, rank: string) => {
@@ -320,6 +300,20 @@ export default function MyPlayBoard() {
     if (contract) setCurrentPlayer(nextPosition(contract.declarer));
   }, [board]);
 
+  useEffect(() => {
+    if (typeof (window as any).calcDDTable !== "function") return;
+    const pbn = generateRemainingPBN(board, []);
+    let cancelled = false;
+    setTimeout(() => {
+      if (cancelled) return;
+      try {
+        const result = runDDS(pbn);
+        if (!cancelled) setDdsTable(result);
+      } catch { }
+    }, 50);
+    return () => { cancelled = true; };
+  }, [board]);
+
   const resetBoard = useCallback(() => {
     const b = new Board(Math.floor(Math.random() * 16));
     b.deal([new Hand(), new Hand(), new Hand(), new Hand()]);
@@ -360,10 +354,10 @@ export default function MyPlayBoard() {
                 <span className={`bridge-suit-label ${SUIT_COLORS[suit] === "red" ? "bridge-card-red" : ""}`}>{SUIT_ICONS[suit]}</span>
                 <div className="bridge-card-row">
                   {hand[suit].map((rank) => {
-                    const tNum = isCurrent ? cardTricks[suit + rank] : undefined;
+                    const tNum = cardTricks[pos + suit + rank];
                     let diffClass = "";
                     let showValue: string | null = null;
-                    if (showTrickStatus && tNum !== undefined && contract) {
+                    if (showTrickStatus && tNum !== undefined && contract && isCurrent) {
                       const thisIsDeclaring = (contract.declarer === "N" || contract.declarer === "S") === (pos === "N" || pos === "S");
                       const declTricks = thisIsDeclaring ? tNum : 13 - tNum;
                       const target = getContractTricks(contract.level);
