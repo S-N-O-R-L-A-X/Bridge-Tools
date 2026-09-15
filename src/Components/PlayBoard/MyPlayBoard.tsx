@@ -170,6 +170,27 @@ export default function MyPlayBoard() {
     return result as Record<Position, Record<string, string[]>>;
   }, [board, playedCards]);
 
+  const origHands = useMemo(() => {
+    const sortRanks = (ranks: string[]) => [...ranks].sort((a, b) => Card.RANK[a] - Card.RANK[b]);
+    const sortHand = (h: Hand) => {
+      const copy: Record<string, string[]> = { S: [], H: [], D: [], C: [] };
+      for (const s of COLORS) copy[s] = sortRanks(h.hand[s]);
+      return copy;
+    };
+    return {
+      N: sortHand(board.Nhand),
+      S: sortHand(board.Shand),
+      E: sortHand(board.Ehand),
+      W: sortHand(board.Whand),
+    };
+  }, [board]);
+
+  const playedMap = useMemo(() => {
+    const map: Record<string, Set<string>> = { N: new Set(), S: new Set(), E: new Set(), W: new Set() };
+    for (const pc of playedCards) map[pc.position].add(pc.suit + pc.rank);
+    return map;
+  }, [playedCards]);
+
   useEffect(() => {
     if (!contract) return;
     if (!showTrickStatus) return;
@@ -339,7 +360,8 @@ export default function MyPlayBoard() {
 
   const renderHand = (pos: Position) => {
     const hand = remainingHands[pos];
-    if (!hand) return null;
+    const orig = origHands[pos];
+    if (!hand || !orig) return null;
     const isCurrent = pos === currentPlayer && !gameOver && contract !== null;
 
     return (
@@ -349,15 +371,16 @@ export default function MyPlayBoard() {
         </div>
         <div className="bridge-suit-list">
           {COLORS.map(suit => (
-            hand[suit].length > 0 && (
+            orig[suit].length > 0 && (
               <div key={suit} className="bridge-suit-line">
                 <span className={`bridge-suit-label ${SUIT_COLORS[suit] === "red" ? "bridge-card-red" : ""}`}>{SUIT_ICONS[suit]}</span>
                 <div className="bridge-card-row">
-                  {hand[suit].map((rank) => {
+                  {orig[suit].map((rank) => {
+                    const isPlayed = playedMap[pos].has(suit + rank);
                     const tNum = cardTricks[pos + suit + rank];
                     let diffClass = "";
                     let showValue: string | null = null;
-                    if (showTrickStatus && tNum !== undefined && contract && isCurrent) {
+                    if (showTrickStatus && tNum !== undefined && contract && isCurrent && !isPlayed) {
                       const thisIsDeclaring = (contract.declarer === "N" || contract.declarer === "S") === (pos === "N" || pos === "S");
                       const declTricks = thisIsDeclaring ? tNum : 13 - tNum;
                       const target = getContractTricks(contract.level);
@@ -365,18 +388,18 @@ export default function MyPlayBoard() {
                       else if (declTricks < target) diffClass = "bridge-card-worse";
                       showValue = String(tNum);
                     }
-                    const canPlay = isCurrent && contract !== null;
+                    const canPlay = isCurrent && contract !== null && !isPlayed;
                     const allowed = canPlay ? mustFollowSuit(hand, currentTrick, contract!.strain) : null;
                     const isAllowed = allowed ? allowed[suit] : false;
                     return (
                       <button
                         key={rank}
-                        className={`bridge-card ${SUIT_COLORS[suit] === "red" ? "bridge-card-red" : ""} ${canPlay && isAllowed ? "bridge-card-clickable" : ""} ${diffClass}`}
+                        className={`bridge-card ${SUIT_COLORS[suit] === "red" ? "bridge-card-red" : ""} ${isPlayed ? "bridge-card-played" : ""} ${canPlay && isAllowed ? "bridge-card-clickable" : ""} ${diffClass}`}
                         onClick={() => handleCardClick(pos, suit, rank)}
-                        disabled={!canPlay || !isAllowed}
+                        disabled={isPlayed || !canPlay || !isAllowed}
                       >
                         <span>{rank}</span>
-                        {showValue !== null && (
+                        {!isPlayed && showValue !== null && (
                           <em>{showValue}</em>
                         )}
                       </button>

@@ -150,6 +150,13 @@
   background: #fff0f0;
 }
 
+.bridge-card-played {
+  background: #d6d6d6;
+  color: #8a8a8a;
+  border-color: #b0b0b0;
+  opacity: 0.85;
+}
+
 /* Trick grid */
 .trick-grid {
   display: grid;
@@ -449,6 +456,7 @@
   .bridge-card { background: #333; color: #ddd; border-color: #555; }
   .bridge-card-clickable { background: #3a3a3a; }
   .bridge-card-clickable:hover { background: #4a90d9; }
+  .bridge-card-played { background: #1f1f1f; color: #666; border-color: #333; opacity: 0.85; }
   .contract-panel, .info-box { background: #2a2a2a; border-color: #444; }
   .analysis-choice { background: #333; color: #ddd; border-color: #555; }
   .analysis-choice-active { background: #4a90d9; color: #fff; }
