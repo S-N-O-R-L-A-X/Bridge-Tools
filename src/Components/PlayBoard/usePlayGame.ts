@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import Board from "../../models/Board";
 import Hand from "../../models/Hand";
 import Card from "../../models/Card";
@@ -16,8 +16,38 @@ function createBoard(): Board {
   return b;
 }
 
-export default function usePlayGame() {
-  const [board, setBoard] = useState(createBoard);
+function buildBoard(boardnum: number, vul: string, dealer: string, handsData: { cards: Card[]; hand: { [key: string]: string[] }; points: number; shape: { [key: string]: number } }[]): Board {
+  const b = new Board(boardnum);
+  (b as any).vul = vul;
+  (b as any).dealer = dealer;
+  [b.Nhand, b.Shand, b.Ehand, b.Whand] = handsData.map(d => {
+    const h = new Hand();
+    h.cards = [...d.cards];
+    for (const s of COLORS) h.hand[s] = [...d.hand[s]];
+    h.points = d.points;
+    for (const s of COLORS) h.shape[s] = d.shape[s];
+    return h;
+  });
+  return b;
+}
+
+function snapshotBoard(b: Board) {
+  return {
+    boardnum: b.boardnum,
+    vul: b.vul,
+    dealer: b.dealer,
+    hands: [b.Nhand, b.Shand, b.Ehand, b.Whand].map(h => ({
+      cards: [...h.cards],
+      hand: { S: [...h.hand.S], H: [...h.hand.H], D: [...h.hand.D], C: [...h.hand.C] },
+      points: h.points,
+      shape: { S: h.shape.S, H: h.shape.H, D: h.shape.D, C: h.shape.C },
+    })),
+  };
+}
+
+export default function usePlayGame(initialBoard?: Board) {
+  const initialSnapshot = useRef(initialBoard ? snapshotBoard(initialBoard) : null);
+  const [board, setBoard] = useState(() => initialBoard ?? createBoard());
   const [contract, setContract] = useState<Contract | null>(null);
   const [playedCards, setPlayedCards] = useState<PlayedCard[]>([]);
   const [currentTrick, setCurrentTrick] = useState<PlayedCard[]>([]);
@@ -217,7 +247,9 @@ export default function usePlayGame() {
   }, [board]);
 
   const resetBoard = useCallback(() => {
-    setBoard(createBoard());
+    setBoard(initialSnapshot.current
+      ? buildBoard(initialSnapshot.current.boardnum, initialSnapshot.current.vul, initialSnapshot.current.dealer, initialSnapshot.current.hands)
+      : createBoard());
     setContract(null);
     setPlayedCards([]);
     setCurrentTrick([]);

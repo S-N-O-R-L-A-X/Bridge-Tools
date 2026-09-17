@@ -1,4 +1,5 @@
 import { Position } from "../../Utils/maps";
+import Board from "../../models/Board";
 import usePlayGame from "./usePlayGame";
 import HandSeat from "./HandSeat";
 import TrickArea from "./TrickArea";
@@ -7,7 +8,11 @@ import ResultPanel from "./ResultPanel";
 import { formatContract, getContractTricks } from "../../Utils/bridgePlay";
 import "./MyPlayBoard.css";
 
-export default function MyPlayBoard() {
+interface MyPlayBoardProps {
+  board?: Board;
+}
+
+export default function MyPlayBoard({ board: initialBoard }: MyPlayBoardProps = {}) {
   const {
     board, contract, ddsTable,
     currentTrick, trickNumber, currentPlayer, nsTricks, ewTricks,
@@ -16,7 +21,7 @@ export default function MyPlayBoard() {
     gameOver, undoLength,
     setSelectedLevel, setSelectedStrain, setSelectedDeclarer, setShowTrickStatus,
     handleConfirmContract, handleCardClick, undoPlay, resetBoard,
-  } = usePlayGame();
+  } = usePlayGame(initialBoard);
 
   const seatActive = (pos: Position) => pos === currentPlayer && !gameOver && contract !== null;
 
