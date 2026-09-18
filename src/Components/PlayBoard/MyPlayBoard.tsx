@@ -9,21 +9,27 @@ import { formatContract, getContractTricks } from "../../Utils/bridgePlay";
 import "./MyPlayBoard.css";
 
 interface MyPlayBoardProps {
-  board?: Board;
+  board: Board;
+  onNewBoard?: () => void;
 }
 
-export default function MyPlayBoard({ board: initialBoard }: MyPlayBoardProps = {}) {
+export default function MyPlayBoard({ board, onNewBoard }: MyPlayBoardProps) {
   const {
-    board, contract, ddsTable,
+    contract, ddsTable,
     currentTrick, trickNumber, currentPlayer, nsTricks, ewTricks,
     cardTricks, playedMap, remainingHands, origHands,
     selectedLevel, selectedStrain, selectedDeclarer, showTrickStatus, contractReady,
     gameOver, undoLength,
     setSelectedLevel, setSelectedStrain, setSelectedDeclarer, setShowTrickStatus,
     handleConfirmContract, handleCardClick, undoPlay, resetBoard,
-  } = usePlayGame(initialBoard);
+  } = usePlayGame(board);
 
   const seatActive = (pos: Position) => pos === currentPlayer && !gameOver && contract !== null;
+
+  const handleReset = () => {
+    resetBoard();
+    if (onNewBoard) onNewBoard();
+  };
 
   return (
     <div className="my-playboard">
@@ -44,7 +50,7 @@ export default function MyPlayBoard({ board: initialBoard }: MyPlayBoardProps = 
                 {board.vul === "NS" ? "N" : board.vul === "EW" ? "E" : board.vul === "Both" ? "B" : "D"}
               </text>
             </svg>
-            <button className="board-number" onClick={resetBoard}>第 {board.boardnum} 副</button>
+            <button className="board-number" onClick={handleReset}>第 {board.boardnum} 副</button>
           </div>
 
           <div className="seat seat-north">
@@ -85,7 +91,7 @@ export default function MyPlayBoard({ board: initialBoard }: MyPlayBoardProps = 
           undoLength={undoLength}
           handleConfirmContract={handleConfirmContract}
           undoPlay={undoPlay}
-          resetBoard={resetBoard}
+          resetBoard={handleReset}
         />
 
         <ResultPanel

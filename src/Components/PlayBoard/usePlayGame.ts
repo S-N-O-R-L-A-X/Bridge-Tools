@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import Board from "../../models/Board";
 import Hand from "../../models/Hand";
 import Card from "../../models/Card";
@@ -10,44 +10,7 @@ type RemainingHands = Record<Position, HandBySuit>;
 
 const POSITIONS: Position[] = ["N", "S", "E", "W"];
 
-function createBoard(): Board {
-  const b = new Board(Math.floor(Math.random() * 16));
-  b.deal([new Hand(), new Hand(), new Hand(), new Hand()]);
-  return b;
-}
-
-function buildBoard(boardnum: number, vul: string, dealer: string, handsData: { cards: Card[]; hand: { [key: string]: string[] }; points: number; shape: { [key: string]: number } }[]): Board {
-  const b = new Board(boardnum);
-  (b as any).vul = vul;
-  (b as any).dealer = dealer;
-  [b.Nhand, b.Shand, b.Ehand, b.Whand] = handsData.map(d => {
-    const h = new Hand();
-    h.cards = [...d.cards];
-    for (const s of COLORS) h.hand[s] = [...d.hand[s]];
-    h.points = d.points;
-    for (const s of COLORS) h.shape[s] = d.shape[s];
-    return h;
-  });
-  return b;
-}
-
-function snapshotBoard(b: Board) {
-  return {
-    boardnum: b.boardnum,
-    vul: b.vul,
-    dealer: b.dealer,
-    hands: [b.Nhand, b.Shand, b.Ehand, b.Whand].map(h => ({
-      cards: [...h.cards],
-      hand: { S: [...h.hand.S], H: [...h.hand.H], D: [...h.hand.D], C: [...h.hand.C] },
-      points: h.points,
-      shape: { S: h.shape.S, H: h.shape.H, D: h.shape.D, C: h.shape.C },
-    })),
-  };
-}
-
-export default function usePlayGame(initialBoard?: Board) {
-  const initialSnapshot = useRef(initialBoard ? snapshotBoard(initialBoard) : null);
-  const [board, setBoard] = useState(() => initialBoard ?? createBoard());
+export default function usePlayGame(board: Board) {
   const [contract, setContract] = useState<Contract | null>(null);
   const [playedCards, setPlayedCards] = useState<PlayedCard[]>([]);
   const [currentTrick, setCurrentTrick] = useState<PlayedCard[]>([]);
@@ -66,6 +29,29 @@ export default function usePlayGame(initialBoard?: Board) {
   const [showTrickStatus, setShowTrickStatus] = useState(false);
 
   const contractReady = selectedLevel !== null && selectedStrain !== null && selectedDeclarer !== null;
+
+  const clearPlayState = useCallback(() => {
+    setContract(null);
+    setPlayedCards([]);
+    setCurrentTrick([]);
+    setTrickNumber(0);
+    setNsTricks(0);
+    setEwTricks(0);
+    setDdsTable(null);
+    setCardTricks({});
+    setUndoStack([]);
+    setComputing(false);
+    setCurrentPlayer("W");
+    setSelectedLevel(null);
+    setSelectedStrain(null);
+    setSelectedDeclarer(null);
+  }, []);
+
+  useEffect(() => {
+    clearPlayState();
+  }, [board, clearPlayState]);
+
+  const resetBoard = clearPlayState;
 
   const remainingHands = useMemo<RemainingHands>(() => {
     const origHands: Hand[] = [board.Nhand, board.Shand, board.Ehand, board.Whand];
@@ -229,10 +215,6 @@ export default function usePlayGame(initialBoard?: Board) {
   }, [undoStack]);
 
   useEffect(() => {
-    if (contract) setCurrentPlayer(nextPosition(contract.declarer));
-  }, [board]);
-
-  useEffect(() => {
     if (typeof (window as any).calcDDTable !== "function") return;
     const pbn = generateRemainingPBN(board, []);
     let cancelled = false;
@@ -246,30 +228,10 @@ export default function usePlayGame(initialBoard?: Board) {
     return () => { cancelled = true; };
   }, [board]);
 
-  const resetBoard = useCallback(() => {
-    setBoard(initialSnapshot.current
-      ? buildBoard(initialSnapshot.current.boardnum, initialSnapshot.current.vul, initialSnapshot.current.dealer, initialSnapshot.current.hands)
-      : createBoard());
-    setContract(null);
-    setPlayedCards([]);
-    setCurrentTrick([]);
-    setTrickNumber(0);
-    setNsTricks(0);
-    setEwTricks(0);
-    setCurrentPlayer("W");
-    setDdsTable(null);
-    setCardTricks({});
-    setUndoStack([]);
-    setComputing(false);
-    setSelectedLevel(null);
-    setSelectedStrain(null);
-    setSelectedDeclarer(null);
-  }, []);
-
   const gameOver = trickNumber >= 13;
 
   return {
-    board, contract, ddsTable, cardTricks, computing,
+    contract, ddsTable, cardTricks, computing,
     currentTrick, trickNumber, currentPlayer, nsTricks, ewTricks,
     playedCards, playedMap, remainingHands, origHands,
     selectedLevel, selectedStrain, selectedDeclarer, showTrickStatus, contractReady,
