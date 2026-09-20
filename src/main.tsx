@@ -9,6 +9,8 @@ import './index.css'
 import BridgeSolver from './views/AnalysisOnline(abandoned)/BridgeSolverOnline'
 import DealWithHands from './views/Deal/DealWithHands'
 import CalculateContract from './views/CalculateContract/CalculateContract'
+import ManualBoardInput from './views/ManualBoard/ManualBoardInput'
+import { loadManualBoard, makeBoardFromManual, clearManualBoard } from './Utils/manualBoard'
 
 function createDealtBoard(): Board {
   const b = new Board(Math.floor(Math.random() * 16));
@@ -16,9 +18,26 @@ function createDealtBoard(): Board {
   return b;
 }
 
+function loadSavedManualBoard(): Board | null {
+  const manual = loadManualBoard();
+  if (!manual) return null;
+  try {
+    return makeBoardFromManual(manual);
+  } catch {
+    return null;
+  }
+}
+
+function initBoard(): Board {
+  return loadSavedManualBoard() ?? createDealtBoard();
+}
+
 function PlayBoardPage() {
-  const [board, setBoard] = React.useState(createDealtBoard);
-  const handleNewBoard = () => setBoard(createDealtBoard());
+  const [board, setBoard] = React.useState<Board>(initBoard);
+  const handleNewBoard = () => {
+    clearManualBoard();
+    setBoard(createDealtBoard());
+  };
   return <MyPlayBoard board={board} onNewBoard={handleNewBoard} />;
 }
 
@@ -42,6 +61,11 @@ const route_info = [
         path: "/play-board",
         title: "打牌面板",
         element: <PlayBoardPage />
+      },
+      {
+        path: "/manual-board",
+        title: "手动输入牌",
+        element: <ManualBoardInput />
       },
       {
         path: "/calc-contract",
