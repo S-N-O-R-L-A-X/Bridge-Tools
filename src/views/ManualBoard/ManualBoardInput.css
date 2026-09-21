@@ -40,6 +40,28 @@
   border-radius: 10px;
   padding: 0.7rem;
   min-width: 0;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.manual-seat:not(.manual-seat-active) {
+  cursor: pointer;
+}
+
+.manual-seat:not(.manual-seat-active):hover {
+  border-color: #4a90d9;
+  box-shadow: 0 1px 6px rgba(74, 144, 217, 0.25);
+}
+
+.manual-seat-active {
+  border-color: #4a90d9;
+  box-shadow: 0 2px 10px rgba(74, 144, 217, 0.3);
+}
+
+.manual-seat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
 }
 
 .manual-seat-title {
@@ -50,7 +72,27 @@
   display: inline-block;
   padding: 0.1rem 0.5rem;
   border-radius: 4px;
-  margin-bottom: 0.5rem;
+}
+
+.manual-seat-collapse {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  background: #fff;
+  color: #555;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.manual-seat-collapse:hover {
+  background: #f0f0f0;
+  border-color: #4a90d9;
+}
+
+.manual-seat-empty {
+  font-size: 0.8rem;
+  color: #aaa;
+  padding: 0.3rem 0 0.2rem;
 }
 
 .manual-suit-row {
@@ -257,6 +299,15 @@
   .manual-board { background: #1a1a1a; }
   .manual-seat { background: #2a2a2a; border-color: #444; }
   .manual-seat-title { background: #444; color: #ddd; }
+  .manual-board-title { color: #ddd; }
+  .manual-board-hint { color: #aaa; }
+  .manual-suit-icon { color: #ddd; }
+  .manual-suit-red { color: #e74c3c; }
+  .manual-seat-collapse { background: #333; color: #ddd; border-color: #555; }
+  .manual-seat-collapse:hover { background: #444; border-color: #4a90d9; }
+  .manual-seat-empty { color: #666; }
+  .manual-seat:not(.manual-seat-active):hover { border-color: #4a90d9; }
+  .manual-seat-active { border-color: #4a90d9; }
   .manual-card-btn { background: #333; color: #ddd; border-color: #555; }
   .manual-card-btn:hover:not(:disabled) { background: #3a3a3a; border-color: #4a90d9; }
   .manual-card-selected { background: #4a90d9; color: #fff; border-color: #4a90d9; }
@@ -269,8 +320,4 @@
   .manual-error-list { background: #2a2a2a; border-color: #444; }
   .manual-clear-btn { background: #333; color: #ddd; border-color: #555; }
   .manual-clear-btn:hover { background: #444; }
-  .manual-board-title { color: #ddd; }
-  .manual-board-hint { color: #aaa; }
-  .manual-suit-icon { color: #ddd; }
-  .manual-suit-red { color: #e74c3c; }
 }

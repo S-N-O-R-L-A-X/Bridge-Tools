@@ -17,6 +17,7 @@ for (const suit of SUITS) for (const rank of RANK2CARD) ALL_CARDS.push(suit + ra
 export default function ManualBoardInput() {
   const navigate = useNavigate();
   const [boardnum, setBoardnum] = useState<number>(Math.floor(Math.random() * 16));
+  const [activePos, setActivePos] = useState<Position | null>(null);
   const [owners, setOwners] = useState<Record<string, Position | null>>(() => {
     const init: Record<string, Position | null> = {};
     for (const key of ALL_CARDS) init[key] = null;
@@ -64,44 +65,59 @@ export default function ManualBoardInput() {
     });
   };
 
-  const renderSeat = (pos: Position) => (
-    <div className="manual-seat">
-      <div className="manual-seat-title">{pos}</div>
-      {SUITS.map((suit) => (
-        <div className="manual-suit-row" key={suit}>
-          <span className={`manual-suit-icon${RED_SUITS.has(suit) ? " manual-suit-red" : ""}`}>{SUIT_ICONS[suit]}</span>
-          <div className="manual-card-row">
-            {RANK2CARD.map((rank) => {
-              const key = suit + rank;
-              const owner = owners[key];
-              const isMine = owner === pos;
-              const taken = owner !== null && owner !== pos;
-              return (
-                <button
-                  key={key}
-                  className={
-                    "manual-card-btn" +
-                    (RED_SUITS.has(suit) ? " manual-card-red" : "") +
-                    (isMine ? " manual-card-selected" : "") +
-                    (taken ? " manual-card-taken" : "")
-                  }
-                  disabled={taken}
-                  onClick={() => handleCard(pos, key)}
-                  title={taken ? `属于 ${owner} 家` : `${SUIT_ICONS[suit]}${rank}`}
-                >
-                  {taken ? owner : rank}
-                </button>
-              );
-            })}
-          </div>
-          <span className="manual-suit-count">{parsed.byPos[pos][suit].length}张</span>
+  const renderSeat = (pos: Position) => {
+    const active = activePos === pos;
+    return (
+      <div className={`manual-seat${active ? " manual-seat-active" : ""}`} onClick={active ? undefined : () => setActivePos(pos)}>
+        <div className="manual-seat-header">
+          <div className="manual-seat-title">{pos}家</div>
+          {active && (
+            <button className="manual-seat-collapse" onClick={() => setActivePos(null)}>收起</button>
+          )}
         </div>
-      ))}
-      <div className="manual-seat-meta">
-        {parsed.counts[pos]}张 {parsed.byPos[pos].S.length}{parsed.byPos[pos].H.length}{parsed.byPos[pos].D.length}{parsed.byPos[pos].C.length}牌型 · {parsed.hcp[pos]}点
+        {active ? (
+          SUITS.map((suit) => (
+            <div className="manual-suit-row" key={suit}>
+              <span className={`manual-suit-icon${RED_SUITS.has(suit) ? " manual-suit-red" : ""}`}>{SUIT_ICONS[suit]}</span>
+              <div className="manual-card-row">
+                {RANK2CARD.map((rank) => {
+                  const key = suit + rank;
+                  const owner = owners[key];
+                  const isMine = owner === pos;
+                  const taken = owner !== null && owner !== pos;
+                  return (
+                    <button
+                      key={key}
+                      className={
+                        "manual-card-btn" +
+                        (RED_SUITS.has(suit) ? " manual-card-red" : "") +
+                        (isMine ? " manual-card-selected" : "") +
+                        (taken ? " manual-card-taken" : "")
+                      }
+                      disabled={taken}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCard(pos, key);
+                      }}
+                      title={taken ? `属于 ${owner} 家` : `${SUIT_ICONS[suit]}${rank}`}
+                    >
+                      {taken ? owner : rank}
+                    </button>
+                  );
+                })}
+              </div>
+              <span className="manual-suit-count">{parsed.byPos[pos][suit].length}张</span>
+            </div>
+          ))
+        ) : (
+          <div className="manual-seat-empty">点击此处输入该家牌张</div>
+        )}
+        <div className="manual-seat-meta">
+          {parsed.counts[pos]}张 {parsed.byPos[pos].S.length}{parsed.byPos[pos].H.length}{parsed.byPos[pos].D.length}{parsed.byPos[pos].C.length}牌型 · {parsed.hcp[pos]}点
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const handleStart = () => {
     if (!parsed.valid) return;
@@ -114,7 +130,7 @@ export default function ManualBoardInput() {
     <div className="manual-board">
       <h2 className="manual-board-title">手动摆牌</h2>
       <p className="manual-board-hint">
-        点击各家座位中的牌张按钮即可为该国分配/取消该牌，被其他家占用的牌会显示归属字母。每家选满 13 张后即可开始打牌。
+        点击四家座位切换到对应家的牌张输入区，点击牌张按钮即可为该国分配/取消该牌，被其他家占用的牌会显示归属字母。每家选满 13 张后即可开始打牌。
       </p>
 
       <div className="manual-layout">
