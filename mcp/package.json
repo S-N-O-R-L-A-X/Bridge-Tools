@@ -1,0 +1,13 @@
+{
+  "name": "bridge-mcp",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "MCP server for bridge double-dummy analysis",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0"
+  }
+}
