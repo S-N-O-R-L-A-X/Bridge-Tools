@@ -11,6 +11,67 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { calculateDoubleDummyTable, getNextPlays } from "./ddsCore.js";
+import { dealHands } from "./dealCore.js";
+
+const ONE_HAND_FILTER_SCHEMA = {
+  type: "object",
+  properties: {
+    points: {
+      type: "array",
+      items: { type: "number" },
+      minItems: 2,
+      maxItems: 2,
+      description: "HCP range [min, max] inclusive.",
+    },
+    shapes: {
+      type: "array",
+      items: { type: "number" },
+      minItems: 4,
+      maxItems: 4,
+      description: "Exact distribution [S, H, D, C], must sum to 13, e.g. [5,3,3,2].",
+    },
+    ambiguousShape: {
+      type: "array",
+      items: {
+        type: "array",
+        items: { type: "number" },
+        minItems: 2,
+        maxItems: 2,
+        description: "per-suit [min, max]",
+      },
+      minItems: 4,
+      maxItems: 4,
+      description:
+        "Per-suit count ranges [[minS,maxS],[minH,maxH],[minD,maxD],[minC,maxC]], e.g. [[5,6],[3,4],[2,3],[1,3]].",
+    },
+    maxsuit: {
+      type: "number",
+      description: "Longest suit must be at most this many cards.",
+    },
+    minsuit: {
+      type: "number",
+      description: "Shortest suit must be at least this many cards.",
+    },
+    havesuit: {
+      type: "array",
+      items: { type: "number" },
+      description: "Hand must contain a suit with one of these lengths, e.g. [4,5] means a 4- or 5-card suit.",
+    },
+    solid: {
+      type: "boolean",
+      description: "Longest suit must contain at least 3 of A/K/Q/J.",
+    },
+    maxace: { type: "number", description: "At most this many aces." },
+    minace: { type: "number", description: "At least this many aces." },
+    cards: {
+      type: "array",
+      items: { type: "string" },
+      description:
+        'Known/fixed cards held by this seat, as rank-then-suit codes e.g. ["AS","KD","TS"] (T = 10).',
+    },
+  },
+  additionalProperties: false,
+};
 
 const STRAINS = ["N", "S", "H", "D", "C"];
 
@@ -103,6 +164,42 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ["pbn", "trump", "plays"],
         },
       },
+      {
+        name: "deal_hands",
+        description:
+          "Generate random bridge deals (hands) subject to per-seat constraints " +
+          "like HCP range, exact shape, shape ranges, longest/shortest suit, " +
+          "aces, and known fixed cards. Same engine as the web app's Deal page. " +
+          "Returns one PBN-format deal per board plus a per-hand summary " +
+          "(points, shape). Randomness is genuine; ask for more boards to get " +
+          "more hands, or pair the result with analyze_double_dummy.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            boardSize: {
+              type: "number",
+              minimum: 1,
+              maximum: 100,
+              default: 1,
+              description: "How many deals/boards to generate (default 1).",
+            },
+            filters: {
+              type: "object",
+              properties: {
+                N: { ...ONE_HAND_FILTER_SCHEMA, description: "North hand constraints" },
+                S: { ...ONE_HAND_FILTER_SCHEMA, description: "South hand constraints" },
+                E: { ...ONE_HAND_FILTER_SCHEMA, description: "East hand constraints" },
+                W: { ...ONE_HAND_FILTER_SCHEMA, description: "West hand constraints" },
+              },
+              additionalProperties: false,
+              description:
+                "Optional per-seat constraints. Omit a seat to deal it freely. " +
+                "With no shape constraints at all it just deals random hands.",
+            },
+          },
+          required: [],
+        },
+      },
     ],
   };
 });
@@ -136,6 +233,37 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               text:
                 `Double-dummy best plays for the trick (trump ${args.trump}):\n` +
                 JSON.stringify(res, null, 2),
+            },
+          ],
+        };
+      }
+      case "deal_hands": {
+        const boardSize = args.boardSize ?? 1;
+        const filters = args.filters || {};
+        const boards = dealHands(boardSize, filters);
+
+        const lines = boards.map((b) => {
+          const seats = ["N", "S", "E", "W"].map(
+            (seat) => {
+              const h = b[seat];
+              const shape = `${h.shape.S}-${h.shape.H}-${h.shape.D}-${h.shape.C}`;
+              return `${seat}: ${shape} (${h.points} HCP)`;
+            }
+          );
+          return [
+            `Board ${b.boardnum} — dealer ${b.dealer}, vul ${b.vul}`,
+            `PBN: ${b.pbn}`,
+            ...seats.map((s) => "  " + s),
+          ].join("\n");
+        });
+
+        return {
+          content: [
+            {
+              type: "text",
+              text:
+                `Dealt ${boards.length} board(s):\n\n` +
+                lines.join("\n\n"),
             },
           ],
         };

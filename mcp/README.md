@@ -11,8 +11,9 @@
 | --- | --- |
 | `analyze_double_dummy(pbn)` | 给定完整 52 张牌局（PBN），计算每一花色定约下每一家（N/S/E/W）全部明手的最佳可得墩数 —— 双明手最优解，精确而非估计。 |
 | `next_plays(pbn, trump, plays)` | 首墩/某一墩的引牌分析：给定牌局+将牌+引牌方已出的牌（可空），返回该引牌方每张可能出牌的双明手得分。 |
+| `deal_hands(boardSize, filters)` | 按每家特征（HCP 区间 / 固定牌型 / 模糊牌型区间 / 最长最短门 / 特定花色长度 / 尖张数 / 已知亮牌）随机发牌，返回 PBN + 各家点力与牌型。与网页端 Deal 页面同一套算法。 |
 
-引擎复用 web 版同一套 DDS 编译产物：`../public/out.js`（内联 wasm）+ `../public/dds.js`，在 Node 里用 `vm` 加载，不重复构建。
+引擎复用 web 版同一套 DDS 编译产物：`../public/out.js`（内联 wasm）+ `../public/dds.js`，在 Node 里用 `vm` 加载，不重复构建。`deal_hands` 则复用 `src/workers/deal.worker.ts` 的发牌逻辑（`mcp/dealCore.js` 内的纯 JS 移植）。
 
 ## 运行
 
@@ -63,13 +64,27 @@ N:AKQJT98.AKQJ.32. 54.32.54.KQJT9 6.KQJT98.AKQJ. AKQ
 
 ```json
 {"name":"analyze_double_dummy","arguments":{"pbn":"N:KS..A..."}}
+{"name":"deal_hands","arguments":{"boardSize":2,"filters":{"N":{"points":[15,17],"ambiguousShape":[[5,5],[3,4],[2,4],[2,3]]},"S":{"points":[0,10],"cards":["AS","KD"]}}}}
 ```
 
-DDS 忙时单次求解在毫秒/十毫秒级；结果缓存由 `dds.js` 内部 cache 自动完成（同 PBN 只算一次）。
+`filters` 内的每家门口字段（均可省略）：
+
+| 字段 | 含义 |
+| --- | --- |
+| `points` | HCP 区间 `[min, max]` |
+| `shapes` | 固定牌型 `[S,H,D,C]`，四门和须为 13 |
+| `ambiguousShape` | 每门张数范围 `[[minS,maxS],[minH,maxH],[minD,maxD],[minC,maxC]]` |
+| `maxsuit` / `minsuit` | 最长 / 最短门张数的上下限 |
+| `havesuit` | 必须有某一门长度落在给定集合，如 `[4,5]` |
+| `solid` | 最长门至少含 A/K/Q/J 中的 3 张 |
+| `maxace` / `minace` | A 数量上限 / 下限 |
+| `cards` | 已知亮出的牌，如 `["AS","KD","TS"]`（T=10） |
+
+DDS 忙时单次求解在毫秒/十毫秒级；结果缓存由 `dds.js` 内部 cache 自动完成（同 PBN 只算一次）。发牌服从约束时可能重试多次，单副在 <100ms 量级（求解慢时以毫秒/十毫秒计）。
 
 ## TODO / 扩展思路
 
-- [ ] `deal_hands`（按约束随机发牌，复用 `src/workers/deal.worker.ts` 逻辑）
+- [x] `deal_hands`（按约束随机发牌，复用 `src/workers/deal.worker.ts` 逻辑）
 - [ ] `suit_probability`（某分布/关键张位置的概率，复用 `src/Components/Probability/*` 的算法）
 - [ ] `render_pbn`（把 PBN 渲染成 ASCII 桥牌竖排，供模型直观展示给用户）
 - [ ] SSE / streamable HTTP 传输（供远程部署）
