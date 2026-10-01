@@ -14,15 +14,33 @@ const BOARD_NUMBERS = Array.from({ length: 16 }, (_, i) => i);
 const ALL_CARDS: string[] = [];
 for (const suit of SUITS) for (const rank of RANK2CARD) ALL_CARDS.push(suit + rank);
 
+function emptyInit(): Record<string, Position | null> {
+  const init: Record<string, Position | null> = {};
+  for (const key of ALL_CARDS) init[key] = null;
+  return init;
+}
+
+/** 若只剩 13 张牌且恰好有一家一张未输入，则把这 13 张全部归给该家。 */
+function autoFillLastSeat(next: Record<string, Position | null>): Record<string, Position | null> {
+  const counts: Record<Position, number> = { N: 0, S: 0, E: 0, W: 0 };
+  let assigned = 0;
+  for (const pos of Object.values(next)) {
+    if (!pos) continue;
+    counts[pos] += 1;
+    assigned += 1;
+  }
+  const empty = POSITIONS.filter((pos) => counts[pos] === 0);
+  if (assigned !== 39 || empty.length !== 1) return next;
+  const target = empty[0];
+  for (const key of ALL_CARDS) if (next[key] === null) next[key] = target;
+  return next;
+}
+
 export default function ManualBoardInput() {
   const navigate = useNavigate();
   const [boardnum, setBoardnum] = useState<number>(Math.floor(Math.random() * 16));
   const [activePos, setActivePos] = useState<Position | null>(null);
-  const [owners, setOwners] = useState<Record<string, Position | null>>(() => {
-    const init: Record<string, Position | null> = {};
-    for (const key of ALL_CARDS) init[key] = null;
-    return init;
-  });
+  const [owners, setOwners] = useState<Record<string, Position | null>>(emptyInit);
 
   const parsed = useMemo(() => {
     const byPos: Record<Position, RanksBySuit> = { N: { S: [], H: [], D: [], C: [] }, S: { S: [], H: [], D: [], C: [] }, E: { S: [], H: [], D: [], C: [] }, W: { S: [], H: [], D: [], C: [] } };
@@ -49,20 +67,18 @@ export default function ManualBoardInput() {
   }, [owners]);
 
   const handleCard = (pos: Position, key: string) => {
+    const newCount = parsed.counts[pos] + (owners[key] === pos ? -1 : 1);
     setOwners((prev) => {
       const next = { ...prev };
       if (next[key] === null) next[key] = pos;
       else if (next[key] === pos) next[key] = null;
-      return next;
+      return autoFillLastSeat(next);
     });
+    if (newCount === 13) setActivePos(null);
   };
 
   const handleClear = () => {
-    setOwners(() => {
-      const init: Record<string, Position | null> = {};
-      for (const key of ALL_CARDS) init[key] = null;
-      return init;
-    });
+    setOwners(emptyInit);
   };
 
   const renderSeat = (pos: Position) => {
@@ -130,7 +146,7 @@ export default function ManualBoardInput() {
     <div className="manual-board">
       <h2 className="manual-board-title">手动摆牌</h2>
       <p className="manual-board-hint">
-        点击四家座位切换到对应家的牌张输入区，点击牌张按钮即可为该国分配/取消该牌，被其他家占用的牌会显示归属字母。每家选满 13 张后即可开始打牌。
+        点击四家座位切换到对应家的牌张输入区，点击牌张按钮即可为该国分配/取消该牌，被其他家占用的牌会显示归属字母。每家选满 13 张后输入区会自动收起；当只剩 13 张牌且还有一家完全没输入时，剩余牌会自动归给最后一家。
       </p>
 
       <div className="manual-layout">
