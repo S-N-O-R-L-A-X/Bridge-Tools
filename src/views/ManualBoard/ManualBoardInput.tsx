@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "../../models/Card";
 import { ColorsShort, DEALER, Position, RANK2CARD, VUL } from "../../Utils/maps";
-import { saveManualBoard, ManualBoardData, RanksBySuit } from "../../Utils/manualBoard";
+import { saveManualBoard, loadManualBoardDraft, ManualBoardData, RanksBySuit } from "../../Utils/manualBoard";
 import "./ManualBoardInput.css";
 
 const POSITIONS: Position[] = ["N", "S", "E", "W"];
@@ -36,11 +36,27 @@ function autoFillLastSeat(next: Record<string, Position | null>): Record<string,
   return next;
 }
 
+/** 把打牌页传回来的这副牌还原成各家归属表。 */
+function draftToOwners(data: ManualBoardData): Record<string, Position | null> {
+  const next = emptyInit();
+  for (const pos of POSITIONS) {
+    const bySuit = data.hands[pos] ?? ({} as RanksBySuit);
+    for (const suit of SUITS) {
+      for (const rank of bySuit[suit] ?? []) {
+        const key = suit + rank;
+        if (next[key] === null) next[key] = pos;
+      }
+    }
+  }
+  return next;
+}
+
 export default function ManualBoardInput() {
   const navigate = useNavigate();
-  const [boardnum, setBoardnum] = useState<number>(Math.floor(Math.random() * 16));
+  const [draft] = useState<ManualBoardData | null>(loadManualBoardDraft);
+  const [boardnum, setBoardnum] = useState<number>(draft?.boardnum ?? Math.floor(Math.random() * 16));
   const [activePos, setActivePos] = useState<Position | null>(null);
-  const [owners, setOwners] = useState<Record<string, Position | null>>(emptyInit);
+  const [owners, setOwners] = useState<Record<string, Position | null>>(() => (draft ? draftToOwners(draft) : emptyInit()));
 
   const parsed = useMemo(() => {
     const byPos: Record<Position, RanksBySuit> = { N: { S: [], H: [], D: [], C: [] }, S: { S: [], H: [], D: [], C: [] }, E: { S: [], H: [], D: [], C: [] }, W: { S: [], H: [], D: [], C: [] } };

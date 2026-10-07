@@ -11,6 +11,7 @@ export interface ManualBoardData {
 }
 
 const STORAGE_KEY = "bridge-tools:manual-board";
+const DRAFT_KEY = "bridge-tools:manual-board-draft";
 
 export interface ParsedSuitResult {
   ranks: string[];
@@ -83,5 +84,44 @@ export function clearManualBoard(): void {
     localStorage.removeItem(STORAGE_KEY);
   } catch {
     // ignore storage errors
+  }
+}
+
+export function boardToManualData(board: Board): ManualBoardData {
+  const toRanks = (hand: Hand): RanksBySuit => {
+    const bySuit: RanksBySuit = { S: [], H: [], D: [], C: [] };
+    for (const suit of COLORS) bySuit[suit] = [...(hand.hand[suit] ?? [])];
+    return bySuit;
+  };
+  return {
+    boardnum: board.boardnum,
+    hands: {
+      N: toRanks(board.Nhand),
+      S: toRanks(board.Shand),
+      E: toRanks(board.Ehand),
+      W: toRanks(board.Whand),
+    },
+  };
+}
+
+/** 从打牌页把当前这副牌交给手动输入页（一次性草稿，读取后即清除）。 */
+export function saveManualBoardDraft(data: ManualBoardData): void {
+  try {
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+  } catch {
+    // ignore storage errors
+  }
+}
+
+export function loadManualBoardDraft(): ManualBoardData | null {
+  try {
+    const raw = sessionStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    sessionStorage.removeItem(DRAFT_KEY);
+    const data = JSON.parse(raw) as ManualBoardData;
+    if (typeof data !== "object" || data === null || !data.hands) return null;
+    return data;
+  } catch {
+    return null;
   }
 }

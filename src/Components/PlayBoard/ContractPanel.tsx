@@ -16,6 +16,7 @@ interface ContractPanelProps {
   handleConfirmContract: () => void;
   undoPlay: () => void;
   resetBoard: () => void;
+  backToInput: () => void;
 }
 
 export default function ContractPanel(props: ContractPanelProps) {
@@ -23,7 +24,7 @@ export default function ContractPanel(props: ContractPanelProps) {
     selectedLevel, selectedStrain, selectedDeclarer,
     setSelectedLevel, setSelectedStrain, setSelectedDeclarer,
     contract, contractReady, showTrickStatus, setShowTrickStatus,
-    undoLength, handleConfirmContract, undoPlay, resetBoard,
+    undoLength, handleConfirmContract, undoPlay, resetBoard, backToInput,
   } = props;
 
   return (
@@ -119,6 +120,10 @@ export default function ContractPanel(props: ContractPanelProps) {
           上一步
         </button>
       )}
+
+      <button className="reset-btn undo-btn" onClick={backToInput}>
+        回到输入牌
+      </button>
     </section>
   );
 }

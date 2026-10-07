@@ -1,11 +1,13 @@
 import { Position } from "../../Utils/maps";
 import Board from "../../models/Board";
+import { useNavigate } from "react-router-dom";
 import usePlayGame from "./usePlayGame";
 import HandSeat from "./HandSeat";
 import TrickArea from "./TrickArea";
 import ContractPanel from "./ContractPanel";
 import ResultPanel from "./ResultPanel";
 import { formatContract, getContractTricks } from "../../Utils/bridgePlay";
+import { boardToManualData, saveManualBoardDraft } from "../../Utils/manualBoard";
 import "./MyPlayBoard.css";
 
 interface MyPlayBoardProps {
@@ -14,6 +16,7 @@ interface MyPlayBoardProps {
 }
 
 export default function MyPlayBoard({ board, onNewBoard }: MyPlayBoardProps) {
+  const navigate = useNavigate();
   const {
     contract, ddsTable,
     currentTrick, trickNumber, currentPlayer, nsTricks, ewTricks,
@@ -29,6 +32,11 @@ export default function MyPlayBoard({ board, onNewBoard }: MyPlayBoardProps) {
   const handleReset = () => {
     resetBoard();
     if (onNewBoard) onNewBoard();
+  };
+
+  const handleBackToInput = () => {
+    saveManualBoardDraft(boardToManualData(board));
+    navigate("/manual-board");
   };
 
   return (
@@ -92,6 +100,7 @@ export default function MyPlayBoard({ board, onNewBoard }: MyPlayBoardProps) {
           handleConfirmContract={handleConfirmContract}
           undoPlay={undoPlay}
           resetBoard={handleReset}
+          backToInput={handleBackToInput}
         />
 
         <ResultPanel
