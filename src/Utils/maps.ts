@@ -36,6 +36,12 @@ export const DEALER = ["W", "N", "E", "S", "W"];
 export const VUL = ["EW", "None", "NS", "EW", "Both", "NS", "EW", "Both", "None",
   "EW", "Both", "None", "NS", "Both", "None", "NS", "EW",];
 
+/** 局号从 1 开始：第1副双方无局、北家开叫，直接按局号取表。 */
+const boardIndex = (boardnum: number, len: number): number => ((boardnum % len) + len) % len;
+
+export const vulOfBoard = (boardnum: number): string => VUL[boardIndex(boardnum, 16)];
+export const dealerOfBoard = (boardnum: number): string => DEALER[boardIndex(boardnum, 4)];
+
 export const POSITION2NUMBER = { "N": 0, "S": 1, "E": 2, "W": 3 };
 export const PROGRAM_POSITIONS: Position[] = ["N", "S", "E", "W"];
 export const CONTRACTCOLORS: TRUMP[] = ["NT", "S", "H", "D", "C"];

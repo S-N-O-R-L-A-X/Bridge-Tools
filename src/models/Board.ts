@@ -1,6 +1,7 @@
 import Hand from "./Hand";
 import Card from "./Card";
 import { card2idx } from "../Utils/utils";
+import { dealerOfBoard, vulOfBoard } from "../Utils/maps";
 
 function shuffleAlgo(arr: any[]) {
   let n = arr.length, rand;
@@ -13,10 +14,6 @@ function shuffleAlgo(arr: any[]) {
 }
 
 export default class Board {
-  private static readonly VUL = ["EW", "None", "NS", "EW", "Both", "NS", "EW", "Both", "None",
-    "EW", "Both", "None", "NS", "Both", "None", "NS", "EW"];
-  private static readonly DEALER = ["W", "N", "E", "S", "W"];
-
   all_cards: Card[];
   known_cards: Set<number>;
   boardnum: number;
@@ -32,13 +29,11 @@ export default class Board {
   constructor(boardnum: number) {
     this.boardnum = boardnum;
 
-    const vul_key = boardnum % 16;
-    this.vul = Board.VUL[vul_key];
+    this.vul = vulOfBoard(boardnum);
     this.all_cards = [];
     this.known_cards = new Set<number>();
 
-    const dealer_key = boardnum % 4;
-    this.dealer = Board.DEALER[dealer_key];
+    this.dealer = dealerOfBoard(boardnum);
 
     this.Nhand = new Hand();
     this.Shand = new Hand();

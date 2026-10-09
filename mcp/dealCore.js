@@ -9,6 +9,9 @@ const VUL = [
   "EW", "Both", "None", "NS", "Both", "None", "NS", "EW",
 ];
 const DEALER = ["W", "N", "E", "S", "W"];
+// boardNum 是从 1 开始的局号：第1副双方无局、北家开叫，直接按局号取表。
+const vulOfBoard = (boardNum) => VUL[((boardNum % 16) + 16) % 16];
+const dealerOfBoard = (boardNum) => DEALER[((boardNum % 4) + 4) % 4];
 const PLAYERS = ["N", "S", "E", "W"];
 
 function makeCard(suit, rank) {
@@ -539,8 +542,8 @@ export function dealHands(boardSize, filters) {
 
         const board = {
           boardnum: boardNum,
-          vul: VUL[boardNum % 16],
-          dealer: DEALER[boardNum % 4],
+          vul: vulOfBoard(boardNum),
+          dealer: dealerOfBoard(boardNum),
           pbn: convertAllHandsToPBN(hands),
           N: serializeHand(hands[0]),
           S: serializeHand(hands[1]),

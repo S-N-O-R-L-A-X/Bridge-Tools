@@ -13,7 +13,7 @@ import ManualBoardInput from './views/ManualBoard/ManualBoardInput'
 import { loadManualBoard, makeBoardFromManual, clearManualBoard } from './Utils/manualBoard'
 
 function createDealtBoard(): Board {
-  const b = new Board(Math.floor(Math.random() * 16));
+  const b = new Board(Math.floor(Math.random() * 16) + 1);
   b.deal([new Hand(), new Hand(), new Hand(), new Hand()]);
   return b;
 }

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "../../models/Card";
-import { ColorsShort, DEALER, Position, RANK2CARD, VUL } from "../../Utils/maps";
+import { ColorsShort, dealerOfBoard, Position, RANK2CARD, vulOfBoard } from "../../Utils/maps";
 import { saveManualBoard, loadManualBoardDraft, ManualBoardData, RanksBySuit } from "../../Utils/manualBoard";
 import "./ManualBoardInput.css";
 
@@ -9,7 +9,7 @@ const POSITIONS: Position[] = ["N", "S", "E", "W"];
 const SUITS: ColorsShort[] = ["S", "H", "D", "C"];
 const SUIT_ICONS: Record<string, string> = { S: "♠", H: "♥", D: "♦", C: "♣" };
 const RED_SUITS = new Set<string>(["H", "D"]);
-const BOARD_NUMBERS = Array.from({ length: 16 }, (_, i) => i);
+const BOARD_NUMBERS = Array.from({ length: 16 }, (_, i) => i + 1);
 
 const ALL_CARDS: string[] = [];
 for (const suit of SUITS) for (const rank of RANK2CARD) ALL_CARDS.push(suit + rank);
@@ -54,7 +54,7 @@ function draftToOwners(data: ManualBoardData): Record<string, Position | null> {
 export default function ManualBoardInput() {
   const navigate = useNavigate();
   const [draft] = useState<ManualBoardData | null>(loadManualBoardDraft);
-  const [boardnum, setBoardnum] = useState<number>(draft?.boardnum ?? Math.floor(Math.random() * 16));
+  const [boardnum, setBoardnum] = useState<number>(draft?.boardnum ?? Math.floor(Math.random() * 16) + 1);
   const [activePos, setActivePos] = useState<Position | null>(null);
   const [owners, setOwners] = useState<Record<string, Position | null>>(() => (draft ? draftToOwners(draft) : emptyInit()));
 
@@ -177,11 +177,11 @@ export default function ManualBoardInput() {
           <label>副号</label>
           <select className="manual-boardnum-select" value={boardnum} onChange={(e) => setBoardnum(Number(e.target.value))}>
             {BOARD_NUMBERS.map((n) => (
-              <option key={n} value={n}>{n + 1}</option>
+              <option key={n} value={n}>{n}</option>
             ))}
           </select>
           <span className="manual-boardnum-info">
-            有局:{VUL[boardnum % 16]} · 首叫:{DEALER[boardnum % 4]}
+            有局:{vulOfBoard(boardnum)} · 首叫:{dealerOfBoard(boardnum)}
           </span>
         </div>
 
