@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Card from "../../models/Card";
 import { ColorsShort, dealerOfBoard, Position, RANK2CARD, vulOfBoard } from "../../Utils/maps";
 import { saveManualBoard, loadManualBoardDraft, ManualBoardData, RanksBySuit } from "../../Utils/manualBoard";
+import ImageImport from "./ImageImport";
 import "./ManualBoardInput.css";
 
 const POSITIONS: Position[] = ["N", "S", "E", "W"];
@@ -57,6 +58,7 @@ export default function ManualBoardInput() {
   const [boardnum, setBoardnum] = useState<number>(draft?.boardnum ?? Math.floor(Math.random() * 16) + 1);
   const [activePos, setActivePos] = useState<Position | null>(null);
   const [owners, setOwners] = useState<Record<string, Position | null>>(() => (draft ? draftToOwners(draft) : emptyInit()));
+  const [showImport, setShowImport] = useState(false);
 
   const parsed = useMemo(() => {
     const byPos: Record<Position, RanksBySuit> = { N: { S: [], H: [], D: [], C: [] }, S: { S: [], H: [], D: [], C: [] }, E: { S: [], H: [], D: [], C: [] }, W: { S: [], H: [], D: [], C: [] } };
@@ -95,6 +97,24 @@ export default function ManualBoardInput() {
 
   const handleClear = () => {
     setOwners(emptyInit);
+  };
+
+  const handleImport = (hands: Partial<Record<Position, RanksBySuit>>, boardnum: number | null) => {
+    setOwners((prev) => {
+      const next = { ...prev };
+      for (const pos of POSITIONS) {
+        const bySuit = hands[pos];
+        if (!bySuit) continue;
+        for (const suit of SUITS) {
+          for (const rank of bySuit[suit] ?? []) {
+            const key = suit + rank;
+            if (next[key] === null) next[key] = pos;
+          }
+        }
+      }
+      return next;
+    });
+    if (boardnum && boardnum >= 1 && boardnum <= 16) setBoardnum(boardnum);
   };
 
   const renderSeat = (pos: Position) => {
@@ -192,10 +212,13 @@ export default function ManualBoardInput() {
         </div>
 
         <div className="manual-actions">
+          <button className="manual-upload-btn" onClick={() => setShowImport(true)}>上传图片识别</button>
           <button className="manual-clear-btn" onClick={handleClear}>清空</button>
           <button className="manual-start-btn" disabled={!parsed.valid} onClick={handleStart}>开始打牌</button>
         </div>
       </div>
+
+      {showImport && <ImageImport onApply={handleImport} onClose={() => setShowImport(false)} />}
     </div>
   );
 }
