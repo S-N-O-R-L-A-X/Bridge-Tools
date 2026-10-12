@@ -2,8 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Position } from "../../Utils/maps";
 import { RanksBySuit } from "../../Utils/manualBoard";
 import {
+  AI_PRESETS,
   AISettings,
   aiRecognizeImage,
+  getPreset,
   loadAISettings,
   ocrImage,
   parseHandsFromText,
@@ -133,12 +135,35 @@ export default function ImageImport({ onApply, onClose }: ImageImportProps) {
         {mode === "ai" && showSettings && (
           <div className="image-import-settings">
             <label>
+              服务预设
+              <select
+                value={aiSettings.preset}
+                onChange={(e) => {
+                  const preset = getPreset(e.target.value);
+                  setAiSettings({
+                    baseUrl: preset.baseUrl,
+                    model: preset.model,
+                    apiKey: aiSettings.apiKey,
+                    preset: preset.id,
+                    disableThinking: preset.disableThinking ?? false,
+                  });
+                }}
+              >
+                {AI_PRESETS.map((p) => (
+                  <option key={p.id} value={p.id}>{p.label}</option>
+                ))}
+              </select>
+            </label>
+            {getPreset(aiSettings.preset).note && (
+              <div className="image-import-settings-note">{getPreset(aiSettings.preset).note}</div>
+            )}
+            <label>
               接口地址
               <input
                 type="text"
                 value={aiSettings.baseUrl}
                 placeholder="https://api.openai.com/v1"
-                onChange={(e) => setAiSettings({ ...aiSettings, baseUrl: e.target.value })}
+                onChange={(e) => setAiSettings({ ...aiSettings, baseUrl: e.target.value, preset: "custom" })}
               />
             </label>
             <label>
@@ -146,7 +171,7 @@ export default function ImageImport({ onApply, onClose }: ImageImportProps) {
               <input
                 type="password"
                 value={aiSettings.apiKey}
-                placeholder="sk-..."
+                placeholder="自建服务可留空"
                 onChange={(e) => setAiSettings({ ...aiSettings, apiKey: e.target.value })}
               />
             </label>
@@ -155,9 +180,17 @@ export default function ImageImport({ onApply, onClose }: ImageImportProps) {
               <input
                 type="text"
                 value={aiSettings.model}
-                placeholder="gpt-4o-mini"
-                onChange={(e) => setAiSettings({ ...aiSettings, model: e.target.value })}
+                placeholder="Qwen/Qwen3.5-4B"
+                onChange={(e) => setAiSettings({ ...aiSettings, model: e.target.value, preset: "custom" })}
               />
+            </label>
+            <label className="image-import-checkbox-row">
+              <input
+                type="checkbox"
+                checked={aiSettings.disableThinking}
+                onChange={(e) => setAiSettings({ ...aiSettings, disableThinking: e.target.checked })}
+              />
+              关闭模型思考（Qwen3/GLM 等推理模型，加速且输出更干净）
             </label>
           </div>
         )}

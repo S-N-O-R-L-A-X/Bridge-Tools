@@ -377,13 +377,34 @@
   color: #444;
 }
 
-.image-import-settings input {
+.image-import-settings input,
+.image-import-settings select {
   padding: 0.35rem 0.5rem;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 0.82rem;
   background: #fff;
   color: #222;
+}
+
+.image-import-settings-note {
+  grid-column: 1 / -1;
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: -0.15rem;
+}
+
+.image-import-settings .image-import-checkbox-row {
+  grid-template-columns: auto 1fr;
+  font-size: 0.78rem;
+  color: #444;
+  cursor: pointer;
+}
+
+.image-import-settings .image-import-checkbox-row input[type="checkbox"] {
+  width: auto;
+  padding: 0;
+  margin: 0;
 }
 
 .image-import-body {
